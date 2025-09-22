@@ -1,0 +1,61 @@
+= CI0136-II-2025-final-project
+:experimental:
+:nofooter:
+:source-highlighter: pygments
+:sectnums:
+:stem: latexmath
+:toc: auto
+:toclevels: 2
+:xrefstyle: short
+
+== Description
+
+The final project consists of a semester-long collaborative project developed for the _CI-0136 Software Design_ course. It is a **RESTful API backend** written in Python using the Flask library, which serves as a digital recipe book.
+
+The application provides a web API for clients (like Postman or a frontend application) to perform *CRUD* operations (Create, Read, Update, Delete) on a collection of recipes. The development focus is on core software design principles such as *SOLID*, modularity, testing, clean code architecture, and the implementation of common *design patterns*.
+
+As a backend service with no built-in graphical user interface (UI), the emphasis is placed on designing a well-structured, logical API.
+
+== Repository Rules & Contribution Guidelines
+
+To ensure a smooth and collaborative development process for all teams, the following *rules* have been established and must be adhered to by all contributors.
+
+=== Branching Strategy
+
+* *Branch Naming Convention*: All feature branches must be named using the pattern `<team-name>-<feature>`.
++
+Example: `team-alpha-add-recipe`
+* *Base Branches*:
+** `main`: Represents the *production-ready* state of the project. Direct commits are forbidden.
+** `dev`: The main development branch where feature branches are merged for integration. All work is merged here before proceeding to `main`.
+
+=== Pull Request (PR) Process
+
+1.  **Creation**: Once a feature is complete, open a Pull Request from your feature branch (`team-alpha-my-feature`) targeting the `dev` branch.
+2.  *Review Requirements*:
+    * Every PR *must be reviewed and approved* by at least one member from *each* of the other teams before it can be merged.
+    * Each team is responsible for assigning a dedicated member to review PRs from other teams in a timely manner.
+3.  *Definition of Done (DoD)*: A feature is considered complete and a PR can be merged only when it satisfies all following criteria:
+    * The code fulfills the Acceptance Criteria for the user story/feature.
+    * All new code is covered by passing unit tests.
+    * All existing tests continue to pass.
+    * The code follows the project's coding standards (see below).
+    * The PR has received the required approvals.
+
+=== Coding & Collaboration Standards
+
+* *Language*: All code, comments, commit messages, and documentation within the repository must be written in *English*. The use of "Spanglish" or other mixed languages is to be avoided to maintain consistency.
+* *Python Style*: All Python code must adhere to the `PEP 8` style guide. Use linters and formatters to ensure compliance.
+* *Commit Messages*: Write clear, descriptive commit messages (for example: "Add feature to delete recipes" instead of "Added feature").
+* *Testing*: Tests are mandatory. Strive for meaningful tests with high coverage.
+
+== Credits
+
+This project is developed as part of the *CI-0136 Software Design* course during the *II Semester of 2025**.
+
+* *University of Costa Rica*
+* *School of Computer Science and Informatics*
+* *Course*: CI-0136 Software Design
+* *Professor*: Daniel Salazar Mora
+
+This is a collaborative effort, and *all students* of the course are contributing to the development of the recipe book.
