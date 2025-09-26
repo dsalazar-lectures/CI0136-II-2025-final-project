@@ -12,7 +12,7 @@ def validate_request_data(data, required_fields):
     for field in required_fields:
         if field not in data:
             return False, jsonify, ({'error': f'Missing field: {field}'}), 400
-    
+
     return True, None
 
 
@@ -35,3 +35,19 @@ def register():
         return jsonify({'error': message}), 400
 
     return jsonify({'message': message, 'user': user.to_dict()}), 201
+
+
+@auth_bp.route('/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    required_fields = ['username', 'password']
+
+    is_valid, error_response = validate_request_data(data, required_fields)
+    if not is_valid:
+        return error_response
+
+    user = user_manager.get_user_by_username(data['username'])
+    if not user or user.password != data['password']:
+        return jsonify({'error': 'Invalid username or password'}), 401
+
+    return jsonify({'message': 'Login successful', 'user': user.to_dict()}), 200
