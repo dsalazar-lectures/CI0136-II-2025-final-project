@@ -1,5 +1,5 @@
 from src.Model.User.User import User
-
+from src.Application.User.userAuthent import hash_password
 
 class UserManager:
     def __init__(self):
@@ -33,12 +33,12 @@ class UserManager:
         exists, exists_msg = self.user_exists(username, email)
         if exists:
             return None, exists_msg
-
+        
+        pw_hash = hash_password(password)  # bcrypt con salt interno
         new_user = User(
             id=self.next_id,
             username=username,
-            # TODO (Jime): Hashing should be done here
-            password=password,
+            password_hash=pw_hash,
             email=email,
             role=role
         )

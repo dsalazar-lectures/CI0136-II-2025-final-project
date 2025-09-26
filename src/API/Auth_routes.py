@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 from src.Model.User.UserManager import UserManager
+from src.Application.User.userAuthent import verify_password
 
 auth_bp = Blueprint('auth', __name__)
 user_manager = UserManager()
@@ -47,7 +48,7 @@ def login():
         return error_response
 
     user = user_manager.get_user_by_username(data['username'])
-    if not user or user.password != data['password']:
+    if not user or not verify_password(data['password'], user.password_hash):
         return jsonify({'error': 'Invalid username or password'}), 401
 
     return jsonify({'message': 'Login successful', 'user': user.to_dict()}), 200
