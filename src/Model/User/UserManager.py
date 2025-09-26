@@ -6,16 +6,38 @@ class UserManager:
         self.users = []
         self.next_id = 1
 
-    def create_user(self, username, password, email, role="user"):
+    def user_exists(self, username, email):
         for user in self.users:
             if user.username == username:
-                return None, "Username already exists"
+                return True, "Username already exists"
             if user.email == email:
-                return None, "Email already exists"
+                return True, "Email already exists"
+        return False, None
+
+    def validate_userdata(self, username, password, email):
+        if not username or not isinstance(username, str):
+            return False, "Username is required"
+        if not password or not isinstance(password, str):
+            return False, "Password is required"
+        if not email or not isinstance(email, str):
+            return False, "Email is required"
+        if "@" not in email or "." not in email:
+            return False, "Invalid email format"
+        return True, None
+
+    def create_user(self, username, password, email, role="user"):
+        is_valid, valid_msg = self.validate_userdata(username, password, email)
+        if not is_valid:
+            return None, valid_msg
+
+        exists, exists_msg = self.user_exists(username, email)
+        if exists:
+            return None, exists_msg
 
         new_user = User(
             id=self.next_id,
             username=username,
+            # TODO (Jime): Hashing should be done here
             password=password,
             email=email,
             role=role
