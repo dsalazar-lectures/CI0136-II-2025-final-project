@@ -55,6 +55,10 @@ def login():
     
     jwt_token = user_authentication.generate_token(user)
     print("here's the generated token: ", jwt_token)
-    #TODO @Paula: return token
-
-    return jsonify({'message': 'Login successful', 'user': user.to_dict()}), 200
+    
+    return jsonify({
+        'message': 'Login successful', 
+        'user': user.to_dict(),
+        'token': jwt_token
+    }), 200
+    
