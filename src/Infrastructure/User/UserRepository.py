@@ -9,11 +9,14 @@ class UserRepository():
 
     def user_exists(self, username, email):
         # TODO: Check if user exists in the database
-        pass
+        return self.user_schema.user_exists(username, email) # Assuming user_schema has method user_exists
 
     def create_user(self, user_dto):
         # TODO: Create user in the database
-        pass
+        
+        if self.user_exists(user_dto.username, user_dto.email):
+            raise ValueError("User with this username or email already exists")
+
 
     def get_user_by_username(self, username):
         pass
