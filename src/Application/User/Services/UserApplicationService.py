@@ -1,18 +1,21 @@
 from src.Application.DTOs.UserDTO import UserDTO
 from src.Infrastructure.User.UserRepository import UserRepository
 from src.Application.User.Services.ValidationService import ValidationService
-
+from src.Application.User.Services.EncryptionService import EncryptionService
 
 class UserApplicationService:
     def __init__(self):
         self.validation_service = ValidationService()
         self.user_repository = UserRepository()
+        self.encryption_service = EncryptionService()
 
     def create_user_dto(self, data):
 
+        hashed_password = self.encryption_service.hash_password(data['password'])
+
         return UserDTO(
             username=data['username'],
-            password=data['password'],  # TODO: Hashing here
+            password=hashed_password,  # TODO: Hashing here
             email=data['email'],
             role=data.get('role', 'user')
         )
