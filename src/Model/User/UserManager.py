@@ -1,5 +1,7 @@
 from src.Model.User.User import User
-from src.Application.User.userAuthent import hash_password
+from src.Application.User.UserAuthent import UserAuthent
+
+user_authentication = UserAuthent()
 
 class UserManager:
     def __init__(self):
@@ -33,8 +35,8 @@ class UserManager:
         exists, exists_msg = self.user_exists(username, email)
         if exists:
             return None, exists_msg
-        
-        pw_hash = hash_password(password)  # bcrypt con salt interno
+
+        pw_hash = user_authentication.hash_password(password)  # bcrypt con salt interno
         new_user = User(
             id=self.next_id,
             username=username,
