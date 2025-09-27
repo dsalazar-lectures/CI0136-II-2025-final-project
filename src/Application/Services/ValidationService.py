@@ -8,10 +8,10 @@ class ValidationService:
         # Validate request data
         # Returns: (is_valid, error_response, status_code)
         if not data:
-            return False, jsonify({'error': 'Invalid input'}), 400
+            return False, {'error': 'Invalid input'}, 400
 
         for field in required_fields:
             if field not in data or data[field] is None or data[field] == "":
-                return False, jsonify({'error': f'Missing field: {field}'}), 400
+                return False, {'error': f'Missing field: {field}'}, 400
 
         return True, None, None
