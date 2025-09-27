@@ -1,23 +1,12 @@
 from src.Application.DTOs.UserDTO import UserDTO
 from src.Database.User.UserRepository import UserRepository
-from src.Application.Services.ValidationService import ValidationService
+from src.Application.User.Services.ValidationService import ValidationService
 
 
 class UserApplicationService:
     def __init__(self):
         self.validation_service = ValidationService()
         self.user_repository = UserRepository()
-
-    def validate_userdata(self, username, password, email):
-        if not username or not isinstance(username, str):
-            return False, "Username is required"
-        if not password or not isinstance(password, str):
-            return False, "Password is required"
-        if not email or not isinstance(email, str):
-            return False, "Email is required"
-        if "@" not in email or "." not in email:
-            return False, "Invalid email format"
-        return True, None
 
     def create_user_dto(self, data):
 
@@ -35,7 +24,7 @@ class UserApplicationService:
         if not is_valid:
             return None, error_response, status_code
 
-        is_valid, valid_msg = self.validate_userdata(
+        is_valid, valid_msg = self.validation_service.validate_userdata(
             data['username'], data['password'], data['email'])
         if not is_valid:
             return None, valid_msg, 400
