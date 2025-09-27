@@ -1,5 +1,5 @@
 from src.Application.DTOs.UserDTO import UserDTO
-from src.Database.User.UserRepository import UserRepository
+from src.Infrastructure.User.UserRepository import UserRepository
 from src.Application.User.Services.ValidationService import ValidationService
 
 
