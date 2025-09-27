@@ -54,7 +54,7 @@ def login():
         return jsonify({'error': 'Invalid username or password'}), 401
     
     jwt_token = user_authentication.generate_token(user)
-    print(jwt_token)
+    print("here's the generated token: ", jwt_token)
     #TODO @Paula: return token
 
     return jsonify({'message': 'Login successful', 'user': user.to_dict()}), 200
