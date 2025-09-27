@@ -12,9 +12,9 @@ class ValidationService:
                 return False, {'error': f'Missing field: {field}'}, 400
 
         return True, None, None
-    
+
     @staticmethod
-    def validate_userdata(self, username, password, email):
+    def validate_userdata(username, password, email):
         if not username or not isinstance(username, str):
             return False, "Username is required"
         if not password or not isinstance(password, str):
