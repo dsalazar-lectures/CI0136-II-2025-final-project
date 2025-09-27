@@ -11,8 +11,6 @@ class UserAuthent:
 
     def generate_token(self, user):
         payload = {
-            "gen": datetime.datetime.now(self.tz),
-            "exp": datetime.datetime.now(self.tz)+datetime.timedelta(minutes=10),
             "sub": user.id,
             "username": user.username
         }
