@@ -4,6 +4,8 @@ from src.Database.User.UserSchema import UserSchema # Import the UserSchema for 
 from src.Application.DTOs.UserDTO import UserDTO # Import the UserDTO for data transfer
 
 class UserRepository():
+    def __init__(self, db_connection): # Assumming db_connection
+        self.user_schema = UserSchema(db_connection)
 
     def user_exists(self, username, email):
         # TODO: Check if user exists in the database
