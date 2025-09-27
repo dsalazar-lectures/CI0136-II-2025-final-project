@@ -13,9 +13,28 @@ class UserRepository():
 
     def create_user(self, user_dto):
         # TODO: Create user in the database
-        
+
         if self.user_exists(user_dto.username, user_dto.email):
             raise ValueError("User with this username or email already exists")
+        
+        # Convert DTO to JSON (dictionary)
+        user_data = {
+            "username": user_dto.username,
+            "password": user_dto.password,
+            "email": user_dto.email,
+            "role": user_dto.role
+        }
+
+        created_user = self.user_schema.create_user(user_data) # Call create_user method from UserSchema
+
+        if created_user:
+            return User(
+                id=created_user['id'],
+                username=created_user['username'],
+                email=created_user['email'],
+                role=created_user['role']
+            )
+        return None
 
 
     def get_user_by_username(self, username):
