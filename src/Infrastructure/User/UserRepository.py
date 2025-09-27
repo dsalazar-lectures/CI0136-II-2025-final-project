@@ -1,5 +1,7 @@
+import json # For handling JSON data
 from src.Model.User.User import User
-
+from src.Database.User.UserSchema import UserSchema # Import the UserSchema for database
+from src.Application.DTOs.UserDTO import UserDTO # Import the UserDTO for data transfer
 
 class UserRepository():
 
