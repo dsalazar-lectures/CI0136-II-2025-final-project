@@ -2,22 +2,30 @@ from typing import Dict, List, Optional
 
 from ...Model.Ingredients.Ingredients import Ingredient
 
-class IngredientRepository:
 
+class IngredientRepository:
     def __init__(self) -> None:
         self._items: Dict[int, Ingredient] = {}
         self._next_id: int = 1
-        self._seed() # mock data
+        self._seed()  # mock data
 
     def get_all(self) -> List[Ingredient]:
         # return by alphabetical order
         return sorted(self._items.values(), key=lambda x: x.name.lower())
-    
+
     def get_by_id(self, ingredient_id: int) -> Optional[Ingredient]:
         return self._items.get(ingredient_id)
-    
+
     # part of the mocking
-    def _add(self, name, *, categories=None, substitutes=None, components=None, recipe_count=0) -> None:
+    def _add(
+        self,
+        name,
+        *,
+        categories=None,
+        substitutes=None,
+        components=None,
+        recipe_count=0,
+    ) -> None:
         iid = self._next_id
         self._next_id += 1
         self._items[iid] = Ingredient(
@@ -30,10 +38,45 @@ class IngredientRepository:
         )
 
     def _seed(self) -> None:
-        self._add("Butter",        categories=["dairy", "fat"],   components=["lactose", "milk_protein"], recipe_count=42)
-        self._add("Margarine",     categories=["fat"],            components=["soy", "plant_oils"],       recipe_count=11)
-        self._add("Whole Milk",    categories=["dairy"],          components=["lactose", "milk_protein"], recipe_count=55)
-        self._add("Almond Milk",   categories=["plant_milk"],     components=["almond"],                  recipe_count=13)
-        self._add("Wheat Flour",   categories=["grain"],          components=["gluten"],                  recipe_count=60)
-        self._add("White Sugar",   categories=["sweetener"],      components=[],                          recipe_count=75)
-        self._add("Egg",           categories=["protein"],        components=["egg_protein"],             recipe_count=50)
+        self._add(
+            "Butter",
+            categories=["dairy", "fat"],
+            components=["lactose", "milk_protein"],
+            recipe_count=42,
+        )
+        self._add(
+            "Margarine",
+            categories=["fat"],
+            components=["soy", "plant_oils"],
+            recipe_count=11,
+        )
+        self._add(
+            "Whole Milk",
+            categories=["dairy"],
+            components=["lactose", "milk_protein"],
+            recipe_count=55,
+        )
+        self._add(
+            "Almond Milk",
+            categories=["plant_milk"],
+            components=["almond"],
+            recipe_count=13,
+        )
+        self._add(
+            "Wheat Flour",
+            categories=["grain"],
+            components=["gluten"],
+            recipe_count=60,
+        )
+        self._add(
+            "White Sugar",
+            categories=["sweetener"],
+            components=[],
+            recipe_count=75,
+        )
+        self._add(
+            "Egg",
+            categories=["protein"],
+            components=["egg_protein"],
+            recipe_count=50,
+        )
