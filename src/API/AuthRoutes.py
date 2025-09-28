@@ -15,3 +15,14 @@ def register():
         return jsonify(response), status_code
 
     return jsonify(response), status_code
+
+@auth_bp.route('/login', methods=['POST'])
+def login():
+    data = request.get_json()
+
+    user, response, status_code = user_app_service.login_user(data)
+
+    if not user:
+        return jsonify(response), status_code
+
+    return jsonify(response), status_code
