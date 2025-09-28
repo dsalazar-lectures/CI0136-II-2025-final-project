@@ -1,7 +1,7 @@
-from src.Application.Recipes.IRecipeRepository import RecipeRepository
+from src.Application.Recipes.IRecipeRepository import recipe_repository
 
 def get_all_recipes():
-    return RecipeRepository.get_all()
+    return recipe_repository.get_all()
 
 def get_recipe_by_id(recipe_id):
-    return RecipeRepository.get_by_id(recipe_id)
+    return recipe_repository.get_by_id(recipe_id)

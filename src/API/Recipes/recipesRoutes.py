@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 from src.Application.Recipes import recipe_service
 
-recipes_bp = Blueprint("recipes", name)
+recipes_bp = Blueprint("recipes", __name__)
 
 @recipes_bp.route("/recipes", methods=["GET"])
 def get_all_recipes():
