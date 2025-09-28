@@ -18,6 +18,7 @@ class UserApplicationService:
             data['password'])
 
         return UserDTO(
+            id=None,
             username=data['username'],
             password=hashed_password,
             email=data['email'],
