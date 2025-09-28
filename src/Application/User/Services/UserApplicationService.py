@@ -3,6 +3,7 @@ from src.Infrastructure.User.UserRepository import UserRepository
 from src.Application.User.Services.ValidationService import ValidationService
 from src.Application.User.Services.EncryptionService import EncryptionService
 
+
 class UserApplicationService:
     def __init__(self):
         self.validation_service = ValidationService()
@@ -11,11 +12,12 @@ class UserApplicationService:
 
     def create_user_dto(self, data):
 
-        hashed_password = self.encryption_service.hash_password(data['password'])
+        hashed_password = self.encryption_service.hash_password(
+            data['password'])
 
         return UserDTO(
             username=data['username'],
-            password=hashed_password,  # TODO: Hashing here
+            password=hashed_password,
             email=data['email'],
             role=data.get('role', 'user')
         )
@@ -30,18 +32,18 @@ class UserApplicationService:
         is_valid, valid_msg = self.validation_service.validate_userdata(
             data['username'], data['password'], data['email'])
         if not is_valid:
-            return None, valid_msg, 400
+            return None, {'error': valid_msg}, 400
 
-        exists, exists_msg = self.user_repository.user_exists(
+        exists = self.user_repository.user_exists(
             data['username'], data['email'])
         if exists:
-            return None, exists_msg, 400
+            return None, {'error': "User with this username or email already exists"}, 400
 
         user_dto = self.create_user_dto(data)
 
-        user, message = self.user_repository.create_user(user_dto)
+        user, message, status = self.user_repository.create_user(user_dto)
 
         if not user:
-            return None, {'error': message}, 400
+            return None, {'error': message}, status
 
-        return user, {'message': message, 'user': user.to_dict()}, 201
+        return user, {'message': message, 'user': user_dto.to_dict()}, status
