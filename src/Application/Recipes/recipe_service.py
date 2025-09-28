@@ -1,8 +1,7 @@
-from src.Database.Recipes.RecipesSchema import system_recipes
+from src.Application.Recipes.IRecipeRepository import RecipeRepository
 
 def get_all_recipes():
-    return system_recipes
+    return RecipeRepository.get_all()
 
 def get_recipe_by_id(recipe_id):
-    recipes = get_all_recipes()
-    return next((recipe for recipe in recipes if recipe.id == recipe_id), None)
+    return RecipeRepository.get_by_id(recipe_id)
