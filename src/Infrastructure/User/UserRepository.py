@@ -1,6 +1,6 @@
 from src.Model.User.User import User
 from src.Application.DTOs.UserDTO import UserDTO # Import the UserDTO for data transfer
-from src.Databe.User.UserCSV import UserCSV # Import the UserCSV
+from src.Database.User.UserCSV import UserCSV # Import the UserCSV
 
 class UserRepository():
     def __init__(self, csv_file_path="users.csv"):
