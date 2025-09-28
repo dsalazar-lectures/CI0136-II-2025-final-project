@@ -7,7 +7,7 @@ class EncryptionService:
     def hash_password(password: str) -> str:
         if isinstance(password, str):
             password = password.encode("utf-8")
-        salt = bcrypt.gensalt()  # sin rounds: usa el default de bcrypt
+        salt = bcrypt.gensalt()  # no rounds: uses default bcrypt
         hashed = bcrypt.hashpw(password, salt)
         return hashed.decode("utf-8")
 
