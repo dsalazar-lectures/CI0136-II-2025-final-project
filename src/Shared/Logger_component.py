@@ -21,3 +21,20 @@ class CustomLogger:
         if not self.logger.handlers:
             for handler in handlers:
                 self.logger.addHandler(handler)
+
+    def log(self, level: str, usuario: str, rol: str, accion: str, descripcion: str):
+        extra = {
+            "usuario": usuario,
+            "rol": rol,
+            "accion": accion,
+            "descripcion": descripcion
+        }
+
+        log_method = {
+            "info": self.logger.info,
+            "warning": self.logger.warning,
+            "error": self.logger.error,
+            "debug": self.logger.debug,
+        }.get(level.lower(), self.logger.info)
+
+        log_method("", extra=extra)
