@@ -9,6 +9,13 @@ class RecipeRepository:
     def get_by_id(self, recipe_id):
         return next((recipe for recipe in system_recipes if recipe.id == recipe_id), None)
     
+    def find_by_ingredient(self, ingredient):
+        ingredient = ingredient.lower()
+        return [
+            recipe for recipe in system_recipes
+            if any(ingredient in ing.lower() for ing in recipe.ingredients)
+        ]
+    
     def build_recipe(self, data):
         return Recipe(
             data["id"],
