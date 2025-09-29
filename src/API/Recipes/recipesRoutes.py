@@ -44,3 +44,18 @@ def delete_recipe(recipe_id):
     if result is False:
         return jsonify({"error": "No autorizado para eliminar esta receta"}), 403
     return jsonify({"message": "Receta eliminada", "recipe": result.to_dict()})
+
+@recipes_bp.route("/recipes/<int:recipe_id>", methods=["PUT"])
+def update_recipe(recipe_id):
+    username = "myUser"  # Change later to actual username
+    updates = request.json or {}
+
+    allowed_fields = {"name", "categories", "ingredients", "duration", "instructions", "portions"}
+    safe_updates = {k: v for k, v in updates.items() if k in allowed_fields}
+
+    result = recipe_service.update_recipe(recipe_id, safe_updates, username)
+    if result is None:
+        return jsonify({"error": "Receta no encontrada"}), 404
+    if result is False:
+        return jsonify({"error": "No autorizado para editar esta receta"}), 403
+    return jsonify(result.to_dict())

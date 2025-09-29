@@ -1,4 +1,5 @@
 import csv
+import os
 from src.Database.Recipes.RecipesSchema import system_recipes, PATH
 from src.Model.Recipes.Recipes import Recipe
 
@@ -99,6 +100,30 @@ class RecipeRepository:
         if recipe.author != username:
             return False
         system_recipes.remove(recipe)
+        self.rewrite_csv()
+        return recipe
+
+    def update_if_owned(self, recipe_id, username, updates: dict):
+        recipe = self.get_by_id(recipe_id)
+        if recipe is None:
+            return None
+        if recipe.author != username:
+            return False
+
+        allowed = {
+            "name": str,
+            "categories": list,
+            "ingredients": list,
+            "duration": int,
+            "instructions": str,
+            "portions": int,
+        }
+        for field, caster in allowed.items():
+            if field in updates and updates[field] is not None:
+                value = updates[field]
+                value = list(value) if caster is list else caster(value)
+                setattr(recipe, field, value)
+
         self.rewrite_csv()
         return recipe
 

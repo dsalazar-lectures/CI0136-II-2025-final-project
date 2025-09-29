@@ -15,3 +15,6 @@ def create_recipe(recipe_data, username):
 
 def delete_recipe(recipe_id, username):
     return recipe_repository.delete_if_owned(recipe_id, username)
+
+def update_recipe(recipe_id, updates, username):
+    return recipe_repository.update_if_owned(recipe_id, username, updates)
