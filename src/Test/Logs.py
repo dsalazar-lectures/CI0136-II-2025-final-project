@@ -2,7 +2,6 @@ from src.Shared.Logger_component import CustomLogger
 
 logger = CustomLogger()
 
-
 try:
     result1 = 10 / 2 
     logger.log(
