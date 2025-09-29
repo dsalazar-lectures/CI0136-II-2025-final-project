@@ -12,3 +12,6 @@ def get_recipes_by_ingredient(ingredient):
 def create_recipe(recipe_data, username):
     recipe_data["author"] = username
     return recipe_repository.add_recipe(recipe_data)
+
+def delete_recipe(recipe_id, username):
+    return recipe_repository.delete_if_owned(recipe_id, username)

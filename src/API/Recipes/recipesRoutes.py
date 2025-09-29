@@ -34,3 +34,13 @@ def create_recipe():
 
     recipe = recipe_service.create_recipe(data, username)
     return jsonify(recipe.to_dict())
+
+@recipes_bp.route("/recipes/<int:recipe_id>", methods=["DELETE"])
+def delete_recipe(recipe_id):
+    username = "myUser"  # Change later to actual username
+    result = recipe_service.delete_recipe(recipe_id, username)
+    if result is None:
+        return jsonify({"error": "Receta no encontrada"}), 404
+    if result is False:
+        return jsonify({"error": "No autorizado para eliminar esta receta"}), 403
+    return jsonify({"message": "Receta eliminada", "recipe": result.to_dict()})
