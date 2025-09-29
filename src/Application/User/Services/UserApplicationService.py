@@ -1,14 +1,13 @@
 from src.Application.DTOs.UserDTO import UserDTO
-from src.Infrastructure.User.UserRepository import UserRepository
+from src.Application.Interfaces.IUserRepository import IUserRepository
 from src.Application.User.Services.ValidationService import ValidationService
 from src.Application.User.Services.EncryptionService import EncryptionService
 from src.Application.User.Services.TokenService import TokenService
 
-
 class UserApplicationService:
-    def __init__(self):
+    def __init__(self, user_repository: IUserRepository):
         self.validation_service = ValidationService()
-        self.user_repository = UserRepository()
+        self.user_repository = user_repository
         self.encryption_service = EncryptionService()
         self.token_service = TokenService()
 
