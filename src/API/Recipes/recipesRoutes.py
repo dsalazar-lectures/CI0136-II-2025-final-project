@@ -14,3 +14,15 @@ def get_recipe(recipe_id):
     if not recipe:
         return jsonify({"error": "Receta no encontrada"}), 404
     return jsonify(recipe.to_dict())
+
+@recipes_bp.route("/recipes", methods=["POST"])
+def create_recipe():
+    data = request.json
+    required_fields = ["name", "categories", "ingredients", "duration", "instructions", "portions"]
+    username = "myUser"
+
+    if not all(field in data for field in required_fields):
+        return jsonify({"error": "Se necesita información adicional sobre la receta"}), 400
+
+    recipe = recipe_service.create_recipe(data, username)
+    return jsonify(recipe.to_dict()), 201
