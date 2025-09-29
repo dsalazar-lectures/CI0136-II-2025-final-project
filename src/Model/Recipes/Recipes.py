@@ -33,3 +33,9 @@ class Recipe:
             "amount of users that have used this recipe": self.users_used_recipe,
         }
 
+    def __str__(self):
+        return (f"Id: {self.id} | {self.name} | Autor: {self.author} | "
+            f"Categorías: {', '.join(self.categories)} | "
+            f"Duración: {self.duration} min | "
+            f"Porciones: {self.portions} | "
+            f"Rating: {self.rating:.1f}")

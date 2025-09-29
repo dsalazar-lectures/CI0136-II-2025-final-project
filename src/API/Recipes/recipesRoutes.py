@@ -6,7 +6,7 @@ recipes_bp = Blueprint("recipes", __name__)
 @recipes_bp.route("/recipes", methods=["GET"])
 def get_all_recipes():
     recipes = recipe_service.get_all_recipes()
-    return jsonify([recipe.to_dict() for recipe in recipes])
+    return jsonify([recipe.__str__() for recipe in recipes])
 
 @recipes_bp.route("/recipes/<int:recipe_id>", methods=["GET"])
 def get_recipe(recipe_id):
