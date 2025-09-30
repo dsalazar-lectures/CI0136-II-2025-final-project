@@ -1,0 +1,20 @@
+import bcrypt
+
+
+class EncryptionService:
+
+    @staticmethod
+    def hash_password(password: str) -> str:
+        if isinstance(password, str):
+            password = password.encode("utf-8")
+        salt = bcrypt.gensalt()  # no rounds: uses default bcrypt
+        hashed = bcrypt.hashpw(password, salt)
+        return hashed.decode("utf-8")
+
+    @staticmethod
+    def verify_password(password: str, stored_hash: str) -> bool:
+        if isinstance(password, str):
+            password = password.encode("utf-8")
+        if isinstance(stored_hash, str):
+            stored_hash = stored_hash.encode("utf-8")
+        return bcrypt.checkpw(password, stored_hash)
