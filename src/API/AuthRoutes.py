@@ -1,8 +1,10 @@
 from flask import Blueprint, request, jsonify
 from src.Application.User.Services.UserApplicationService import UserApplicationService
+from src.Infrastructure.User.UserRepository import UserRepository
 
 auth_bp = Blueprint('auth', __name__)
-user_app_service = UserApplicationService()
+user_repository = UserRepository()
+user_app_service = UserApplicationService(user_repository)
 
 
 @auth_bp.route('/register', methods=['POST'])
