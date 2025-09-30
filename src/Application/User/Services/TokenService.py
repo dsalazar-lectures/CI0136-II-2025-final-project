@@ -10,6 +10,8 @@ class TokenService:
 
     def generate_token(self, user):
         payload = {
+            "iat": datetime.datetime.now(tz=self.tz),
+            "exp": datetime.datetime.now(tz=self.tz) + datetime.timedelta(minutes=10),
             "sub": user.id,
             "username": user.username
         }

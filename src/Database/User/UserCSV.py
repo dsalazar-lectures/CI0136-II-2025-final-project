@@ -48,3 +48,11 @@ class UserCSV:
             writer.writerow(new_user)
 
         return new_user
+    
+    def get_user_by_username(self, username):
+        with open(self.file_path, 'r', newline='') as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                if row['username'] == username:
+                    return row
+        return None

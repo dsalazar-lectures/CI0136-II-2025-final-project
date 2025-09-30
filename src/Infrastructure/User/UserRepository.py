@@ -4,6 +4,7 @@ from src.Application.DTOs.UserDTO import UserDTO
 from src.Database.User.UserCSV import UserCSV
 
 class UserRepository(IUserRepository):
+
     def __init__(self, csv_file_path="users.csv"):
         self.user_csv = UserCSV(csv_file_path)
 

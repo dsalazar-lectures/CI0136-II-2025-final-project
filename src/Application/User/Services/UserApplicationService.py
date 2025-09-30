@@ -17,6 +17,7 @@ class UserApplicationService:
             data['password'])
 
         return UserDTO(
+            id=None,
             username=data['username'],
             password=hashed_password,
             email=data['email'],
@@ -48,3 +49,22 @@ class UserApplicationService:
             return None, {'error': message}, status
 
         return user, {'message': message, 'user': user_dto.to_dict()}, status
+
+    def login_user(self, data):
+        required_fields = ['username', 'password']
+        is_valid, error_response, status_code = self.validation_service.validate_request_data(
+            data, required_fields)
+        if not is_valid:
+            return None, error_response, status_code
+
+        user = self.user_repository.get_user_by_username(data['username'])
+        if not user:
+            return None, {'error': "Invalid username or password"}, 401
+
+        if not self.encryption_service.verify_password(data['password'], user.password):
+            return None, {'error': "Invalid username or password"}, 401
+
+        token = self.token_service.generate_token(user)
+
+        return user, {'message': "Login successful", 'token': token}, 200
+
