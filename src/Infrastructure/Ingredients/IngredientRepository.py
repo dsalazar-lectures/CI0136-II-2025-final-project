@@ -16,6 +16,12 @@ class IngredientRepository:
     def get_by_id(self, ingredient_id: int) -> Optional[Ingredient]:
         return self._items.get(ingredient_id)
 
+    def get_by_name(self, ingredient_name: str) -> Optional[Ingredient]:
+        for ingredient in self._items.values():
+            if ingredient.name.lower() == ingredient_name.lower():
+                return ingredient
+        return None
+
     # part of the mocking
     def _add(
         self,
