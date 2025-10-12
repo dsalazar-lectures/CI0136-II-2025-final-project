@@ -22,6 +22,15 @@ mode = st.sidebar.selectbox(
 
 # --- Show the corresponding window ---
 if mode == "General Data":
-    show_general_logs_window(available_files)
+    try:
+        show_general_logs_window(available_files)
+    except Exception as e:
+        st.subheader("Logs Analysis")
+        st.info("Esta vista no está disponible en este momento.")
 elif mode == "Logs Analysis":
-    show_analysis_logs_window(available_files, analysis_registry)
+    try:
+        show_analysis_logs_window(available_files, analysis_registry)
+    except Exception as e:
+        st.subheader("Logs Analysis")
+        st.info("Esta vista no está disponible en este momento.")
+        
