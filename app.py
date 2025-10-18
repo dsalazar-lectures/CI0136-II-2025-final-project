@@ -8,6 +8,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
 # Import blueprints
 from src.API.Ingredients.IngredientsRoutes import ingredients_bp
 from src.API.Recipes.recipesRoutes import recipes_bp
+from src.API.Metrics.DashboardRoute import dashboard_bp
 
 def create_app():
     app = Flask(__name__)
@@ -15,6 +16,7 @@ def create_app():
     # Register blueprints
     app.register_blueprint(ingredients_bp)
     app.register_blueprint(recipes_bp, url_prefix='/api')
+    app.register_blueprint(dashboard_bp, url_prefix='/api')
     
     # Health check endpoint
     @app.route('/')
@@ -23,7 +25,8 @@ def create_app():
             "GET /api/ingredients - Get all ingredients",
             "GET /api/ingredients/<id> - Get ingredient by ID", 
             "GET /api/recipes - Get all recipes",
-            "GET /api/recipes/<id> - Get recipe by ID"
+            "GET /api/recipes/<id> - Get recipe by ID",
+            "GET /api/metrics/open-dashboard?port=8601"
         ]}
     
     return app

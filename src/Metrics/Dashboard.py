@@ -6,8 +6,8 @@ from AnalysisLogs import analysis_registry
 
 st.set_page_config(page_title="Logs Dashboard", page_icon="📊", layout="wide")
 
-dashboard_folder = Path(__file__).parent
-available_files = list(dashboard_folder.glob("*.json"))
+database_logs_folder = Path(__file__).parent.parent / "Database" / "Logs"
+available_files = list(database_logs_folder.glob("*.json"))
 
 
 if not available_files:
