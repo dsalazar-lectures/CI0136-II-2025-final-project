@@ -9,7 +9,7 @@ class CustomLogger:
         name: str = "AppLogger",
         handlers: Optional[List[logging.Handler]] = None,
         level: int = logging.DEBUG,
-        add_console: bool = True,
+        add_console: bool = False,
         console_level: int = logging.DEBUG,
         log_dir: str = "src/database/Logs/",
     ):
