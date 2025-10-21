@@ -1,4 +1,6 @@
-from src.Application.Recipes.IRecipeRepository import recipe_repository
+from src.Infrastructure.Recipes.CSVRecipeRepository import CSVRecipeRepository
+
+recipe_repository = CSVRecipeRepository()
 
 def get_all_recipes():
     return recipe_repository.get_all()
