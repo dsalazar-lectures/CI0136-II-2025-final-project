@@ -36,6 +36,7 @@ def _start_streamlit_if_needed(port: int) -> bool:
         sys.executable, "-m", "streamlit", "run", str(dashboard_py),
         "--server.address", "0.0.0.0",
         "--server.port", str(port),
+        "--server.headless", "true", 
     ]
     subprocess.Popen(cmd, cwd=str(repo_root))
 
