@@ -26,13 +26,10 @@ def get_recipes_by_ingredient(ingredient):
 @recipes_bp.route("/addrecipe", methods=["POST"])
 def create_recipe():
     data = request.json
-    required_fields = ["name", "categories", "ingredients", "duration", "instructions", "portions"]
     username = "myUser"
-
-    if not all(field in data for field in required_fields):
-        return jsonify({"error": "Se necesita información adicional sobre la receta"}), 400
-
     recipe = recipe_service.create_recipe(data, username)
+    if recipe == -1:
+        return jsonify({"error": "Se necesita información adicional sobre la receta"}), 400
     return jsonify(recipe.to_dict())
 
 @recipes_bp.route("/recipes/<int:recipe_id>", methods=["DELETE"])
@@ -43,7 +40,7 @@ def delete_recipe(recipe_id):
         return jsonify({"error": "Receta no encontrada"}), 404
     if result is False:
         return jsonify({"error": "No autorizado para eliminar esta receta"}), 403
-    return jsonify({"message": "Receta eliminada", "recipe": result.to_dict()})
+    return jsonify({"message": "Receta eliminada", "recipe": result.__str__()})
 
 @recipes_bp.route("/recipes/<int:recipe_id>", methods=["PUT"])
 def update_recipe(recipe_id):
@@ -54,6 +51,8 @@ def update_recipe(recipe_id):
     safe_updates = {k: v for k, v in updates.items() if k in allowed_fields}
 
     result = recipe_service.update_recipe(recipe_id, safe_updates, username)
+    if result == -1:
+        return jsonify({"error": "Datos de actualización inválidos"}), 400
     if result is None:
         return jsonify({"error": "Receta no encontrada"}), 404
     if result is False:
