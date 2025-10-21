@@ -1,15 +1,21 @@
 from src.Application.DTOs.UserDTO import UserDTO
 from src.Application.Interfaces.IUserRepository import IUserRepository
-from src.Application.User.Services.ValidationService import ValidationService
-from src.Application.User.Services.EncryptionService import EncryptionService
-from src.Application.User.Services.TokenService import TokenService
+from src.Application.Interfaces.IEncryptionService import IEncryptionService
+from src.Application.Interfaces.IValidationService import IValidationService
+from src.Application.Interfaces.ITokenService import ITokenService
 
 class UserApplicationService:
-    def __init__(self, user_repository: IUserRepository):
-        self.validation_service = ValidationService()
+    def __init__(
+        self,
+        user_repository: IUserRepository,
+        validation_service: IValidationService,
+        encryption_service: IEncryptionService,
+        token_service: ITokenService
+    ):
+        self.validation_service = validation_service
         self.user_repository = user_repository
-        self.encryption_service = EncryptionService()
-        self.token_service = TokenService()
+        self.encryption_service = encryption_service
+        self.token_service = token_service
 
     def create_user_dto(self, data):
 
