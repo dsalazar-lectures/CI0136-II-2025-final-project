@@ -71,6 +71,7 @@ class UserApplicationService:
             return None, {'error': "Invalid username or password"}, 401
 
         token = self.token_service.generate_token(user)
+        self.user_repository.update_user_token(user.username, token, getattr(user, 'key', None))
 
         return user, {'message': "Login successful", 'token': token}, 200
 
