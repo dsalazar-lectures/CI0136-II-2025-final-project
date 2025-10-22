@@ -10,9 +10,10 @@ class TokenService(ITokenService):
         self.tz = pytz.timezone("America/Costa_Rica")
 
     def generate_token(self, user):
+        now = datetime.datetime.now(tz=self.tz)
         payload = {
-            "iat": datetime.datetime.now(tz=self.tz),
-            "exp": datetime.datetime.now(tz=self.tz) + datetime.timedelta(minutes=10),
+            "iat": now,
+            "exp": now + datetime.timedelta(minutes=60),
             "sub": user.id,
             "username": user.username
         }
