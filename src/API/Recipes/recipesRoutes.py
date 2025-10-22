@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request
 from src.Application.Recipes import recipe_service
+from src.API.Recipes.recipesController import update_recipe_controller
 
 recipes_bp = Blueprint("recipes", __name__)
 
@@ -46,15 +47,5 @@ def delete_recipe(recipe_id):
 def update_recipe(recipe_id):
     username = "myUser"  # Change later to actual username
     updates = request.json or {}
-
-    allowed_fields = {"name", "categories", "ingredients", "duration", "instructions", "portions"}
-    safe_updates = {k: v for k, v in updates.items() if k in allowed_fields}
-
-    result = recipe_service.update_recipe(recipe_id, safe_updates, username)
-    if result == -1:
-        return jsonify({"error": "Datos de actualización inválidos"}), 400
-    if result is None:
-        return jsonify({"error": "Receta no encontrada"}), 404
-    if result is False:
-        return jsonify({"error": "No autorizado para editar esta receta"}), 403
-    return jsonify(result.to_dict())
+    status_code, response_data = update_recipe_controller(recipe_id, updates, username)
+    return jsonify(response_data), status_code
