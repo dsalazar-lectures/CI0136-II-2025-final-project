@@ -1,6 +1,4 @@
-from src.Application.Interfaces.IValidationService import IValidationService
-
-class ValidationService(IValidationService):
+class ValidationService:
 
     @staticmethod
     def validate_request_data(data, required_fields):
