@@ -38,3 +38,6 @@ class UserRepository(IUserRepository):
                 role=db_user['role']
             )
         return None
+    
+    def update_user_token(self, username, token, key=None) -> bool:
+        return self.user_csv.update_user_token(username, token, key)
