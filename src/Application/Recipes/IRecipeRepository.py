@@ -1,25 +1,28 @@
 import csv
-import os
 from src.Database.Recipes.RecipesSchema import system_recipes, PATH
 from src.Model.Recipes.Recipes import Recipe
 
 # storage for user-created recipes separate from CSV system_recipes
 user_recipes = []
 
+
 class RecipeRepository:
     def get_all(self):
         return system_recipes + user_recipes
 
     def get_by_id(self, recipe_id):
-        return next((recipe for recipe in system_recipes if recipe.id == recipe_id), None)
-    
+        return next(
+            (recipe for recipe in system_recipes if recipe.id == recipe_id), None
+        )
+
     def find_by_ingredient(self, ingredient):
         ingredient = ingredient.lower()
         return [
-            recipe for recipe in system_recipes
+            recipe
+            for recipe in system_recipes
             if any(ingredient in ing.lower() for ing in recipe.ingredients)
         ]
-    
+
     def build_recipe(self, data):
         return Recipe(
             data["id"],
@@ -32,25 +35,27 @@ class RecipeRepository:
             data["author"],
             0,
             0,
-            0
+            0,
         )
-    
+
     def save_to_csv(self, recipe):
         with open(PATH, mode="a", newline="", encoding="utf-8") as file:
             writer = csv.writer(file)
-            writer.writerow([
-                recipe.id,
-                recipe.name,
-                recipe.categories,
-                recipe.ingredients,
-                recipe.duration,
-                recipe.instructions,
-                recipe.portions,
-                recipe.author,
-                recipe.califications_sumatory,
-                recipe.califications_amount,
-                recipe.users_used_recipe
-            ])
+            writer.writerow(
+                [
+                    recipe.id,
+                    recipe.name,
+                    recipe.categories,
+                    recipe.ingredients,
+                    recipe.duration,
+                    recipe.instructions,
+                    recipe.portions,
+                    recipe.author,
+                    recipe.califications_sumatory,
+                    recipe.califications_amount,
+                    recipe.users_used_recipe,
+                ]
+            )
 
     def rewrite_csv(self):
         # Overwrite the recipes CSV with the current in-memory system_recipes
@@ -71,19 +76,21 @@ class RecipeRepository:
             writer = csv.writer(file)
             writer.writerow(header)
             for r in system_recipes:
-                writer.writerow([
-                    r.id,
-                    r.name,
-                    r.categories,
-                    r.ingredients,
-                    r.duration,
-                    r.instructions,
-                    r.portions,
-                    r.author,
-                    r.califications_sumatory,
-                    r.califications_amount,
-                    r.users_used_recipe,
-                ])
+                writer.writerow(
+                    [
+                        r.id,
+                        r.name,
+                        r.categories,
+                        r.ingredients,
+                        r.duration,
+                        r.instructions,
+                        r.portions,
+                        r.author,
+                        r.califications_sumatory,
+                        r.califications_amount,
+                        r.users_used_recipe,
+                    ]
+                )
 
     def add_recipe(self, recipe_data):
         recipe_data["id"] = max((recipe.id for recipe in system_recipes), default=0) + 1
@@ -126,5 +133,6 @@ class RecipeRepository:
 
         self.rewrite_csv()
         return recipe
+
 
 recipe_repository = RecipeRepository()
