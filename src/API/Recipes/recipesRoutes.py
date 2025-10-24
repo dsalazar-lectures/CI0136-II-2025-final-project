@@ -37,7 +37,10 @@ def create_recipe():
     username = "myUser"
     recipe = recipe_service.create_recipe(data, username)
     if recipe == -1:
-        return jsonify({"error": "Se necesita información adicional sobre la receta"}), 400
+        return (
+            jsonify({"error": "Se necesita información adicional sobre la receta"}),
+            400,
+        )
     return jsonify(recipe.to_dict())
 
 

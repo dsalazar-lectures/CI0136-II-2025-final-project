@@ -31,6 +31,7 @@ def update_recipe(recipe_id, updates, username):
         return -1
     return recipe_repository.update_if_owned(recipe_id, username, updates)
 
+
 def validate_data(recipe_data) -> bool:
     for key, value in recipe_data.items():
         if key in ["name", "instructions"]:
