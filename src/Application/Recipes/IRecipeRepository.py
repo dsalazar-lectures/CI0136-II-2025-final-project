@@ -28,4 +28,4 @@ class IRecipeRepository(ABC):
 
     @abstractmethod
     def find_by_category(self, category):
-        pass
+        pass
