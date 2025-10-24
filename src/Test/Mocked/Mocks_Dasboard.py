@@ -76,4 +76,4 @@ class TestLogsDashboard(unittest.TestCase):
         mock_info.assert_called_once()
 
 
-# Para correr los test: python -m unittest discover -s src/Test/Mocked -p "Mocks_Dasboard.py" -v
+# Run test: python -m unittest discover -s src/Test/Mocked -p "Mocks_Dasboard.py" -v
