@@ -38,7 +38,11 @@ def _start_streamlit_if_needed(port: int) -> bool:
         "--server.port", str(port),
         "--server.headless", "true", 
     ]
-    subprocess.Popen(cmd, cwd=str(repo_root))
+    import os
+    env = os.environ.copy()
+    env["PYTHONPATH"] = str(repo_root / "src")  # asegúrate de que apunte a tu carpeta 'src'
+
+    subprocess.Popen(cmd, cwd=str(repo_root), env=env)
 
     for _ in range(100): 
         if _is_port_open(port):

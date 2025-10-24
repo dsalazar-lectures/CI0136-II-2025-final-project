@@ -1,9 +1,9 @@
 import streamlit as st
 from pathlib import Path
 from typing import Iterable, Literal, Callable, Dict
-from DashboardGeneralLogs import show_general_logs_window
-from DashboardAnalysisLogs import show_analysis_logs_window
-from AnalysisLogs import analysis_registry
+from Metrics.DashboardGeneralLogs import GeneralData_Window
+from Metrics.DashboardAnalysisLogs import Analysis_Window
+from Metrics.AnalysisLogs import AnalysisLogs
 
 Mode = Literal["General Data", "Logs Analysis"]
 class LogsDashboard:
@@ -19,15 +19,15 @@ class LogsDashboard:
         self._logs_dir: Path = logs_dir or (Path(__file__).parent.parent / "Database" / "Logs")
 
     def run(self) -> None:
-        self._init_page()
-        files = self._get_available_json_files()
-        mode = self._select_mode()
-        self._render_mode(mode, files)
+        self.init_page()
+        files = self.get_available_json_files()
+        mode = self.select_mode()
+        self.render_mode(mode, files)
 
-    def _init_page(self) -> None:
+    def init_page(self) -> None:
         st.set_page_config(page_title=self.PAGE_TITLE, page_icon=self.PAGE_ICON, layout=self.PAGE_LAYOUT)
 
-    def _get_available_json_files(self) -> list[Path]:
+    def get_available_json_files(self) -> list[Path]:
         folder = self._logs_dir
         available_files = list(folder.glob("*.json"))
         if (not folder.exists()) or (not available_files):
@@ -35,13 +35,13 @@ class LogsDashboard:
             st.stop()
         return available_files
 
-    def _select_mode(self) -> Mode:
+    def select_mode(self) -> Mode:
         return st.sidebar.selectbox("Select an option:", self.MODES)
 
-    def _render_mode(self, mode: Mode, files: Iterable[Path]) -> None:
+    def render_mode(self, mode: Mode, files: Iterable[Path]) -> None:
         handlers: Dict[Mode, Callable[[], None]] = {
-            self.MODE_GENERAL: (lambda: show_general_logs_window(files)),
-            self.MODE_ANALYSIS: (lambda: show_analysis_logs_window(files, analysis_registry)),
+            self.MODE_GENERAL: (lambda: GeneralData_Window.show_general_logs_window(files)),
+            self.MODE_ANALYSIS: (lambda: Analysis_Window.show_analysis_logs_window(files, AnalysisLogs.analysis_registry)),
         }
 
         handler = handlers.get(mode)
