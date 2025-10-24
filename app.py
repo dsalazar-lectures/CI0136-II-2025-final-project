@@ -13,6 +13,8 @@ from src.API.Menu.menuRoutes import recipes_bp as menu_bp
 def create_app():
     app = Flask(__name__)
 
+    app.json.ensure_ascii = False
+
     # Register blueprints
     app.register_blueprint(ingredients_bp)
     app.register_blueprint(recipes_bp, url_prefix='/api')
