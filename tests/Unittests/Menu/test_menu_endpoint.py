@@ -2,15 +2,7 @@ import unittest
 from unittest.mock import patch
 from flask import Flask
 from src.API.Menu.menuRoutes import recipes_bp
-from src.Application.Recipes import recipe_service
-
-class DummyRecipe:
-    def __init__(self, id, name, categories):
-        self.id = id
-        self.name = name
-        self.categories = categories
-    def to_dict(self):
-        return {"id": self.id, "name": self.name, "categories": self.categories}
+from tests.Mocks.Recipes.mock_recipe_repo import MockRecipe
 
 class MenuEndpointTestCase(unittest.TestCase):
     def setUp(self):
@@ -21,9 +13,9 @@ class MenuEndpointTestCase(unittest.TestCase):
     @patch("src.Application.Recipes.recipe_service.get_recipes_by_category")
     def test_get_menu_returns_limited_recipes(self, mock_get_recipes):
         recipes = [
-            DummyRecipe(1, "recipe1", ["category1", "category2"]),
-            DummyRecipe(2, "recipe2", ["category1", "category3"]),
-            DummyRecipe(3, "recipe3", ["category4"])
+            MockRecipe(1, "recipe1", ["category1", "category2"]),
+            MockRecipe(2, "recipe2", ["category1", "category3"]),
+            MockRecipe(3, "recipe3", ["category4"])
         ]
         mock_get_recipes.side_effect = lambda category: [r for r in recipes if category in r.categories]
         response = self.client.get("/menu?category=category1")
@@ -45,7 +37,7 @@ class MenuEndpointTestCase(unittest.TestCase):
 
     @patch("src.Application.Recipes.recipe_service.get_recipes_by_category")
     def test_get_menu_category_filter(self, mock_get_recipes):
-        recipes = [DummyRecipe(1, "recipe1", ["category1"]), DummyRecipe(2, "recipe2", ["category2"])]
+        recipes = [MockRecipe(1, "recipe1", ["category1"]), MockRecipe(2, "recipe2", ["category2"])]
         mock_get_recipes.side_effect = lambda category: [r for r in recipes if category in r.categories]
         response = self.client.get("/menu?category=category2")
         self.assertEqual(response.status_code, 200)
