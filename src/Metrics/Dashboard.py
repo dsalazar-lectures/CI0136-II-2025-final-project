@@ -1,9 +1,19 @@
+
+import sys
+import os
+
+# Makes sure the root directory is in sys.path
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
+if ROOT_DIR not in sys.path:
+    sys.path.append(ROOT_DIR)
+    
 import streamlit as st
 from pathlib import Path
 from typing import Iterable, Literal, Callable, Dict
 from DashboardGeneralLogs import show_general_logs_window
 from DashboardAnalysisLogs import show_analysis_logs_window
 from AnalysisLogs import analysis_registry
+
 
 Mode = Literal["General Data", "Logs Analysis"]
 class LogsDashboard:
