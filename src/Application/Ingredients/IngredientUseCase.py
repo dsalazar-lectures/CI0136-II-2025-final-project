@@ -22,6 +22,10 @@ class IngredientUseCase:
         """Get a specific ingredient by its name."""
         return self.repository.get_by_name(ingredient_name)
 
+    def create_ingredient(self, name, categories, substitutes, components, recipe_count = 0):
+        """Create a new ingredient"""
+        return self.repository.create_ingredient(name, categories, substitutes, components, recipe_count)
+
 
 # Create a singleton instance to be imported by the routes
 ingredient_service = IngredientUseCase()
