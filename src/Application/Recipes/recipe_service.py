@@ -18,3 +18,6 @@ def delete_recipe(recipe_id, username):
 
 def update_recipe(recipe_id, updates, username):
     return recipe_repository.update_if_owned(recipe_id, username, updates)
+
+def get_recipes_by_category(category):
+    return recipe_repository.find_by_category(category)
