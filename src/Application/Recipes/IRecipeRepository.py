@@ -25,3 +25,7 @@ class IRecipeRepository(ABC):
     @abstractmethod
     def update_if_owned(self, recipe_id, username, updates):
         pass
+
+    @abstractmethod
+    def find_by_category(self, category):
+        pass

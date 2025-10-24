@@ -44,3 +44,4 @@ def validate_data(recipe_data) -> bool:
 
 def get_recipes_by_category(category):
     return recipe_repository.find_by_category(category)
+    return True
