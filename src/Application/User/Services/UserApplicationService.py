@@ -54,6 +54,7 @@ class UserApplicationService:
         if not user:
             return None, {'error': message}, status
 
+        self.user_repository.create_user_profile(user.id)
         return user, {'message': message, 'user': user_dto.to_dict()}, status
 
     def login_user(self, data):
