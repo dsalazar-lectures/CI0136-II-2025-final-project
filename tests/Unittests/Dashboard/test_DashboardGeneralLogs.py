@@ -6,7 +6,7 @@ import json
 import unittest
 import pandas as pd
 import tempfile
-from src.Metrics.DashboardGeneralLogs import GeneralData_Window
+from src.Services.Metrics.DashboardGeneralLogs import GeneralData_Window
 
 class TestDashboardGeneralLogs(unittest.TestCase):
 

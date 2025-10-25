@@ -26,7 +26,7 @@ def create_app():
             "GET /api/ingredients/<id> - Get ingredient by ID", 
             "GET /api/recipes - Get all recipes",
             "GET /api/recipes/<id> - Get recipe by ID",
-            "GET /api/metrics/open-dashboard?port=8601"
+            "GET /api/Services/metrics/open-dashboard?port=8601"
         ]}
     
     return app

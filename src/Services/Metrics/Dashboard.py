@@ -1,9 +1,9 @@
 import streamlit as st
 from pathlib import Path
 from typing import Iterable, Literal, Callable, Dict
-from Metrics.DashboardGeneralLogs import GeneralData_Window
-from Metrics.DashboardAnalysisLogs import Analysis_Window
-from Metrics.AnalysisLogs import AnalysisLogs
+from Services.Metrics.DashboardGeneralLogs import GeneralData_Window
+from Services.Metrics.DashboardAnalysisLogs import Analysis_Window
+from Services.Metrics.AnalysisLogs import AnalysisLogs
 
 Mode = Literal["General Data", "Logs Analysis"]
 class LogsDashboard:
