@@ -18,7 +18,7 @@ class Recipe:
     @property
     def rating(self):
         return self.califications_sumatory / self.califications_amount if self.califications_amount > 0 else 0
-    
+
     def to_dict(self):
         return {
             "id": self.id,
