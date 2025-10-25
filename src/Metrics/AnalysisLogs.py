@@ -2,6 +2,7 @@ from typing import List, Dict, Callable
 import pandas as pd
 import streamlit as st
 from src.Application.Recipes import IRecipeRepository
+from datetime import datetime, timedelta
 
 # --------------------------------------------------------------------------------
 
@@ -33,9 +34,18 @@ class AnalysisLogs:
             if df is None or df.empty:
                 st.text("No 'Search recipes' data found.")
             else:
-                counts = df["Id_Producto"].value_counts(ascending=True).head(10)
+                df["timestamp"] = pd.to_datetime(df["timestamp"])
+                week_ago = datetime.today() - timedelta(days=7)
+                df = df[
+                    (df["timestamp"] >= week_ago)
+                    & (df["timestamp"] <= datetime.today())
+                ]
+                counts = df["Id_Producto"].value_counts(ascending=True)
+                # st.write(f"all counts {counts}")
+                counts = counts[counts < 5]
+                # st.write(f"filtered counts {counts}")
                 recipes_counts = {}
-                for recipe_id in df["Id_Producto"].unique():
+                for recipe_id in counts.index:
                     recipe = IRecipeRepository.recipe_repository.get_by_id(recipe_id)
                     if recipe:
                         recipes_counts[recipe.to_dict()["name"]] = counts[recipe_id]
