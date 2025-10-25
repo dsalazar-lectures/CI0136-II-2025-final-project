@@ -6,7 +6,7 @@ import json
 import unittest
 import pandas as pd
 import tempfile
-from Metrics.DashboardGeneralLogs import GeneralData_Window
+from src.Metrics.DashboardGeneralLogs import GeneralData_Window
 
 class TestDashboardGeneralLogs(unittest.TestCase):
 
@@ -31,4 +31,4 @@ class TestDashboardGeneralLogs(unittest.TestCase):
 
 
 
-# Run test: python -m unittest discover -s src/Test/Unit_Test -p "Unittest_DashboardGeneralLogs.py" -v
+# Run test: ython -m unittest tests.Unittests.Dashboard.test_DashboardGeneralLogs -v

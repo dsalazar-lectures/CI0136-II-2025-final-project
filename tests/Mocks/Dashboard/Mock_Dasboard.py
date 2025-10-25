@@ -2,7 +2,7 @@ import unittest, sys
 from unittest.mock import patch
 from pathlib import Path
 sys.path.append(str(Path(__file__).resolve().parents[3] / "src"))
-from Metrics.Dashboard import LogsDashboard
+from src.Metrics.Dashboard import LogsDashboard
 
 class TestLogsDashboard(unittest.TestCase):
     @patch("Metrics.Dashboard.st.stop")
@@ -76,4 +76,4 @@ class TestLogsDashboard(unittest.TestCase):
         mock_info.assert_called_once()
 
 
-# Run test: python -m unittest discover -s src/Test/Mocked -p "Mocks_Dasboard.py" -v
+# Run test: python -m unittest tests.Mocks.Dashboard.Mock_Dasboard -v

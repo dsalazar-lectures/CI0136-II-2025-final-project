@@ -10,9 +10,6 @@ sys.path.append(str(Path(__file__).resolve().parents[3] / "src"))
 from Metrics.DashboardGeneralLogs import GeneralData_Window
 from Metrics.GeneralLogs import GeneralLogs
 
-patcher_st = patch("Metrics.DashboardGeneralLogs.st", new_callable=MagicMock)
-mock_st = patcher_st.start()
-
 class TestDashboardGeneralLogs(unittest.TestCase):
 
     @patch.object(GeneralData_Window, "sidebar_select_files", return_value=[Path("mock.json")])
@@ -53,4 +50,4 @@ class TestDashboardGeneralLogs(unittest.TestCase):
         mock_info.assert_called_once()
         mock_stop.assert_called_once()
 
-# Run test: python -m unittest discover -s src/Test/Mocked -p "Mocks_DashboardGeneralLogs.py" -v
+# Run test: python -m unittest tests.Mocks.Dashboard.Mock_GeneralLogs -v
