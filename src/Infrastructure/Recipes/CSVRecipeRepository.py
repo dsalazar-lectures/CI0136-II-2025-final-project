@@ -142,8 +142,6 @@ class CSVRecipeRepository(IRecipeRepository):
             for recipe in system_recipes
             if any(
                 category in str(recipe_category).lower()
-                for recipe_category in (
-                    recipe.categories
-                )
+                for recipe_category in (recipe.categories)
             )
         ]
