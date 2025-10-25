@@ -25,6 +25,26 @@ class IngredientUseCase:
     def create_ingredient(self, name, categories, substitutes, components, recipe_count = 0):
         """Create a new ingredient"""
         return self.repository.create_ingredient(name, categories, substitutes, components, recipe_count)
+    
+    def add_recipe(self, ingredient_id: int):
+        """Add a recipe to an ingredient's recipe count"""
+        return self.repository.add_recipe(ingredient_id)
+    
+    def update_categories(self, ingredient_id: int, categories):
+        """Update an ingredient's categories"""
+        return self.repository.update_ingredient_categories(ingredient_id, categories)
+    
+    def update_substitutes(self, ingredient_id: int, substitutes):
+        """Update an ingredient's substitutes"""
+        return self.repository.update_ingredient_substitutes(ingredient_id, substitutes)
+    
+    def update_components(self, ingredient_id: int, components):
+        """Update an ingredient's components"""
+        return self.repository.update_ingredient_components(ingredient_id, components)
+    
+    def delete_ingredient(self, ingredient_id: int):
+        """Delete an ingredient from the ingredient dictionary"""
+        return self.repository.delete_ingredient(ingredient_id)
 
 
 # Create a singleton instance to be imported by the routes
