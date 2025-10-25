@@ -49,6 +49,11 @@ class IngredientRepository:
             return "ID is not valid"
         ingredient.change_components(components)
 
+    def delete_ingredient(self, id: int):
+        ingredient = self._items.pop(id, None)
+        if (ingredient is None):
+            return "ID is not valid"
+
     # part of the mocking
     def _add(
         self,
