@@ -27,3 +27,15 @@ class Ingredient:
 
     def is_base_ingredient(self):
         return len(self.components) == 0
+    
+    def add_recipe(self):
+        self.recipe_count = self.recipe_count + 1
+    
+    def change_categories(self, categories):
+        self.categories = categories
+
+    def change_substitutes(self, substitutes):
+        self.substitutes = substitutes
+
+    def change_components(self, components):
+        self.components = components
