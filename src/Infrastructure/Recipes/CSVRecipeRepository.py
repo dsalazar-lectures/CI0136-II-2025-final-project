@@ -13,14 +13,14 @@ class CSVRecipeRepository(IRecipeRepository):
 
     def get_by_id(self, recipe_id):
         return next((recipe for recipe in system_recipes if recipe.id == recipe_id), None)
-    
+
     def find_by_ingredient(self, ingredient):
         ingredient = ingredient.lower()
         return [
             recipe for recipe in system_recipes
             if any(ingredient in ing.lower() for ing in recipe.ingredients)
         ]
-    
+
     def build_recipe(self, data):
         return Recipe(
             data["id"],
@@ -35,7 +35,7 @@ class CSVRecipeRepository(IRecipeRepository):
             0,
             0
         )
-    
+
     def save_to_csv(self, recipe):
         with open(PATH, mode="a", newline="", encoding="utf-8") as file:
             writer = csv.writer(file)
@@ -127,3 +127,16 @@ class CSVRecipeRepository(IRecipeRepository):
 
         self.rewrite_csv()
         return recipe
+
+    def find_by_category(self, category):
+        category = category.lower()
+        return [
+            recipe
+            for recipe in system_recipes
+            if any(
+                category in str(recipe_category).lower()
+                for recipe_category in (
+                    recipe.categories
+                )
+            )
+        ]
