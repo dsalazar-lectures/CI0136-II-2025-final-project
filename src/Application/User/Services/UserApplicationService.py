@@ -67,4 +67,3 @@ class UserApplicationService:
         token = self.token_service.generate_token(user)
 
         return user, {'message': "Login successful", 'token': token}, 200
-
