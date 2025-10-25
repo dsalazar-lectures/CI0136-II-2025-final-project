@@ -48,12 +48,12 @@ class AnalysisLogs:
         """Top N de usuarios con MÁS INICIOS DE SESIÓN (action == 'Login') en el rango dado."""
         df = AnalysisLogs._concat_and_filter(df_list, start_date, end_date)
 
-        # Validación mínima
+        # Minimum validation
         if df.empty or not {"user", "action"}.issubset(df.columns):
             st.info("No hay datos suficientes ('user' y 'action') para calcular logins.")
             return
 
-        # Solo eventos de Login (match exacto)
+        # Login events only (exact match)
         df = df[df[ACTION_COL] == ACTION_VALUE_LOGIN]
         if df.empty:
             st.info("No hay inicios de sesión en el rango seleccionado.")

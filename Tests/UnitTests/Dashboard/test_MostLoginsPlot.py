@@ -19,7 +19,7 @@ class MostLoginsPlotTest(unittest.TestCase):
 
     @patch("src.Metrics.AnalysisLogs.st")
     def test_missing_columns_shows_info(self, mock_st):
-        # Falta 'action'
+        # Missing 'action'
         bad = pd.DataFrame({"timestamp": ["2025-10-12"], "user": ["Alice"]})
         AnalysisLogs.top_users_most_active(
             df_list=[{"name": "Login.json", "data": bad}],
@@ -27,18 +27,18 @@ class MostLoginsPlotTest(unittest.TestCase):
             end_date=pd.Timestamp("2025-10-20"),
             top_n=10
         )
-        mock_st.info.assert_called()      # avisa que faltan columnas
+        mock_st.info.assert_called()      # warns that columns are missing
         mock_st.bar_chart.assert_not_called()
 
     @patch("src.Metrics.AnalysisLogs.st")
     def test_counts_only_login_actions(self, mock_st):
-        # Solo estos 3 cuentan (action == "Login")
+        # Only these 3 count (action == "Login")
         df_login = pd.DataFrame({
             "timestamp": ["2025-10-12", "2025-10-13", "2025-10-13"],
             "user": ["Alice", "Bob", "Alice"],
             "action": ["Login", "Login", "Login"],
         })
-        # Estos NO cuentan
+        # These DO NOT count
         df_other = pd.DataFrame({
             "timestamp": ["2025-10-12", "2025-10-13"],
             "user": ["Alice", "Alice"],
@@ -54,9 +54,9 @@ class MostLoginsPlotTest(unittest.TestCase):
         )
 
         mock_st.bar_chart.assert_called_once()
-        # Verificamos el Series que se graficó
+        # We check the Series that was graphed
         series_passed = mock_st.bar_chart.call_args[0][0]
-        # Solo logins: Alice=2, Bob=1
+        # Only logins: Alice=2, Bob=1
         assert series_passed.to_dict() == {"Alice": 2, "Bob": 1}
         mock_st.dataframe.assert_called_once()
 
@@ -76,5 +76,5 @@ class MostLoginsPlotTest(unittest.TestCase):
         )
 
         series_passed = mock_st.bar_chart.call_args[0][0]
-        # Solo cae dentro del rango el 2025-10-15 => Alice=1
+        # Only 2025-10-15 falls within the range => Alice=1
         assert series_passed.to_dict() == {"Alice": 1}
