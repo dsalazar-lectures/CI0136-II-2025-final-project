@@ -5,6 +5,7 @@ from Services.Metrics.DashboardGeneralLogs import GeneralData_Window
 from Services.Metrics.DashboardAnalysisLogs import Analysis_Window
 from Services.Metrics.AnalysisLogs import AnalysisLogs
 
+
 Mode = Literal["General Data", "Logs Analysis"]
 class LogsDashboard:
     MODE_GENERAL: Mode = "General Data"
@@ -16,7 +17,7 @@ class LogsDashboard:
     LEVEL_WARNING = "### ⚠️ No JSON files found in the folder."
 
     def __init__(self, logs_dir: Path | None = None) -> None:
-        self._logs_dir: Path = logs_dir or (Path(__file__).parent.parent / "Database" / "Logs")
+        self._logs_dir: Path = logs_dir or (Path(__file__).resolve().parents[2] / "Database" / "Logs")
 
     def run(self) -> None:
         self.init_page()

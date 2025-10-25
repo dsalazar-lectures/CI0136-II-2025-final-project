@@ -1,11 +1,11 @@
-import unittest
+import unittest, sys
 from unittest.mock import patch, MagicMock
 import pandas as pd
 from pathlib import Path
-import sys
+
 sys.path.append(str(Path(__file__).resolve().parents[3] / "src"))
 
-from Services.Metrics.GeneralLogs import GeneralLogs
+from Services.Metrics.GeneralLogs import GeneralLogs # type: ignore
 
 class TestGeneralLogs(unittest.TestCase):
 

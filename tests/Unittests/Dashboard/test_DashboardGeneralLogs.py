@@ -1,11 +1,9 @@
-import sys
-from pathlib import Path
-sys.path.append(str(Path(__file__).resolve().parents[3] / "src"))
-
-import json
-import unittest
+import json, unittest, sys
 import pandas as pd
 import tempfile
+from pathlib import Path
+
+sys.path.append(str(Path(__file__).resolve().parents[3] / "src"))
 from src.Services.Metrics.DashboardGeneralLogs import GeneralData_Window
 
 class TestDashboardGeneralLogs(unittest.TestCase):
