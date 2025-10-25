@@ -38,3 +38,9 @@ class UserRepository(IUserRepository):
                 role=db_user['role']
             )
         return None
+    
+    def update_password(self, username, hashed_password):
+        updated = self.user_csv.update_password(username, hashed_password)
+        if updated:
+            return True, "Password updated successfully", 200
+        return False, "Failed to update password", 400
