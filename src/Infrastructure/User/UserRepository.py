@@ -39,5 +39,18 @@ class UserRepository(IUserRepository):
             )
         return None
     
-    def update_user_token(self, username, token, key=None) -> bool:
+    def get_user_by_token(self,token):
+        db_user = self.user_csv.get_user_by_token(token)
+        if db_user:
+            return UserDTO(
+                id=int(db_user['id']),
+                username=db_user['username'],
+                password=db_user['password'],
+                email=db_user['email'],
+                role=db_user['role'],
+                key=db_user['key']
+            )
+        return None
+    
+    def update_user_token(self, username, token, key) -> bool:
         return self.user_csv.update_user_token(username, token, key)

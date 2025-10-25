@@ -14,7 +14,7 @@ class TokenService(ITokenService):
         payload = {
             "iat": now,
             "exp": now + datetime.timedelta(minutes=60),
-            "sub": user.id,
+            "sub": str(user.id),
             "username": user.username
         }
 
@@ -27,5 +27,12 @@ class TokenService(ITokenService):
         user.key = secrets.token_hex(32)
 
     @staticmethod
-    def verify_token(token):
-        pass
+    def verify_token(token, user):
+        try:
+            payload = jwt.decode(token, user.key, algorithms=["HS256"])
+            return True
+        except (jwt.ExpiredSignatureError):
+            return False
+
+        return False
+

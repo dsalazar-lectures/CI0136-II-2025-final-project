@@ -60,6 +60,16 @@ class UserCSV:
                     return row
         return None
     
+    def get_user_by_token(self, token):
+        with open(self.file_path, 'r', newline='') as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                if row['token'] == token:
+                    return row
+                   
+        return None
+                  
+    
     def update_user_token(self, username, token, key=None):
         updated = False
         tmp = NamedTemporaryFile('w', delete=False, newline='')
