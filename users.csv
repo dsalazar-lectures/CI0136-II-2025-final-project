@@ -1,0 +1,2 @@
+id,username,password,email,role
+1,kafka,$2b$12$t7YtQo8EfKLsDxFVVsBsEeU9cNyfjEhL63g4f6fzwWUopRJOBN2nO,nuevo.email@example.com,user
