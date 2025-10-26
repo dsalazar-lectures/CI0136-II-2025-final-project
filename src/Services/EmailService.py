@@ -19,18 +19,36 @@ def send_email(sender, recipient, subject, contents):
     with smtplib.SMTP(smtp_server, smtp_port) as s:
         s.send_message(message)
 
+port = 587
+smtp_server = "smtp.gmail.com"
+sender_email = "jhonpython61@gmail.com"
+password = "recm ylge acie zhye"
 
-def send_file(receiver_email, menuAdapter):
-    port = 587
-    smtp_server = "smtp.gmail.com"
-    sender_email = "jhonpython61@gmail.com"
-    password = "recm ylge acie zhye"
-    contents = "Test"
+
+def sendEmail(receiver_email, newSubject, newContent):
+    message = EmailMessage()
+    message.set_content(newContent)
+
+    message["Subject"] = newSubject
+    message["From"] = sender_email
+    message["To"] = receiver_email
+
+    with smtplib.SMTP(smtp_server, port) as server:
+        server.starttls()
+        server.login(sender_email, password)
+        server.sendmail(sender_email, receiver_email, message.as_string())
+
+    return
+
+
+def sendMenu(receiver_email, menuAdapter):
+    textContent = "This is an automated message, please do not reply to this email"
+    mailSubject = "Menu requested"
 
     message = EmailMessage()
-    message.set_content(contents)
+    message.set_content(textContent)
 
-    message["Subject"] = "test.py"
+    message["Subject"] = mailSubject
     message["From"] = sender_email
     message["To"] = receiver_email
 
@@ -51,4 +69,4 @@ def send_file(receiver_email, menuAdapter):
 
 
 if __name__ == "__main__":
-    send_file("cascante.aldo@gmail.com")
+    sendEmail("cascante.aldo@gmail.com", "Test", "This is a notification")

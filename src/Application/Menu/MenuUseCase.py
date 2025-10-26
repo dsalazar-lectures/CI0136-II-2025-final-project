@@ -1,10 +1,10 @@
 from src.Application.Menu.MenuPdfAdapter import MenuPdfAdapter
-from src.Services.EmailService import send_file
+from src.Services.EmailService import sendMenu
 
 
 def emailPdf(recipeList, recipientEmail):
 
     adapter = MenuPdfAdapter(recipeList)
-    send_file(recipientEmail, adapter)
+    sendMenu(recipientEmail, adapter)
 
     return "200"
