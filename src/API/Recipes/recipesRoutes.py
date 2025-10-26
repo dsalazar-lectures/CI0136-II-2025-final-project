@@ -23,11 +23,8 @@ def get_recipe(recipe_id):
 def get_recipes_by_ingredient(ingredient):
     recipes = recipe_service.get_recipes_by_ingredient(ingredient)
     if not recipes:
-        return (
-            jsonify({"message": f"No se encontraron recetas con '{ingredient}'"}),
-            404,
-        )
-
+        return jsonify({"message": f"No se encontraron recetas con '{ingredient}'"}), 404
+    
     return jsonify([recipe.__str__() for recipe in recipes])
 
 
@@ -37,10 +34,7 @@ def create_recipe():
     username = "myUser"
     recipe = recipe_service.create_recipe(data, username)
     if recipe == -1:
-        return (
-            jsonify({"error": "Se necesita información adicional sobre la receta"}),
-            400,
-        )
+        return jsonify({"error": "Se necesita información adicional sobre la receta"}), 400
     return jsonify(recipe.to_dict())
 
 
@@ -61,3 +55,30 @@ def update_recipe(recipe_id):
     updates = request.json or {}
     status_code, response_data = update_recipe_controller(recipe_id, updates, username)
     return jsonify(response_data), status_code
+
+@recipes_bp.route("/recipes/filter", methods=["POST"])
+def filter_recipes():
+    filter_criteria = request.json or {}
+    
+    # Validate and convert types if needed
+    if 'duration' in filter_criteria and filter_criteria['duration'] is not None:
+        try:
+            filter_criteria['duration'] = int(filter_criteria['duration'])
+        except (ValueError, TypeError):
+            return jsonify({"error": "Duration debe ser un número"}), 400
+    
+    if 'rating' in filter_criteria and filter_criteria['rating'] is not None:
+        try:
+            filter_criteria['rating'] = float(filter_criteria['rating'])
+        except (ValueError, TypeError):
+            return jsonify({"error": "Rating debe ser un número"}), 400
+    
+    filtered_recipes = recipe_service.filter_recipes(filter_criteria)
+    
+    if not filtered_recipes:
+        return jsonify({"message": "No se encontraron recetas con los filtros aplicados", "recipes": []}), 200
+    
+    return jsonify({
+        "count": len(filtered_recipes),
+        "recipes": [recipe.to_dict() for recipe in filtered_recipes]
+    }), 200
