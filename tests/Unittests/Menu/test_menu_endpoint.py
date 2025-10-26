@@ -41,8 +41,7 @@ class MenuEndpointTestCase(unittest.TestCase):
         self.assertEqual(len(data), 1)
         self.assertEqual(data[0]["name"], "recipe2")
 
-    @patch("src.Application.Menu.MenuUseCase.emailPdf")
-    def test_get_menu_emailPdf_invalid_address(self, mock_get_random_recipe):
+    def test_get_menu_emailPdf_invalid_address(self):
         response = MenuUseCase.emailPdf(1, "test.gmail.com")
         self.assertEqual(response, 400)
 
