@@ -3,7 +3,7 @@ from Shared.Logs.Logger_textfile import TxtFileLogger
 logger = TxtFileLogger()
 
 try:
-    result1 = 10 / 2 
+    result1 = 10 / 2
     logger.log(
         level="info",
         user="Alice",
@@ -51,7 +51,7 @@ except Exception as e:
     )
 
 try:
-    result2 = 10 / 0  
+    result2 = 10 / 0
     logger.log(
         level="info",
         user="Bob",
