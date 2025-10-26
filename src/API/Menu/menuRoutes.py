@@ -11,7 +11,8 @@ def get_menu():
     recipe = recipe_service.get_random_recipe_by_category(category)
     return jsonify([recipe.to_dict() if recipe else {}])
 
-@recipes_bp.route('/menu/email', methods=["GET"])
+
+@recipes_bp.route("/menu/email", methods=["GET"])
 def emailMenu():
     menuRecipes = request.json.get("ids")
     recipientEmail = request.json.get("sendto")
