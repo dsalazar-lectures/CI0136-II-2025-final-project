@@ -1,6 +1,6 @@
 from itertools import chain
 import os
-from Application.Interfaces.IMenuAdapter import IMenuAdapter
+from src.Application.Interfaces.IMenuAdapter import IMenuAdapter
 from src.Application.Recipes import recipe_service
 from fpdf import FPDF
 
@@ -28,7 +28,6 @@ class MenuPdfAdapter(IMenuAdapter):
 
         for id in self.recipeList:
            recipe = recipe_service.get_recipe_by_id(int(id))
-           print(recipe.name)
            pdfMenu.multi_cell(w=pdfMenu.w - 50, h=20, txt=recipe.name, align="J")
            pdfMenu.multi_cell(w=pdfMenu.w  - 50, h=20, txt="Ingredientes:" + (" ".join(str(i) for i in chain(recipe.ingredients))), align="J")
            pdfMenu.multi_cell(w=pdfMenu.w  - 50, h=20, txt= "Instrucciones: " + recipe.instructions, align="J")
