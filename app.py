@@ -9,7 +9,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "src"))
 from src.API.Ingredients.IngredientsRoutes import ingredients_bp
 from src.API.Recipes.recipesRoutes import recipes_bp
 from src.API.Menu.menuRoutes import recipes_bp as menu_bp
-from src.API.AuthRoutes import auth_bp
+
 
 def create_app():
     app = Flask(__name__)
@@ -20,16 +20,13 @@ def create_app():
     app.register_blueprint(ingredients_bp)
     app.register_blueprint(recipes_bp, url_prefix="/api")
     app.register_blueprint(menu_bp, url_prefix="/api")
-    app.register_blueprint(auth_bp, url_prefix='/auth')
-    
+
     # Health check endpoint
     @app.route("/")
     def health_check():
         return {
             "status": "API is running",
             "endpoints": [
-                "POST /auth/register",
-                "POST /auth/login",
                 "GET /api/ingredients - Get all ingredients",
                 "GET /api/ingredients/<id> - Get ingredient by ID",
                 "GET /api/recipes - Get all recipes",
