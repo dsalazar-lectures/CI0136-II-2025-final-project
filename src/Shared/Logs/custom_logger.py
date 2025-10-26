@@ -26,15 +26,15 @@ class CustomLogger:
         user: str,
         role: str,
         action: str,
-        description: str,
         id_object: int | str = "-",
+        description: str = "",
     ) -> None:
         event = AuditEvent(
             user=user,
             role=role,
             action=action,
-            description=description,
             id_object=id_object,
+            description=description,
         )
         extra = asdict(event)
 
