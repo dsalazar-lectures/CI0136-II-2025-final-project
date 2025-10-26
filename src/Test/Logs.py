@@ -1,16 +1,16 @@
-from Shared.Logs.Logger_textfile import TxtFileLogger
+from src.Shared.Logs.Logger_textfile import TxtFileLogger
 
 logger = TxtFileLogger()
 
 try:
-    result1 = 10 / 2 
+    result1 = 10 / 2
     logger.log(
         level="info",
         user="Alice",
         role="Chef",
         action="Add recipe",
         id_object=123,
-        description=f"Recipe added successfully: {result1}"
+        description=f"Recipe added successfully: {result1}",
     )
 
     logger.log(
@@ -19,7 +19,7 @@ try:
         role="Admin",
         action="Login",
         id_object=124,
-        description="User logged in successfully"
+        description="User logged in successfully",
     )
 
     logger.log(
@@ -28,7 +28,7 @@ try:
         role="User",
         action="Select an ingredient",
         id_object=125,
-        description="The ingredient is not in the list"
+        description="The ingredient is not in the list",
     )
 
     logger.log(
@@ -37,7 +37,7 @@ try:
         role="User",
         action="Modify recipe",
         id_object=126,
-        description="Recipe modified successfully"
+        description="Recipe modified successfully",
     )
 
 except Exception as e:
@@ -47,18 +47,18 @@ except Exception as e:
         role="Administrator",
         action="Generate report",
         id_object=127,
-        description=f"An unexpected error occurred: {str(e)}"
+        description=f"An unexpected error occurred: {str(e)}",
     )
 
 try:
-    result2 = 10 / 0  
+    result2 = 10 / 0
     logger.log(
         level="info",
         user="Bob",
         role="User",
         action="Login",
         id_object=128,
-        description=f"Login successful: {result2}"
+        description=f"Login successful: {result2}",
     )
 
 except Exception as e:
@@ -68,5 +68,5 @@ except Exception as e:
         role="User",
         action="Login",
         id_object=128,
-        description=f"An error occurred during login: {str(e)}"
+        description=f"An error occurred during login: {str(e)}",
     )

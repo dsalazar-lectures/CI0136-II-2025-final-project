@@ -2,6 +2,7 @@ import logging
 from typing import List, Optional
 from pathlib import Path
 
+
 class CustomLogger:
 
     def __init__(
@@ -46,8 +47,22 @@ class CustomLogger:
         console.setLevel(logging.DEBUG)
         return [console]
 
-    def log(self, level: str, user: str, role: str, action: str, id_object: int, description: str):
-        extra = {"user": user, "role": role, "action": action, "id_object": id_object, "description": description}
+    def log(
+        self,
+        level: str,
+        user: str,
+        role: str,
+        action: str,
+        id_object: int,
+        description: str,
+    ):
+        extra = {
+            "user": user,
+            "role": role,
+            "action": action,
+            "id_object": id_object,
+            "description": description,
+        }
         method = {
             "info": self.logger.info,
             "warning": self.logger.warning,
