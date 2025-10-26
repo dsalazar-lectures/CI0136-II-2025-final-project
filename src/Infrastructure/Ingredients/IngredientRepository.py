@@ -39,9 +39,7 @@ class IngredientRepository:
             return ingredient.substitutes
         return None
 
-    def get_substitutes_by_name(
-        self, ingredient_name: str
-    ) -> Optional[List[int]]:
+    def get_substitutes_by_name(self, ingredient_name: str) -> Optional[List[int]]:
         for ingredient in self._items.values():
             if ingredient.name.lower() == ingredient_name.lower():
                 if ingredient.has_substitutes():
