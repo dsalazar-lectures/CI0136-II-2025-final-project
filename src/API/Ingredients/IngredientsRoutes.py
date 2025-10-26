@@ -30,6 +30,7 @@ def get_ingredient_name(ingredient_name):
 
 @ingredients_bp.route("/ingredients/create", methods=["POST"])
 def create_new_ingredient():
+    """Create a new ingredient"""
     name = request.json.get("name")
     categories = request.json.get("categories")
     substitutes = request.json.get("substitutes")
@@ -38,3 +39,28 @@ def create_new_ingredient():
     ingredient_service.create_ingredient(name, categories, substitutes, components)
 
     return jsonify({"message": "Ingredient created successfully"}), 201
+
+@ingredients_bp.route("/ingredients/update", methods=["POST"])
+def update_ingredient():
+    """Update one or more fields of an ingredient"""
+    id = request.json.get("id")
+    ingredient = ingredient_service.get_ingredient_by_id(id)
+    if ingredient is None:
+        return jsonify({"message": "Ingredient not found"}, 404)
+    
+    data = request.json
+
+    for field in ["categories", "substitutes", "components"]:
+        if field in data and not isinstance(data[field], list):
+            return jsonify({"error": f"{field} must be a list"}), 400
+
+    if "categories" in request.json:
+        ingredient_service.update_categories(id, data["categories"])
+
+    if "substitutes" in request.json:
+        ingredient_service.update_substitutes(id, data["substitutes"])
+
+    if "components" in request.json:
+        ingredient_service.update_components(id, data["components"])
+
+    return jsonify({"message": "Ingredient updated successfully"}), 200
