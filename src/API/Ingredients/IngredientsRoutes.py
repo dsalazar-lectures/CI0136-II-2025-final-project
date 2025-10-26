@@ -27,14 +27,14 @@ def get_ingredient_by_id(ingredient_id):
 
 @ingredients_bp.route("/ingredients/search", methods=["POST"])
 def search_ingredients_body():
-    """Buscar ingredientes por nombres O ids O categorías (solo un criterio a la vez)."""
+    """Search for ingredients by name OR ID OR category"""
     data = _get_request_data()
     if isinstance(data, tuple):
         return data
 
     simple = _get_simple_flag(data)
     
-    # Verificar que solo venga un criterio de búsqueda
+    # Verify that only one search criterion is provided
     search_criteria = [key for key in ['names', 'ids', 'categories'] if key in data]
     if len(search_criteria) == 0:
         return jsonify({
@@ -65,21 +65,19 @@ def search_ingredients_body():
         return jsonify({"results": _handle_categories(categories, simple)})
 
 def _get_request_data():
-    """Obtiene y valida el cuerpo JSON."""
+    """Retrieves and validates the JSON body."""
     data = request.get_json(silent=True)
     if not data:
         return jsonify({"error": "Cuerpo JSON requerido"}), 400
     return data
 
 def _get_simple_flag(data):
-    """Obtiene el parámetro 'simple' desde query o body."""
     simple_q = request.args.get('simple')
     if simple_q is not None:
         return simple_q.lower() == 'true'
     return bool(data.get('simple')) if 'simple' in data else False
 
 def _parse_names(data):
-    """Normaliza el campo 'names' (lista o string con comas)."""
     raw = data.get('names')
     if raw is None:
         return jsonify({"error": "Campo 'names' requerido en el body"}), 400
@@ -98,7 +96,6 @@ def _parse_names(data):
     return names
 
 def _handle_single_name(name, simple):
-    """Busca un solo ingrediente y devuelve resultado o 404."""
     ingredient = ingredient_service.get_ingredient_by_name(name)
     if ingredient is None:
         return jsonify({"error": "Ingrediente no encontrado"}), 404
@@ -107,7 +104,7 @@ def _handle_single_name(name, simple):
     )
 
 def _handle_multiple_names(names, simple):
-    """Busca múltiples ingredientes y devuelve resultados + faltantes."""
+    """Searches for multiple ingredients and returns results + missing items."""
     results = []
     not_found = []
 
@@ -121,7 +118,6 @@ def _handle_multiple_names(names, simple):
     return jsonify({"results": results, "not_found": not_found})
 
 def _parse_ids(data):
-    """Normaliza el campo 'ids' (lista o string con comas)."""
     raw = data.get('ids')
     if not raw:
         return []
@@ -139,7 +135,6 @@ def _parse_ids(data):
         return jsonify({"error": "Los IDs deben ser números enteros"}), 400
     
 def _parse_categories(data):
-    """Normaliza el campo 'categories' (lista o string con comas)."""
     raw = data.get('categories')
     if not raw:
         return []
@@ -154,7 +149,6 @@ def _parse_categories(data):
     return [cat for cat in items if cat]
 
 def _handle_multiple_ids(ids, simple):
-    """Busca múltiples ingredientes por ID."""
     results = []
     not_found = []
 
@@ -170,7 +164,6 @@ def _handle_multiple_ids(ids, simple):
     return {"results": results, "not_found": not_found}
 
 def _handle_categories(categories, simple):
-    """Busca ingredientes por categorías."""
     results = []
     for category in categories:
         ingredients = ingredient_service.get_ingredients_by_category(category)
