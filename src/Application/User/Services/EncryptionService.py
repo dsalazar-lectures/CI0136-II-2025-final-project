@@ -1,6 +1,7 @@
 import bcrypt
 from src.Application.Interfaces.IEncryptionService import IEncryptionService
 
+
 class EncryptionService(IEncryptionService):
 
     @staticmethod
