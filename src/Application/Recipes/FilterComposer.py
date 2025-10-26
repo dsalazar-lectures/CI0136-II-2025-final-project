@@ -5,6 +5,7 @@ from src.Application.Recipes.DurationFilter import DurationFilter
 from src.Application.Recipes.CalificationFilter import CalificationFilter
 from src.Application.Recipes.IngredientsFilter import IngredientsFilter
 from src.Application.Recipes.PortionsFilter import PortionsFilter
+from src.Application.Recipes.DislikesFilter import DislikesFilter
 
 
 class FilterComposer:
@@ -18,7 +19,8 @@ class FilterComposer:
             'duration': DurationFilter,
             'rating': CalificationFilter,
             'ingredients': IngredientsFilter,
-            'portions': PortionsFilter
+            'portions': PortionsFilter,
+            'dislikes': DislikesFilter
         }
     
     def apply_filters(self, recipes, filter_criteria):
