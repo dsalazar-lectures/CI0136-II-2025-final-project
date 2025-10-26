@@ -42,3 +42,17 @@ def login():
         return jsonify(response), status_code
 
     return jsonify(response), status_code
+
+
+@auth_bp.route("/change-password", methods=["POST"])
+def change_password():
+
+    # Request username, old_password, and new_password
+    data = request.get_json()
+
+    username = request.json.get("username")
+    if not username:
+        return jsonify({"error": "User not authenticated"}), 401
+
+    _, response, status_code = user_app_service.change_password(username, data)
+    return jsonify(response), status_code
