@@ -64,3 +64,13 @@ def update_ingredient():
         ingredient_service.update_components(id, data["components"])
 
     return jsonify({"message": "Ingredient updated successfully"}), 200
+
+@ingredients_bp.route("/ingredients/delete", methods=["POST"])
+def delete_ingredient():
+    """Delete an ingredient"""
+    # User permissions need to be validated here
+    id = request.json.get("id")
+
+    ingredient_service.delete_ingredient(id)
+
+    return jsonify({"message": "Ingredient deleted successfully"}), 200
