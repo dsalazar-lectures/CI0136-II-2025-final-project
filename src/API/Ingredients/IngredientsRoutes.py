@@ -32,6 +32,8 @@ def get_ingredient_name(ingredient_name):
 def create_new_ingredient():
     """Create a new ingredient"""
     name = request.json.get("name")
+    if not name:
+        return jsonify({"error": "Ingredient name is required"})
     categories = request.json.get("categories")
     substitutes = request.json.get("substitutes")
     components = request.json.get("components")
@@ -71,6 +73,9 @@ def delete_ingredient():
     # User permissions need to be validated here
     id = request.json.get("id")
 
-    ingredient_service.delete_ingredient(id)
+    result = ingredient_service.delete_ingredient(id)
+
+    if result == "ID is not valid":
+        return jsonify({"error": "Ingredient not found"}), 404
 
     return jsonify({"message": "Ingredient deleted successfully"}), 200
