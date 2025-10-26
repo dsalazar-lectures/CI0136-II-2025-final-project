@@ -17,7 +17,7 @@ def generate_menus(category: str, count: int):
     """
     # Validate count
     if count < 1:
-        return jsonify({"error": "count must be a positive integer"}), 400
+        return jsonify({"error": "el número de menús a generar debe ser un número entero positivo"}), 400
     # Category comes from the path; simply fetch recipes
     recipes = recipe_service.get_recipes_by_category(category)
     if not recipes:
