@@ -3,12 +3,13 @@ import sys
 import os
 
 # Add src directory to path for imports
-sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
+sys.path.append(os.path.join(os.path.dirname(__file__), "src"))
 
 # Import blueprints
 from src.API.Ingredients.IngredientsRoutes import ingredients_bp
 from src.API.Recipes.recipesRoutes import recipes_bp
 from src.API.Menu.menuRoutes import recipes_bp as menu_bp
+
 
 def create_app():
     app = Flask(__name__)
@@ -17,22 +18,26 @@ def create_app():
 
     # Register blueprints
     app.register_blueprint(ingredients_bp)
-    app.register_blueprint(recipes_bp, url_prefix='/api')
-    app.register_blueprint(menu_bp, url_prefix='/api')
+    app.register_blueprint(recipes_bp, url_prefix="/api")
+    app.register_blueprint(menu_bp, url_prefix="/api")
 
     # Health check endpoint
-    @app.route('/')
+    @app.route("/")
     def health_check():
-        return {"status": "API is running", "endpoints": [
-            "GET /api/ingredients - Get all ingredients",
-            "GET /api/ingredients/<id> - Get ingredient by ID",
-            "GET /api/recipes - Get all recipes",
-            "GET /api/recipes/<id> - Get recipe by ID",
-            "GET /api/menu?category=<category> - Get all menu items"
-        ]}
+        return {
+            "status": "API is running",
+            "endpoints": [
+                "GET /api/ingredients - Get all ingredients",
+                "GET /api/ingredients/<id> - Get ingredient by ID",
+                "GET /api/recipes - Get all recipes",
+                "GET /api/recipes/<id> - Get recipe by ID",
+                "GET /api/menu?category=<category> - Get all menu items",
+            ],
+        }
 
     return app
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     app = create_app()
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True, host="0.0.0.0", port=5000)

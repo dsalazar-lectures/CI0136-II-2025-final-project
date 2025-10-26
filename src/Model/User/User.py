@@ -9,9 +9,9 @@ class User:
     def to_dict(self):
         # Turn user object into a dictionary
         return {
-            'id': self.id,
-            'username': self.username,
-            'password': self.password,
-            'email': self.email,
-            'role': self.role
+            "id": self.id,
+            "username": self.username,
+            "password": self.password,
+            "email": self.email,
+            "role": self.role,
         }

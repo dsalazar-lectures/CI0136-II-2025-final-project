@@ -1,8 +1,21 @@
 import ast
 
+
 class Recipe:
-    def __init__(self, id, name, categories, ingredients, duration, instructions,
-                 portions, author, califications_sumatory, califications_amount, users_used_recipe):
+    def __init__(
+        self,
+        id,
+        name,
+        categories,
+        ingredients,
+        duration,
+        instructions,
+        portions,
+        author,
+        califications_sumatory,
+        califications_amount,
+        users_used_recipe,
+    ):
         self.id = int(id)
         self.name = name
         self.categories = ast.literal_eval(categories)
@@ -17,7 +30,11 @@ class Recipe:
 
     @property
     def rating(self):
-        return self.califications_sumatory / self.califications_amount if self.califications_amount > 0 else 0
+        return (
+            self.califications_sumatory / self.califications_amount
+            if self.califications_amount > 0
+            else 0
+        )
 
     def to_dict(self):
         return {
@@ -34,8 +51,10 @@ class Recipe:
         }
 
     def __str__(self):
-        return (f"Id: {self.id} | {self.name} | Autor: {self.author} | "
+        return (
+            f"Id: {self.id} | {self.name} | Autor: {self.author} | "
             f"Categorías: {', '.join(self.categories)} | "
             f"Duración: {self.duration} min | "
             f"Porciones: {self.portions} | "
-            f"Rating: {self.rating:.1f}")
+            f"Rating: {self.rating:.1f}"
+        )
