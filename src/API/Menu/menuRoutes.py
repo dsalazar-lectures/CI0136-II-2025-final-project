@@ -1,10 +1,10 @@
 from flask import Blueprint, jsonify, request
 from src.Application.Recipes import recipe_service
 
-recipes_bp = Blueprint("menu", __name__)
+menu_bp = Blueprint("menu", __name__)
 
 
-@recipes_bp.route("/menu", methods=["GET"])
+@menu_bp.route("/menu", methods=["GET"])
 def get_menu():
     category = request.args.get("category")
     recipes = recipe_service.get_recipes_by_category(category)
@@ -12,7 +12,7 @@ def get_menu():
     return jsonify([recipe.to_dict() for recipe in limited_recipes])
 
 
-@recipes_bp.route("/menu/<string:category>/<int:count>", methods=["GET"])
+@menu_bp.route("/menu/<string:category>/<int:count>", methods=["GET"])
 def generate_menus(category: str, count: int):
     """Generate N menus for a given category using path parameters.
     Example: GET /api/menu/almuerzo/5

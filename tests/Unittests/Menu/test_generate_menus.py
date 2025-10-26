@@ -1,14 +1,14 @@
 import unittest
 from unittest.mock import patch
 from flask import Flask
-from src.API.Menu.menuRoutes import recipes_bp
+from src.API.Menu.menuRoutes import menu_bp
 from tests.Mocks.Recipes.mock_recipe_repo import MockRecipe
 
 
 class GenerateMenusTestCase(unittest.TestCase):
     def setUp(self):
         app = Flask(__name__)
-        app.register_blueprint(recipes_bp)
+        app.register_blueprint(menu_bp)
         self.client = app.test_client()
 
     @patch("src.Application.Recipes.recipe_service.get_recipes_by_category")
