@@ -5,19 +5,18 @@ class IngredientsFilter(RecipeFilter):
 
     def __init__(self, filter_component, ingredients):
         super().__init__(filter_component)
-        self.ingredients = ingredients
+        self.ingredients = [ing.replace("-", " ").strip().lower() for ing in ingredients]
 
-    def filter(self, recipes, ingredients):
-        matchingIngredients = []
-        requestedIngredients = ingredients.split(',')
-        formattedIngredients = []
-
-        for ing in requestedIngredients:
-            ing.replace("-", " ")
-            formattedIngredients.append(ing)
+    def filter(self, recipes):
+        recipes = self._filter.filter(recipes)
+        matching_recipes  = []
 
         for recipe in recipes:
-            if formattedIngredients.lower().strip in recipe.ingredients.lower():
-                matchingIngredients.append(recipe)
+            recipe_ingredients = [ingredient.strip().lower() for ingredient in recipe.ingredients]
 
-        return matchingIngredients
+            if any(
+                any(ing in ingredient for ingredient in recipe_ingredients)
+                for ing in self.ingredients
+            ):
+                matching_recipes.append(recipe)
+        return matching_recipes
