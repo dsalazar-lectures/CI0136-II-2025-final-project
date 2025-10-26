@@ -45,5 +45,6 @@ class GenerateMenusTestCase(unittest.TestCase):
         names = [m["recipe"]["name"] for m in data]
         self.assertEqual(names, ["recipe1", "recipe2", "recipe1"])
 
+
 if __name__ == "__main__":
     unittest.main()
