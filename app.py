@@ -23,14 +23,17 @@ def create_app():
     # Health check endpoint
     @app.route('/')
     def health_check():
-        return {"status": "API is running", "endpoints": [
-            "GET /api/ingredients - Get all ingredients",
-            "GET /api/ingredients/<id> - Get ingredient by ID",
-            "GET /api/recipes - Get all recipes",
-            "GET /api/recipes/<id> - Get recipe by ID",
-            "GET /api/menu?category=<category> - Get all menu items",
-            "GET /api/menu/<category>/<count> - Generate N menus for a category"
-        ]}
+        return {
+            "status": "API is running",
+            "endpoints": [
+            	"GET /api/ingredients - Get all ingredients",
+            	"GET /api/ingredients/<id> - Get ingredient by ID",
+            	"GET /api/recipes - Get all recipes",
+            	"GET /api/recipes/<id> - Get recipe by ID",
+            	"GET /api/menu?category=<category> - Get all menu items",
+            	"GET /api/menu/<category>/<count> - Generate N menus for a category",
+        	],
+        }
 
     return app
 
