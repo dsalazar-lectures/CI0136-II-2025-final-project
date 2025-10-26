@@ -88,7 +88,7 @@ class UserApplicationService:
 
         return user, {"message": "Login successful", "token": token}, 200
 
-    def change_password(self, username, data):
+    def change_password(self, user, data):
         required_fields = ["old_password", "new_password"]
         is_valid, error_response, status_code = (
             self.validation_service.validate_request_data(data, required_fields)
@@ -98,11 +98,6 @@ class UserApplicationService:
 
         old_password = data["old_password"]
         new_password = data["new_password"]
-
-        # Get user by username
-        user = self.user_repository.get_user_by_username(username)
-        if not user:
-            return None, {"error": "User not found"}, 404
 
         # Verify old password
         if not self.encryption_service.verify_password(old_password, user.password):
@@ -136,20 +131,23 @@ class UserApplicationService:
 
         # Update in the database
         success, message, status = self.user_repository.update_password(
-            username, hashed_new_password
+            user.username, hashed_new_password
         )
         if not success:
             return None, {"error": message}, status
 
         return user, {"message": "Password updated successfully"}, 200
 
-    def verify_valid_session(self, data):
-        user = self.user_repository.get_user_by_token(data["token"])
-
+    def verify_valid_session(self, header, username):
+        # Get user by username
+        user = self.user_repository.get_user_by_username(username)
         if not user:
-            return None, {"error": "Invalid signature"}, 401
+            return None, {"error": "User not found"}, 404
 
-        if self.token_service.verify_token(data["token"], user):
+        # Separating the token from 'Bearer'
+        token = header["Authorization"].split(" ")[1]
+
+        if self.token_service.verify_token(token, user):
             return user, {"message": "Valid session"}, 200
         else:
             return None, {"error": "Expired session"}, 401

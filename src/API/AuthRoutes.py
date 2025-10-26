@@ -45,7 +45,10 @@ def login():
 
 
 @auth_bp.route("/change-password", methods=["POST"])
+# TODO(@Paulette): add jwt_required decorator
 def change_password():
+    if "Authorization" not in request.headers or not request.headers["Authorization"]:
+        return jsonify({"error": "Missing signature"}), 401
 
     # Request username, old_password, and new_password
     data = request.get_json()
@@ -54,5 +57,13 @@ def change_password():
     if not username:
         return jsonify({"error": "User not authenticated"}), 401
 
-    _, response, status_code = user_app_service.change_password(username, data)
+    header = request.headers
+    user, response, status_code = user_app_service.verify_valid_session(
+        header, username
+    )
+
+    if not user:
+        return jsonify(response), status_code
+
+    _, response, status_code = user_app_service.change_password(user, data)
     return jsonify(response), status_code
