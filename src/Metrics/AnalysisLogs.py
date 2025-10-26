@@ -2,7 +2,7 @@ from typing import List, Dict, Callable
 import pandas as pd
 import streamlit as st
 
-#--------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------
 
 MSG_NO_DATA_OR_FUNC = "No data or metrics available to display."
 MSG_EXEC_ERROR_TPL = "Error executing the metric: {}"
@@ -11,11 +11,12 @@ USER_COL = "user"
 ACTION_COL = "action"
 ACTION_VALUE_LOGIN = "Login"
 
-#--------------------------------------------------------------------------------
+
+# --------------------------------------------------------------------------------
 class AnalysisLogs:
     # Example metric functions
     @staticmethod
-    def top_users_least_active(df_list, start_date, end_date): 
+    def top_users_least_active(df_list, start_date, end_date):
         pass
 
     @staticmethod
@@ -28,7 +29,9 @@ class AnalysisLogs:
             df = df.dropna(axis=1, how="all")
             if df.empty or df.dropna(how="all").empty:
                 continue
-            if DATE_COL in df.columns and not pd.api.types.is_datetime64_any_dtype(df[DATE_COL]):
+            if DATE_COL in df.columns and not pd.api.types.is_datetime64_any_dtype(
+                df[DATE_COL]
+            ):
                 df = df.copy()
                 df[DATE_COL] = pd.to_datetime(df[DATE_COL], errors="coerce")
             frames.append(df)
@@ -50,7 +53,9 @@ class AnalysisLogs:
 
         # Minimum validation
         if df.empty or not {"user", "action"}.issubset(df.columns):
-            st.info("No hay datos suficientes ('user' y 'action') para calcular logins.")
+            st.info(
+                "No hay datos suficientes ('user' y 'action') para calcular logins."
+            )
             return
 
         # Login events only (exact match)
@@ -60,16 +65,16 @@ class AnalysisLogs:
             return
 
         counts = df[USER_COL].value_counts().head(top_n)
-        st.write(f"Rango: **{start_date.date()} – {end_date.date()}** · Inicios de sesión: **{len(df)}**")
+        st.write(
+            f"Rango: **{start_date.date()} – {end_date.date()}** · Inicios de sesión: **{len(df)}**"
+        )
         st.bar_chart(counts)
         st.dataframe(counts.rename_axis("user").reset_index(name="logins"))
-
 
     analysis_registry: Dict[str, Callable[..., None]] = {
         "Least Active Users": top_users_least_active,
         "Users with Most Logins": top_users_most_active,
     }
-
 
     @staticmethod
     def show_analysis_logs(df_list, func, start_date, end_date):
