@@ -1,4 +1,4 @@
-from typing import Any, List, Dict
+from typing import List, Dict
 
 
 def generate_menus(recipes, count) -> List[Dict]:
