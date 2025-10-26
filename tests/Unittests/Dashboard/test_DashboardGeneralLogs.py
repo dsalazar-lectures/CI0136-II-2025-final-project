@@ -1,4 +1,4 @@
-import json, unittest, sys
+import json, logging, unittest, sys
 import pandas as pd
 import tempfile
 from pathlib import Path
@@ -29,21 +29,32 @@ class TestDashboardGeneralLogs(unittest.TestCase):
         self.assertTrue(df.empty)
 
     def test_show_general_logs_window_valid(self):
-        patch_sidebar, patch_load, patch_kpis, patch_charts, patch_table = MocksDashboardGeneralLogs.patch_show_general_logs_window_valid()
-
-        with patch_sidebar, patch_load, patch_kpis as mock_kpis, patch_charts as mock_charts, patch_table as mock_table:
-            GeneralData_Window.show_general_logs_window([Path("mock.json")])
-            mock_kpis.assert_called_once()
-            mock_charts.assert_called_once()
-            mock_table.assert_called_once()
+        prev = logging.root.manager.disable
+        logging.disable(logging.WARNING)  
+        try:
+            patch_sidebar, patch_load, patch_kpis, patch_charts, patch_table = (
+                MocksDashboardGeneralLogs.patch_show_general_logs_window_valid()
+            )
+            with patch_sidebar, patch_load, patch_kpis as mock_kpis, patch_charts as mock_charts, patch_table as mock_table:
+                GeneralData_Window.show_general_logs_window([Path("mock.json")])
+                mock_kpis.assert_called_once()
+                mock_charts.assert_called_once()
+                mock_table.assert_called_once()
+        finally:
+            logging.disable(prev)
 
     def test_show_general_logs_window_empty(self):
-        patch_sidebar, patch_warn, patch_stop = MocksDashboardGeneralLogs.patch_show_general_logs_window_empty()
+        prev = logging.root.manager.disable
+        logging.disable(logging.WARNING)
+        try:
+            patch_sidebar, patch_warn, patch_stop = MocksDashboardGeneralLogs.patch_show_general_logs_window_empty()
+            with patch_sidebar, patch_warn as mock_warn, patch_stop as mock_stop:
+                GeneralData_Window.show_general_logs_window([])
+                mock_warn.assert_called_once()
+                mock_stop.assert_called()
+        finally:
+            logging.disable(prev)
 
-        with patch_sidebar, patch_warn as mock_warn, patch_stop as mock_stop:
-            GeneralData_Window.show_general_logs_window([])
-            mock_warn.assert_called_once()
-            mock_stop.assert_called()
 
     def test_sidebar_select_files_valid(self):
         with MocksDashboardGeneralLogs.patch_sidebar_select_files_valid() as mock_multiselect:
