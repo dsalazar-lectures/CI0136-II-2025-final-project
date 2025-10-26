@@ -39,8 +39,15 @@ class UserApplicationService:
             return None, error_response, status_code
 
         is_valid, valid_msg = self.validation_service.validate_userdata(
-            data["username"], data["password"], data["email"]
+            data["username"], data["email"]
         )
+        if not is_valid:
+            return None, {"error": valid_msg}, 400
+
+        is_valid, valid_msg = self.validation_service.validate_password_format(
+            data["password"]
+        )
+
         if not is_valid:
             return None, {"error": valid_msg}, 400
 
