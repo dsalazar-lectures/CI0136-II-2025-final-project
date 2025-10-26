@@ -4,6 +4,7 @@ from flask import Flask
 from src.API.Menu.menuRoutes import recipes_bp
 from tests.Mocks.Recipes.mock_recipe_repo import MockRecipe
 
+
 class GenerateMenusTestCase(unittest.TestCase):
     def setUp(self):
         app = Flask(__name__)
