@@ -61,12 +61,16 @@ def sendMenu(receiver_email, menuAdapter):
         menuFile, maintype="application", subtype=menuFileType, filename=menuFileName
     )
 
-    with smtplib.SMTP(smtp_server, port) as server:
-        server.starttls()
-        server.login(sender_email, password)
-        server.sendmail(sender_email, receiver_email, message.as_string())
+    try:
+        with smtplib.SMTP(smtp_server, port) as server:
+            server.starttls()
+            server.login(sender_email, password)
+            server.sendmail(sender_email, receiver_email, message.as_string())
+    except smtplib.SMTPResponseException as error:
+        print(f"Error: {error.smtp_error}")
+        return error.smtp_code
 
-    return
+    return smtplib.SMTPResponseException.smtp_code
 
 
 if __name__ == "__main__":

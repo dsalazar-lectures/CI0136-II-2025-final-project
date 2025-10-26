@@ -1,4 +1,5 @@
 import re
+import time
 from src.Application.Menu.MenuPdfAdapter import MenuPdfAdapter
 from src.Services.EmailService import sendMenu
 
@@ -9,6 +10,14 @@ def emailPdf(recipeList, recipientEmail):
         return 400
 
     adapter = MenuPdfAdapter(recipeList)
-    sendMenu(recipientEmail, adapter)
+    retryDelay = 3
+
+    for x in range(3):
+        error = sendMenu(recipientEmail, adapter)
+        if (
+            error == 450 or error == 454
+        ):  # mailbox busy or temporarily blocked or temporary authentication problem
+            break
+        time.sleep(retryDelay)
 
     return 200
