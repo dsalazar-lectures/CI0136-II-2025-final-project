@@ -1,6 +1,7 @@
 # concrete decorator
 from src.Application.Recipes.RecipeFilter import RecipeFilter
 
+
 class PortionsFilter(RecipeFilter):
 
     def __init__(self, filter_component, portions):
@@ -10,11 +11,20 @@ class PortionsFilter(RecipeFilter):
     def filter(self, recipes):
         recipes = self._filter.filter(recipes)
 
-        minMaxPortions = str(self.portions).split('-')
-        minPortion = int(minMaxPortions[0]) if len(minMaxPortions) > 0 and minMaxPortions[0] else 0
-        maxPortion = int(minMaxPortions[1]) if len(minMaxPortions) > 1 and minMaxPortions[1] else float('inf')
-        
+        minMaxPortions = str(self.portions).split("-")
+        minPortion = (
+            int(minMaxPortions[0])
+            if len(minMaxPortions) > 0 and minMaxPortions[0]
+            else 0
+        )
+        maxPortion = (
+            int(minMaxPortions[1])
+            if len(minMaxPortions) > 1 and minMaxPortions[1]
+            else float("inf")
+        )
+
         return [
-            recipe for recipe in recipes
+            recipe
+            for recipe in recipes
             if (minPortion <= recipe.portions and recipe.portions <= maxPortion)
         ]

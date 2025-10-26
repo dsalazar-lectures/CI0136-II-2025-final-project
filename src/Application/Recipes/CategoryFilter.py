@@ -1,5 +1,6 @@
 from src.Application.Recipes.RecipeFilter import RecipeFilter
 
+
 class CategoryFilter(RecipeFilter):
 
     def __init__(self, filter_component, categories):
@@ -10,7 +11,9 @@ class CategoryFilter(RecipeFilter):
         recipes = self._filter.filter(recipes)
         filtered = []
         for recipe in recipes:
-            recipe_categories = [category.strip().lower() for category in recipe.categories]
+            recipe_categories = [
+                category.strip().lower() for category in recipe.categories
+            ]
             if any(category in recipe_categories for category in self.categories):
                 filtered.append(recipe)
 

@@ -1,3 +1,2 @@
 # concrete component in Decorator
-from IFilter import IFilter
-
+# from IFilter import IFilter

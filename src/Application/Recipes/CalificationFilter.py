@@ -1,6 +1,7 @@
 # concrete decorator
 from src.Application.Recipes.RecipeFilter import RecipeFilter
 
+
 class CalificationFilter(RecipeFilter):
 
     def __init__(self, filter_component, calification):
@@ -10,6 +11,10 @@ class CalificationFilter(RecipeFilter):
     def filter(self, recipes):
         recipes = self._filter.filter(recipes)
         return [
-            recipe for recipe in recipes
-            if ((recipe.califications_sumatory / recipe.califications_amount) >= self.calification)
+            recipe
+            for recipe in recipes
+            if (
+                (recipe.califications_sumatory / recipe.califications_amount)
+                >= self.calification
+            )
         ]

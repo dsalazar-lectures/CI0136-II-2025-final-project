@@ -1,6 +1,7 @@
 # component interface
 from abc import ABC, abstractmethod
 
+
 class IFilter(ABC):
 
     @abstractmethod

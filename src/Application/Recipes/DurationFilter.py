@@ -1,6 +1,7 @@
 # concrete decorator
 from src.Application.Recipes.RecipeFilter import RecipeFilter
 
+
 class DurationFilter(RecipeFilter):
 
     def __init__(self, filter_component, duration):
@@ -9,7 +10,4 @@ class DurationFilter(RecipeFilter):
 
     def filter(self, recipes):
         recipes = self._filter.filter(recipes)
-        return [
-            recipe for recipe in recipes
-            if recipe.duration <= self.duration
-        ]
+        return [recipe for recipe in recipes if recipe.duration <= self.duration]
