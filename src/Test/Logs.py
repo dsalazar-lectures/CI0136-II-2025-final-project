@@ -1,4 +1,4 @@
-from Shared.Logs.Logger_textfile import TxtFileLogger
+from src.Shared.Logs.Logger_textfile import TxtFileLogger
 
 logger = TxtFileLogger()
 
