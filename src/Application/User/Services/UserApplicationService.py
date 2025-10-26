@@ -107,4 +107,44 @@ class UserApplicationService:
             return None, {'error': message}, status
 
         return user, {'message': "Password updated successfully"}, 200
+    
+    def change_email(self, username, data):
+        # Required fields
+        required_fields = ['old_email', 'new_email', 'password']
+        is_valid, error_response, status_code = self.validation_service.validate_request_data(
+            data, required_fields)
+        if not is_valid:
+            return None, error_response, status_code
 
+        old_email = data['old_email']
+        new_email = data['new_email']
+        password = data['password']
+
+        # Get user by username
+        user = self.user_repository.get_user_by_username(username)
+        if not user:
+            return None, {'error': "User not found"}, 404
+
+        # Verify password
+        if not self.encryption_service.verify_password(password, user.password):
+            return None, {'error': "Password is incorrect"}, 401
+
+        # Verify old email matches
+        if user.email != old_email:
+            return None, {'error': "Old email does not match our records"}, 400
+
+        # Validate new email format
+        is_valid, valid_msg = self.validation_service.validate_email_format(new_email)
+        if not is_valid:
+            return None, {'error': "New email is not valid"}, 400
+
+        # Ensure new email is different
+        if new_email == user.email:
+            return None, {'error': "New email must be different from the current email"}, 400
+
+        # Update in the database
+        success, message, status = self.user_repository.update_email(username, new_email)
+        if not success:
+            return None, {'error': message}, status
+
+        return user, {'message': "Email updated successfully"}, 200

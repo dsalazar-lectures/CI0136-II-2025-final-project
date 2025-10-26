@@ -53,3 +53,11 @@ class ValidationService:
         
         return True, "Password format is valid."
     
+    @staticmethod
+    def validate_email_format(email: str):
+        
+        # Validates that the email has a correct format using a regex pattern.
+        pattern = r"^[\w\.-]+@[\w\.-]+\.\w+$"
+        if re.match(pattern, email):
+            return True, "Valid email format"
+        return False, "Invalid email format. Example: user@example.com"
