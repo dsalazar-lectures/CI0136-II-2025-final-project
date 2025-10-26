@@ -26,6 +26,5 @@ class RecipeServiceTestCase(unittest.TestCase):
         self.assertIsNone(recipe)
 
 
-
 if __name__ == "__main__":
     unittest.main()
