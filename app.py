@@ -32,6 +32,7 @@ def create_app():
                 "GET /api/recipes - Get all recipes",
                 "GET /api/recipes/<id> - Get recipe by ID",
                 "GET /api/menu?category=<category> - Get all menu items",
+                "GET /api/menu/email - Email selected recipies to specific address",
             ],
         }
 

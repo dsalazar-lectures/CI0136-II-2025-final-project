@@ -19,7 +19,7 @@ def send_email(sender, recipient, subject, contents):
     with smtplib.SMTP(smtp_server, smtp_port) as s:
         s.send_message(message)
 
-def send_file(receiver_email):
+def send_file(receiver_email, menuAdapter):
     port = 587
     smtp_server = "smtp.gmail.com"
     sender_email = "jhonpython61@gmail.com"
@@ -33,10 +33,18 @@ def send_file(receiver_email):
     message["From"] = sender_email
     message["To"] = receiver_email
 
+    menuFile = menuAdapter.generateContentFile()
+    menuFileType = menuAdapter.getFileExtension()
+    menuFileName = "menu." + menuFileType
+    
+    message.add_attachment(menuFile, maintype='application', subtype=menuFileType, filename=menuFileName)
+
     with smtplib.SMTP(smtp_server, port) as server:
         server.starttls()
         server.login(sender_email, password)
         server.sendmail(sender_email, receiver_email, message.as_string())
+
+    return
 
 
 if __name__ == "__main__":
