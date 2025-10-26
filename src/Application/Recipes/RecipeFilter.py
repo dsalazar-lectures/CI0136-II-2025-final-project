@@ -1,5 +1,5 @@
 # decorator interface
-from IFilter import IFilter
+from src.Application.Recipes.IFilter import IFilter
 
 class RecipeFilter(IFilter):
 

@@ -1,5 +1,5 @@
 # concrete decorator
-from RecipeFilter import RecipeFilter
+from src.Application.Recipes.RecipeFilter import RecipeFilter
 
 class AuthorFilter(RecipeFilter):
 

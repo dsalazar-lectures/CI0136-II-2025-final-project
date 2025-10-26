@@ -1,4 +1,4 @@
-from RecipeFilter import RecipeFilter
+from src.Application.Recipes.RecipeFilter import RecipeFilter
 
 class CategoryFilter(RecipeFilter):
 
@@ -7,7 +7,8 @@ class CategoryFilter(RecipeFilter):
         self.categories = categories
 
     def filter(self, recipes, category):
+        category_lower = category.lower()
         return [
             recipe for recipe in recipes
-            if (recipe.categories.lower() == category.lower())
+            if any(cat.lower() == category_lower for cat in recipe.categories)
         ]
