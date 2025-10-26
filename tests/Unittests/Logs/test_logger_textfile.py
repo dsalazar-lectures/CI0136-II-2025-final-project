@@ -1,4 +1,3 @@
-import re
 import logging
 import unittest
 from pathlib import Path
@@ -36,7 +35,9 @@ class TxtFileLoggerTests(unittest.TestCase):
     def test_write_single_log_entry(self):
         handler = make_file_handler(self.log_path)
 
-        with patch.object(TxtFileLogger, "_build_default_handlers", return_value=[handler]):
+        with patch.object(
+            TxtFileLogger, "_build_default_handlers", return_value=[handler]
+        ):
             logger = TxtFileLogger()
 
         logger.log(
@@ -45,7 +46,7 @@ class TxtFileLoggerTests(unittest.TestCase):
             role="Chef",
             action="Create recipe",
             id_object=101,
-            description="Created successfully"
+            description="Created successfully",
         )
 
         self._flush_and_close(logger)
@@ -60,7 +61,9 @@ class TxtFileLoggerTests(unittest.TestCase):
     def test_append_multiple_entries(self):
         handler = make_file_handler(self.log_path)
 
-        with patch.object(TxtFileLogger, "_build_default_handlers", return_value=[handler]):
+        with patch.object(
+            TxtFileLogger, "_build_default_handlers", return_value=[handler]
+        ):
             logger = TxtFileLogger()
 
         logger.log("info", "user1", "Role1", "Action1", 1, "desc1")
@@ -76,7 +79,9 @@ class TxtFileLoggerTests(unittest.TestCase):
     def test_log_format_contains_all_fields(self):
         handler = make_file_handler(self.log_path)
 
-        with patch.object(TxtFileLogger, "_build_default_handlers", return_value=[handler]):
+        with patch.object(
+            TxtFileLogger, "_build_default_handlers", return_value=[handler]
+        ):
             logger = TxtFileLogger()
 
         logger.log("error", "bob", "User", "Delete recipe", 999, "Cannot delete")
@@ -87,7 +92,7 @@ class TxtFileLoggerTests(unittest.TestCase):
         self.assertIn(" | ERROR | ", line)
         self.assertRegex(
             line,
-            r"User:\s+bob\s+\|\s+Role:\s+User\s+\|\s+Action:\s+Delete recipe\s+\|\s+ID Object:\s+999\s+\|\s+Description:\s+Cannot delete"
+            r"User:\s+bob\s+\|\s+Role:\s+User\s+\|\s+Action:\s+Delete recipe\s+\|\s+ID Object:\s+999\s+\|\s+Description:\s+Cannot delete",
         )
 
 

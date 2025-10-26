@@ -3,6 +3,7 @@ import logging
 from typing import List
 from pathlib import Path
 
+
 class TxtFileLogger(CustomLogger):
     def __init__(self):
         self._filename = "GeneralLogs.txt"
