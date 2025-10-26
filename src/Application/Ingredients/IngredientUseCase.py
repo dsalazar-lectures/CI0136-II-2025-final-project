@@ -21,6 +21,9 @@ class IngredientUseCase:
 
         """Get a specific ingredient by its name."""
         return self.repository.get_by_name(ingredient_name)
+   
+    def get_ingredients_by_category (self, ingredient_category: str) -> List[Ingredient]:
+        return self.repository.get_by_category (ingredient_category)
 
 
 # Create a singleton instance to be imported by the routes
