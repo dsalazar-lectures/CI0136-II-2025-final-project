@@ -41,3 +41,22 @@ def change_password():
 
     _, response, status_code = user_app_service.change_password(username, data)
     return jsonify(response), status_code
+
+@auth_bp.route('/change-email', methods=['POST'])
+def change_email():
+    #Allows an authenticated user to change their email.
+    #Requires: username, old_email, new_email, password
+
+    # Get JSON data from the request
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': 'Invalid JSON'}), 400
+
+    username = data.get('username')
+    if not username:
+        return jsonify({'error': 'User not authenticated'}), 401
+
+    # Call the application service to handle the email change logic
+    _, response, status_code = user_app_service.change_email(username, data)
+
+    return jsonify(response), status_code
