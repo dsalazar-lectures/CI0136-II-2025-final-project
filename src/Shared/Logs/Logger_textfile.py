@@ -1,4 +1,4 @@
-from Shared.Logs.Logger_component import CustomLogger
+from src.Shared.Logs.Logger_component import CustomLogger
 import logging
 from typing import List
 from pathlib import Path
