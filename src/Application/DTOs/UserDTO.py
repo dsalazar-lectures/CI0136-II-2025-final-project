@@ -6,10 +6,6 @@ class UserDTO:
         self.email = email
         self.role = role
         self.key = key
-    
+
     def to_dict(self):
-        return {
-            'username': self.username,
-            'email': self.email,
-            'role': self.role
-        }
+        return {"username": self.username, "email": self.email, "role": self.role}
