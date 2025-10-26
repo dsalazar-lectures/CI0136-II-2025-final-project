@@ -19,7 +19,7 @@ user_app_service = UserApplicationService(
     token_service=token_service
 )
 
-@auth_bp.route("/register", methods=["POST"])
+@auth_bp.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
 
@@ -30,8 +30,7 @@ def register():
 
     return jsonify(response), status_code
 
-
-@auth_bp.route("/login", methods=["POST"])
+@auth_bp.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
 
