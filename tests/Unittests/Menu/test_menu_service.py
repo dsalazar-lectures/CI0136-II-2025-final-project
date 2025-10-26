@@ -5,7 +5,10 @@ from src.Application.Menu import menu_service
 
 class MenuServiceTestCase(unittest.TestCase):
     def test_generate_menus_happy_path(self):
-        recipes = [MockRecipe(1, "recipe1", ["category1"]), MockRecipe(2, "recipe2", ["category2"])]
+        recipes = [
+            MockRecipe(1, "recipe1", ["category1"]),
+            MockRecipe(2, "recipe2", ["category2"]),
+        ]
         menus = menu_service.generate_menus(recipes, 3)
         self.assertEqual(len(menus), 3)
         names = [m["recipe"]["name"] for m in menus]
