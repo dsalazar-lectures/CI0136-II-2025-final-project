@@ -1,4 +1,5 @@
 from src.Application.Interfaces.IUserRepository import IUserRepository
+from src.Infrastructure.Profiles.ProfileRepository import ProfileRepository
 from src.Model.User.User import User
 from src.Application.DTOs.UserDTO import UserDTO
 from src.Database.User.UserCSV import UserCSV
@@ -8,6 +9,7 @@ class UserRepository(IUserRepository):
 
     def __init__(self, csv_file_path="users.csv"):
         self.user_csv = UserCSV(csv_file_path)
+        self.profile_repository = ProfileRepository()
 
     def user_exists(self, username, email):
         return self.user_csv.user_exists(username, email)
@@ -39,3 +41,9 @@ class UserRepository(IUserRepository):
                 role=db_user["role"],
             )
         return None
+
+    def update_user_token(self, username, token, key=None) -> bool:
+        return self.user_csv.update_user_token(username, token, key)
+
+    def create_user_profile(self, user_id: int):
+        return self.profile_repository.create_profile(user_id)

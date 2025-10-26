@@ -2,17 +2,18 @@ import secrets
 import jwt
 import datetime
 import pytz
+from src.Application.Interfaces.ITokenService import ITokenService
 
-
-class TokenService:
+class TokenService(ITokenService):
 
     def __init__(self) -> None:
         self.tz = pytz.timezone("America/Costa_Rica")
 
     def generate_token(self, user):
+        now = datetime.datetime.now(tz=self.tz)
         payload = {
-            "iat": datetime.datetime.now(tz=self.tz),
-            "exp": datetime.datetime.now(tz=self.tz) + datetime.timedelta(minutes=10),
+            "iat": now,
+            "exp": now + datetime.timedelta(minutes=60),
             "sub": user.id,
             "username": user.username,
         }

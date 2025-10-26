@@ -13,3 +13,11 @@ class IUserRepository(ABC):
     @abstractmethod
     def get_user_by_username(self, username):
         pass
+
+    @abstractmethod
+    def update_user_token(self, username: str, token: str, key: str | None = None) -> bool:
+        ...
+
+    @abstractmethod
+    def create_user_profile(self, user_id: int):
+        ...
