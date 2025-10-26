@@ -27,8 +27,12 @@ class MenuPdfAdapter(IMenuAdapter):
         pdfMenu.multi_cell(w=pdfMenu.w - 50, h=20, txt=" ", align="J")
 
         for id in self.recipeList:
-            recipe = recipe_service.get_recipe_by_id(int(id))
-            pdfMenu.multi_cell(w=pdfMenu.w - 50, h=20, txt=recipe.name, align="J")
+            try:
+                recipe = recipe_service.get_recipe_by_id(int(id))
+                pdfMenu.multi_cell(w=pdfMenu.w - 50, h=20, txt=recipe.name, align="J")
+            except:
+                continue
+            
             pdfMenu.multi_cell(
                 w=pdfMenu.w - 50,
                 h=20,
