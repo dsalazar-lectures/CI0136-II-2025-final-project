@@ -1,9 +1,17 @@
-import json, logging
+import json
+import logging
 from pathlib import Path
+
 
 class JsonArrayHandler(logging.Handler):
 
-    def __init__(self, file_path: Path, level: int = logging.DEBUG, encoding: str = "utf-8", indent: int = 2):
+    def __init__(
+        self,
+        file_path: Path,
+        level: int = logging.DEBUG,
+        encoding: str = "utf-8",
+        indent: int = 2,
+    ):
         super().__init__(level=level)
         self.file_path = Path(file_path)
         self.encoding = encoding
