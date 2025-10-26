@@ -23,7 +23,6 @@ def create_app():
     app.register_blueprint(menu_bp, url_prefix="/api")
     app.register_blueprint(auth_bp, url_prefix="/auth")
 
-
     # Health check endpoint
     @app.route("/")
     def health_check():
