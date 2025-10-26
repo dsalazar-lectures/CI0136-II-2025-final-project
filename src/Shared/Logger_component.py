@@ -3,7 +3,9 @@ from typing import List, Optional
 
 
 class CustomLogger:
-    def __init__(self, name: str = "AppLogger", handlers: Optional[List[logging.Handler]] = None):
+    def __init__(
+        self, name: str = "AppLogger", handlers: Optional[List[logging.Handler]] = None
+    ):
         self.logger = logging.getLogger(name)
         self.logger.setLevel(logging.DEBUG)
 
@@ -13,7 +15,7 @@ class CustomLogger:
 
             formatter = logging.Formatter(
                 fmt="%(asctime)s | %(levelname)s | Usuario: %(usuario)s | Rol: %(rol)s | Acción: %(accion)s | Descripción: %(descripcion)s",
-                datefmt="%Y-%m-%d %H:%M:%S"
+                datefmt="%Y-%m-%d %H:%M:%S",
             )
             console_handler.setFormatter(formatter)
             handlers = [console_handler]
@@ -27,7 +29,7 @@ class CustomLogger:
             "usuario": usuario,
             "rol": rol,
             "accion": accion,
-            "descripcion": descripcion
+            "descripcion": descripcion,
         }
 
         log_method = {

@@ -2,12 +2,12 @@ from flask import Blueprint, request, jsonify
 from src.Application.User.Services.UserApplicationService import UserApplicationService
 from src.Infrastructure.User.UserRepository import UserRepository
 
-auth_bp = Blueprint('auth', __name__)
+auth_bp = Blueprint("auth", __name__)
 user_repository = UserRepository()
 user_app_service = UserApplicationService(user_repository)
 
 
-@auth_bp.route('/register', methods=['POST'])
+@auth_bp.route("/register", methods=["POST"])
 def register():
     data = request.get_json()
 
@@ -18,7 +18,8 @@ def register():
 
     return jsonify(response), status_code
 
-@auth_bp.route('/login', methods=['POST'])
+
+@auth_bp.route("/login", methods=["POST"])
 def login():
     data = request.get_json()
 
