@@ -28,6 +28,7 @@ def get_ingredient_name(ingredient_name):
         return jsonify({"error": "Ingrediente no encontrado"}), 404
     return jsonify(ingredient.to_json())
 
+
 @ingredients_bp.route("/ingredients/create", methods=["POST"])
 def create_new_ingredient():
     """Create a new ingredient"""
@@ -38,9 +39,11 @@ def create_new_ingredient():
     substitutes = request.json.get("substitutes")
     components = request.json.get("components")
 
-    ingredient_service.create_ingredient(name, categories, substitutes, components)
+    ingredient_service.create_ingredient(name, categories,
+                                         substitutes, components)
 
     return jsonify({"message": "Ingredient created successfully"}), 201
+
 
 @ingredients_bp.route("/ingredients/update", methods=["POST"])
 def update_ingredient():
@@ -49,7 +52,7 @@ def update_ingredient():
     ingredient = ingredient_service.get_ingredient_by_id(id)
     if ingredient is None:
         return jsonify({"message": "Ingredient not found"}), 404
-    
+
     data = request.json
 
     for field in ["categories", "substitutes", "components"]:
@@ -66,6 +69,7 @@ def update_ingredient():
         ingredient_service.update_components(id, data["components"])
 
     return jsonify({"message": "Ingredient updated successfully"}), 200
+
 
 @ingredients_bp.route("/ingredients/delete", methods=["POST"])
 def delete_ingredient():

@@ -22,8 +22,10 @@ class IngredientRepository:
                 return ingredient
         return None
 
-    def create_ingredient(self, name, categories, substitutes, components, recipe_count = 0):
-        self._add(name, categories=categories, substitutes=substitutes, components=components, recipe_count=recipe_count)
+    def create_ingredient(self, name, categories,
+                          substitutes, components, recipe_count=0):
+        self._add(name, categories=categories, substitutes=substitutes,
+                  components=components, recipe_count=recipe_count)
 
     def add_recipe(self, id: int):
         ingredient = self._items.get(id)
