@@ -4,12 +4,14 @@ class CategoryFilter(RecipeFilter):
 
     def __init__(self, filter_component, categories):
         super().__init__(filter_component)
-        self.categories = categories
+        self.categories = [cat.strip().lower() for cat in categories]
 
     def filter(self, recipes):
         recipes = self._filter.filter(recipes)
-        category_lower = self.categories.lower()
-        return [
-            recipe for recipe in recipes
-            if any(cat.lower() == category_lower for cat in recipe.categories)
-        ]
+        filtered = []
+        for recipe in recipes:
+            recipe_categories = [category.strip().lower() for category in recipe.categories]
+            if any(category in recipe_categories for category in self.categories):
+                filtered.append(recipe)
+
+        return filtered
