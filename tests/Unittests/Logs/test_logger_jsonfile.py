@@ -31,11 +31,7 @@ class JsonFileHandlerAdvancedTests(unittest.TestCase):
 
     def test_missing_optional_id_object_defaults_to_dash(self):
         self.logger.log(
-            "info",
-            "UserX",
-            "admin",
-            "delete",
-            description="Intento sin id_object"
+            "info", "UserX", "admin", "delete", description="Intento sin id_object"
         )
         self._flush_and_close(self.logger)
 
@@ -54,8 +50,13 @@ class JsonFileHandlerAdvancedTests(unittest.TestCase):
 
         entry = data[0]
         expected_fields = {
-            "timestamp", "level", "user", "role", "action",
-            "id_object", "description"
+            "timestamp",
+            "level",
+            "user",
+            "role",
+            "action",
+            "id_object",
+            "description",
         }
         self.assertTrue(expected_fields.issubset(entry.keys()))
 
