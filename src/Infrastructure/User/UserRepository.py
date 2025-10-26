@@ -38,7 +38,7 @@ class UserRepository(IUserRepository):
                 email=db_user["email"],
                 role=db_user["role"],
                 key=db_user["key"],
-                token=db_user["token"]
+                token=db_user["token"],
             )
         return None
 
@@ -52,7 +52,7 @@ class UserRepository(IUserRepository):
                 email=db_user["email"],
                 role=db_user["role"],
                 key=db_user["key"],
-                token=db_user["token"]
+                token=db_user["token"],
             )
         return None
 
