@@ -138,6 +138,5 @@ class testUserApplicationService(unittest.TestCase):
         self.assertEqual(user_dto.role, "admin")
         self.assertTrue(user_dto.password.startswith("hashed_"))
 
-
 if __name__ == "__main__":
     unittest.main()
