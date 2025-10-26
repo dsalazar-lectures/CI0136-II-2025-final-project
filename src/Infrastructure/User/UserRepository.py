@@ -44,3 +44,9 @@ class UserRepository(IUserRepository):
         if updated:
             return True, "Password updated successfully", 200
         return False, "Failed to update password", 400
+    
+    def update_email(self, username, new_email):
+        updated = self.user_csv.update_email(username, new_email)
+        if updated:
+            return True, "Email updated successfully", 200
+        return False, "Failed to update email", 400
