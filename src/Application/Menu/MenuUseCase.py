@@ -15,7 +15,7 @@ def emailPdf(recipeList, recipientEmail):
     for x in range(3):
         error = sendMenu(recipientEmail, adapter)
         if (
-            error == 450 or error == 454
+            error != 450 or error != 454
         ):  # mailbox busy or temporarily blocked or temporary authentication problem
             break
         time.sleep(retryDelay)

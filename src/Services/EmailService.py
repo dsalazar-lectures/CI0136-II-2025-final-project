@@ -70,7 +70,7 @@ def sendMenu(receiver_email, menuAdapter):
         print(f"Error: {error.smtp_error}")
         return error.smtp_code
 
-    return smtplib.SMTPResponseException.smtp_code
+    return 0
 
 
 if __name__ == "__main__":
