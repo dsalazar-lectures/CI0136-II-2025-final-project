@@ -88,6 +88,61 @@ class UserApplicationService:
 
         return user, {"message": "Login successful", "token": token}, 200
 
+    def change_password(self, username, data):
+        required_fields = ["old_password", "new_password"]
+        is_valid, error_response, status_code = (
+            self.validation_service.validate_request_data(data, required_fields)
+        )
+        if not is_valid:
+            return None, error_response, status_code
+
+        old_password = data["old_password"]
+        new_password = data["new_password"]
+
+        # Get user by username
+        user = self.user_repository.get_user_by_username(username)
+        if not user:
+            return None, {"error": "User not found"}, 404
+
+        # Verify old password
+        if not self.encryption_service.verify_password(old_password, user.password):
+            return None, {"error": "Old password is incorrect"}, 401
+
+        # Validate new password format
+        is_valid, valid_msg = self.validation_service.validate_password_format(
+            new_password
+        )
+        if not is_valid:
+            return (
+                None,
+                {
+                    "error": "The new password does not meet the security requirements (minimum 8 characters, numbers, uppercase, symbols)."
+                },
+                400,
+            )
+
+        # Ensure new password is different
+        if self.encryption_service.verify_password(new_password, user.password):
+            return (
+                None,
+                {
+                    "error": "The new password must be different from the current password."
+                },
+                400,
+            )
+
+        # Hash the new password
+        hashed_new_password = self.encryption_service.hash_password(new_password)
+
+        # Update in the database
+        success, message, status = self.user_repository.update_password(
+            username, hashed_new_password
+        )
+        if not success:
+            return None, {"error": message}, status
+
+        return user, {"message": "Password updated successfully"}, 200
+
     def verify_valid_session(self, data):
         user = self.user_repository.get_user_by_token(data["token"])
 
