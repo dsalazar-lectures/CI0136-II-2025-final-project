@@ -7,8 +7,9 @@ class DurationFilter(RecipeFilter):
         super().__init__(filter_component)
         self.duration = duration
 
-    def filter(self, recipes, duration):
+    def filter(self, recipes):
+        recipes = self._filter.filter(recipes)
         return [
             recipe for recipe in recipes
-            if (recipe.duration <= duration)
+            if recipe.duration <= self.duration
         ]

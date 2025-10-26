@@ -7,8 +7,9 @@ class CalificationFilter(RecipeFilter):
         super().__init__(filter_component)
         self.calification = calification
 
-    def filter(self, recipes, calification):
+    def filter(self, recipes):
+        recipes = self._filter.filter(recipes)
         return [
             recipe for recipe in recipes
-            if ((recipe.califications_sumatory / recipe.califications_amount) >= calification)
+            if ((recipe.califications_sumatory / recipe.califications_amount) >= self.calification)
         ]
