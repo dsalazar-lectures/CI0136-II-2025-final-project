@@ -128,8 +128,15 @@ class UserCSV:
             with open(self.file_path, "w", newline="") as file:
                 writer = csv.DictWriter(
                     file,
-                    fieldnames=["id", "username", "password", "email", "role"],
-                    extrasaction="ignore",
+                    fieldnames=[
+                        "id",
+                        "username",
+                        "password",
+                        "email",
+                        "role",
+                        "key",
+                        "token",
+                    ],
                 )
                 writer.writeheader()
                 writer.writerows(rows)
