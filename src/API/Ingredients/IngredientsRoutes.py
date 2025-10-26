@@ -33,7 +33,7 @@ def create_new_ingredient():
     """Create a new ingredient"""
     name = request.json.get("name")
     if not name:
-        return jsonify({"error": "Ingredient name is required"})
+        return jsonify({"error": "Ingredient name is required"}), 404
     categories = request.json.get("categories")
     substitutes = request.json.get("substitutes")
     components = request.json.get("components")
@@ -48,7 +48,7 @@ def update_ingredient():
     id = request.json.get("id")
     ingredient = ingredient_service.get_ingredient_by_id(id)
     if ingredient is None:
-        return jsonify({"message": "Ingredient not found"}, 404)
+        return jsonify({"message": "Ingredient not found"}), 404
     
     data = request.json
 
