@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch
 from flask import Flask
-from Application.Menu import MenuUseCase
+from src.Application.Menu import MenuUseCase
 from src.API.Menu.menuRoutes import recipes_bp
 from tests.Mocks.Recipes.mock_recipe_repo import MockRecipe
 
