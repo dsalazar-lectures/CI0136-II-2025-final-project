@@ -22,6 +22,23 @@ class IngredientRepository:
                 return ingredient
         return None
 
+    def get_by_category(self, ingredient_category: str) -> List[Ingredient]:
+        matching_ingredients = []
+        for ingredient in self._items.values():
+            if ingredient_category.lower() in [
+                cat.lower() for cat in ingredient.categories
+            ]:
+                matching_ingredients.append(ingredient)
+        return matching_ingredients
+
+    def get_substitutes_by_id(self, ingredient_id: int) -> Optional[List[int]]:
+        ingredient = self._items.get(ingredient_id)
+        if ingredient is None:
+            return None
+        if ingredient.has_substitutes():
+            return ingredient.substitutes
+        return None
+
     # part of the mocking
     def _add(
         self,
