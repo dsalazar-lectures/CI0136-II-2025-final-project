@@ -1,5 +1,4 @@
 import csv
-import os
 from src.Database.Recipes.RecipesSchema import system_recipes, PATH
 from src.Model.Recipes.Recipes import Recipe
 from src.Application.Recipes.IRecipeRepository import IRecipeRepository

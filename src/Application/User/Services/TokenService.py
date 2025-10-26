@@ -30,7 +30,7 @@ class TokenService(ITokenService):
     @staticmethod
     def verify_token(token, user):
         try:
-            payload = jwt.decode(token, user.key, algorithms=["HS256"])
+            jwt.decode(token, user.key, algorithms=["HS256"])
             return True
         except jwt.ExpiredSignatureError:
             return False
