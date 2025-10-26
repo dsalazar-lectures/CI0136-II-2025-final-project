@@ -8,6 +8,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
 # Import blueprints
 from src.API.Ingredients.IngredientsRoutes import ingredients_bp
 from src.API.Recipes.recipesRoutes import recipes_bp
+from src.API.AuthRoutes import auth_bp
 
 def create_app():
     app = Flask(__name__)
@@ -15,6 +16,7 @@ def create_app():
     # Register blueprints
     app.register_blueprint(ingredients_bp)
     app.register_blueprint(recipes_bp, url_prefix='/api')
+    app.register_blueprint(auth_bp, url_prefix='/auth')
     
     # Health check endpoint
     @app.route('/')
