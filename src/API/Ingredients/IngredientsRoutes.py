@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
 from src.Application.Ingredients.IngredientUseCase import ingredient_service
 
 ingredients_bp = Blueprint("ingredients", __name__)
@@ -27,3 +27,14 @@ def get_ingredient_name(ingredient_name):
     if ingredient is None:
         return jsonify({"error": "Ingrediente no encontrado"}), 404
     return jsonify(ingredient.to_json())
+
+@ingredients_bp.route("/ingredients/create", methods=["POST"])
+def create_new_ingredient():
+    name = request.json.get("name")
+    categories = request.json.get("categories")
+    substitutes = request.json.get("substitutes")
+    components = request.json.get("components")
+
+    ingredient_service.create_ingredient(name, categories, substitutes, components)
+
+    return jsonify({"message": "Ingredient created successfully"}), 201
