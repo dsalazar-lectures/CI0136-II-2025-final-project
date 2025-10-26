@@ -20,4 +20,4 @@ def emailPdf(recipeList, recipientEmail):
             break
         time.sleep(retryDelay)
 
-    return 200
+    return 204

@@ -16,4 +16,4 @@ def get_menu():
 def emailMenu():
     menuRecipes = request.json.get("ids")
     recipientEmail = request.json.get("sendto")
-    return jsonify(MenuUseCase.emailPdf(menuRecipes, recipientEmail))
+    return '', MenuUseCase.emailPdf(menuRecipes, recipientEmail)
