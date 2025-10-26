@@ -42,3 +42,9 @@ class MockUserRepository(IUserRepository):
             if user.username == username:
                 return user
         return None
+    
+    def get_user_by_token(self, token):
+        pass
+    
+    def update_user_token(self, username, token, key) -> bool:
+        return self.user_csv.update_user_token(username, token, key)
