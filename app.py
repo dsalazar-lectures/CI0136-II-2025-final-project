@@ -13,7 +13,7 @@ def create_app():
     app = Flask(__name__)
     
     # Register blueprints
-    app.register_blueprint(ingredients_bp)
+    app.register_blueprint(ingredients_bp, url_prefix='/api')
     app.register_blueprint(recipes_bp, url_prefix='/api')
     
     # Health check endpoint
@@ -21,7 +21,9 @@ def create_app():
     def health_check():
         return {"status": "API is running", "endpoints": [
             "GET /api/ingredients - Get all ingredients",
-            "GET /api/ingredients/<id> - Get ingredient by ID", 
+            "GET /api/ingredients/<id> - Get ingredient by ID",
+            "POST /api/ingredients/search - Search ingredient(s) by name, "
+            "category or id",
             "GET /api/recipes - Get all recipes",
             "GET /api/recipes/<id> - Get recipe by ID"
         ]}
