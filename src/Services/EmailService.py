@@ -19,6 +19,7 @@ def send_email(sender, recipient, subject, contents):
     with smtplib.SMTP(smtp_server, smtp_port) as s:
         s.send_message(message)
 
+
 port = 587
 smtp_server = "smtp.gmail.com"
 sender_email = "jhonpython61@gmail.com"

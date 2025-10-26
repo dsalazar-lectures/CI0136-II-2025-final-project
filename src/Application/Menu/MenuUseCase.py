@@ -6,9 +6,9 @@ from src.Services.EmailService import sendMenu
 def emailPdf(recipeList, recipientEmail):
 
     if not re.match("[^@]+@[^@]+\.[^@]+", recipientEmail):
-        return "400"
-    
+        return 400
+
     adapter = MenuPdfAdapter(recipeList)
     sendMenu(recipientEmail, adapter)
 
-    return "200"
+    return 200
