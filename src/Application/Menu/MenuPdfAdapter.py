@@ -30,9 +30,10 @@ class MenuPdfAdapter(IMenuAdapter):
             try:
                 recipe = recipe_service.get_recipe_by_id(int(id))
                 pdfMenu.multi_cell(w=pdfMenu.w - 50, h=20, txt=recipe.name, align="J")
-            except:
+            except Exception as e:
+                print(f"Error {e}")
                 continue
-            
+
             pdfMenu.multi_cell(
                 w=pdfMenu.w - 50,
                 h=20,
