@@ -1,7 +1,7 @@
 from typing import List, Optional
-from Infrastructure.Ingredients.IngredientRepository \
+from src.Infrastructure.Ingredients.IngredientRepository \
                                                     import IngredientRepository
-from Model.Ingredients.Ingredients import Ingredient
+from src.Model.Ingredients.Ingredients import Ingredient
 
 
 class IngredientUseCase:
