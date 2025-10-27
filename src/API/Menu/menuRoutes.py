@@ -4,6 +4,7 @@ from src.Application.Menu import menu_service
 from src.Application.Menu import MenuUseCase
 
 menu_bp = Blueprint("menu", __name__)
+recipes_bp = Blueprint("menu", __name__)
 
 
 @menu_bp.route("/menu", methods=["GET"])
