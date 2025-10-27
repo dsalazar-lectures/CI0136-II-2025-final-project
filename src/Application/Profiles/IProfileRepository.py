@@ -4,6 +4,10 @@ from typing import List
 
 class IProfileRepository(ABC):
     @abstractmethod
+    def create_profile(self, user_id):
+        pass
+
+    @abstractmethod
     def add_favorite_menu(self, user_id: str, menu_id: str) -> bool:
         """Add a menu to user's favorites. Returns True if successful."""
         pass
