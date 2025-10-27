@@ -1,5 +1,5 @@
 from typing import Dict, List, Optional
-from Model.Ingredients.Ingredients import Ingredient
+from src.Model.Ingredients.Ingredients import Ingredient
 
 class IngredientRepository:
     def __init__(self) -> None:
