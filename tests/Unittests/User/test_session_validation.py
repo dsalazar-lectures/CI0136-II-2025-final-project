@@ -1,13 +1,11 @@
 import unittest
-import jwt
-import pytz
-import datetime
+from unittest.mock import patch
 
 from src.Application.User.Services.UserApplicationService import UserApplicationService
 from src.Application.User.Services.ValidationService import ValidationService
 from tests.Mocks.Users.mock_user_repo import MockUserRepository
 from tests.Mocks.Users.mock_encryption_service import MockEncryptionService
-from src.Application.User.Services.TokenService import TokenService
+from tests.Mocks.Users.mock_token_service import MockTokenService
 
 
 class TestSessionService(unittest.TestCase):
@@ -16,7 +14,7 @@ class TestSessionService(unittest.TestCase):
         self.user_repository = MockUserRepository()
         self.encryption_service = MockEncryptionService()
         self.validation_service = ValidationService()
-        self.token_service = TokenService()
+        self.token_service = MockTokenService()
 
         self.user_app_service = UserApplicationService(
             user_repository=self.user_repository,
@@ -24,8 +22,6 @@ class TestSessionService(unittest.TestCase):
             encryption_service=self.encryption_service,
             token_service=self.token_service,
         )
-
-        self.tz = pytz.timezone("America/Costa_Rica")
 
     def test_valid_token(self):
         # register a user
@@ -36,16 +32,14 @@ class TestSessionService(unittest.TestCase):
         }
         self.user_app_service.register_user(register_data)
 
-        # Then login
-        login_data = {"username": "testUser", "password": "Passw@rd123"}
+        header = {"Authorization": "Bearer fake_token"}
 
-        user, response, status_code = self.user_app_service.login_user(login_data)
-
-        header = {"Authorization": f"Bearer {user.token}"}
-
-        user, msg, status_code = self.user_app_service.verify_valid_session(
-            header, user.username
-        )
+        with patch.object(
+            self.user_app_service.token_service, "verify_token", return_value=True
+        ):
+            user, msg, status_code = self.user_app_service.verify_valid_session(
+                header, "testUser"
+            )
 
         self.assertIsNotNone(user)
 
@@ -59,17 +53,14 @@ class TestSessionService(unittest.TestCase):
 
         user, response, status_code = self.user_app_service.register_user(register_data)
 
-        expired_token = jwt.encode(
-            {"exp": datetime.datetime.now(tz=self.tz) - datetime.timedelta(minutes=5)},
-            "mock_key",
-            algorithm="HS256",
-        )
+        header = {"Authorization": "Bearer fake_token"}
 
-        header = {"Authorization": f"Bearer {expired_token}"}
-
-        user, msg, status_code = self.user_app_service.verify_valid_session(
-            header, "testUser"
-        )
+        with patch.object(
+            self.user_app_service.token_service, "verify_token", return_value=False
+        ):
+            user, msg, status_code = self.user_app_service.verify_valid_session(
+                header, "testUser"
+            )
 
         self.assertIsNone(user)
         self.assertEqual(msg, {"error": "Expired session"})
