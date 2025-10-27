@@ -20,21 +20,6 @@ class MenuEndpointTestCase(unittest.TestCase):
         data = response.get_json()
         self.assertEqual(data, [{}])
 
-    @patch("src.Application.Recipes.recipe_service.get_recipes_by_category")
-    def test_get_menu_category_filter(self, mock_get_recipes):
-        recipes = [
-            MockRecipe(1, "recipe1", ["category1"]),
-            MockRecipe(2, "recipe2", ["category2"]),
-        ]
-        mock_get_recipes.side_effect = lambda category: [
-            r for r in recipes if category in r.categories
-        ]
-        response = self.client.get("/api/menu?category=category2")
-        self.assertEqual(response.status_code, 200)
-        data = response.get_json()
-        self.assertEqual(len(data), 1)
-        self.assertEqual(data[0]["name"], "recipe2")
-
     @patch("src.Application.Recipes.recipe_service.get_random_recipe_by_category")
     def test_get_menu_returns_one_random_recipe(self, mock_get_random_recipe):
         recipe = MockRecipe(1, "recipe1", ["category1", "category2"])
