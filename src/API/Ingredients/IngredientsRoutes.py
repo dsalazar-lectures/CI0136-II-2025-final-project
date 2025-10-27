@@ -67,7 +67,7 @@ def search_ingredients_body():
 def _get_request_data():
     """Retrieves and validates the JSON body."""
     data = request.get_json(silent=True)
-    if not data:
+    if data is None:
         return jsonify({"error": "Cuerpo JSON requerido"}), 400
     return data
 
