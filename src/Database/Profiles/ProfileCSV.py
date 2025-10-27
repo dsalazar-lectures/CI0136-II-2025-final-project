@@ -38,3 +38,43 @@ class ProfileCSV:
             writer.writerow(new_profile)
 
         return new_profile
+
+    # TODO(JM) Check if User's team is ok with these functions
+    def get_profile_by_user_id(self, user_id: str):
+        """Get a profile by user_id"""
+        with open(self.file_path, "r", newline="") as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                if row["user_id"] == str(user_id):
+                    return {
+                        "user_id": row["user_id"],
+                        "favorite_foods": row["favorite_foods"].split(";") if row["favorite_foods"] else [],
+                        "unfavorite_foods": row["unfavorite_foods"].split(";") if row["unfavorite_foods"] else [],
+                        "favorite_menus": row["favorite_menus"].split(";") if row["favorite_menus"] else [],
+                    }
+        return None
+
+    def update_profile(self, user_id: str, profile_data: dict):
+        """Update a profile by user_id"""
+        rows = []
+        updated = False
+
+        with open(self.file_path, "r", newline="") as file:
+            reader = csv.DictReader(file)
+            fieldnames = reader.fieldnames
+            for row in reader:
+                if row["user_id"] == str(user_id):
+                    # Update the row with new data
+                    row["favorite_foods"] = ";".join(profile_data.get("favorite_foods", []))
+                    row["unfavorite_foods"] = ";".join(profile_data.get("unfavorite_foods", []))
+                    row["favorite_menus"] = ";".join(profile_data.get("favorite_menus", []))
+                    updated = True
+                rows.append(row)
+
+        if updated:
+            with open(self.file_path, "w", newline="") as file:
+                writer = csv.DictWriter(file, fieldnames=fieldnames)
+                writer.writeheader()
+                writer.writerows(rows)
+
+        return updated
