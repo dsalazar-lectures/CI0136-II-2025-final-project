@@ -17,4 +17,4 @@ class MockTokenService(ITokenService):
         self.keys[user.username] = key
 
     def verify_token(self, token, user):
-        return self.tokens.get(token)
+        return False
