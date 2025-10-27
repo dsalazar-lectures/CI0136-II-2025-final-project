@@ -1,6 +1,8 @@
 from src.Infrastructure.Recipes.CSVRecipeRepository import CSVRecipeRepository
+from src.Application.Recipes.FilterComposer import FilterComposer
 
 recipe_repository = CSVRecipeRepository()
+filter_composer = FilterComposer()
 
 
 def get_all_recipes():
@@ -30,6 +32,11 @@ def update_recipe(recipe_id, updates, username):
     if not validate_data(updates):
         return -1
     return recipe_repository.update_if_owned(recipe_id, username, updates)
+
+
+def filter_recipes(filter_criteria):
+    all_recipes = recipe_repository.get_all()
+    return filter_composer.apply_filters(all_recipes, filter_criteria)
 
 
 def validate_data(recipe_data) -> bool:
