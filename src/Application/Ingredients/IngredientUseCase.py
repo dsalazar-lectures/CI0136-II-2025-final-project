@@ -16,9 +16,7 @@ class IngredientUseCase:
         """Get a specific ingredient by its ID."""
         return self.repository.get_by_id(ingredient_id)
 
-    def get_ingredient_by_name(
-                           self, ingredient_name: str) -> Optional[Ingredient]:
-
+    def get_ingredient_by_name(self, ingredient_name: str) -> Optional[Ingredient]:
         """Get a specific ingredient by its name."""
         return self.repository.get_by_name(ingredient_name)
 

@@ -1,7 +1,6 @@
 # Here goes the ingredient object
 class Ingredient:
-    def __init__(self, id, name, categories, substitutes,
-                 components, recipe_count):
+    def __init__(self, id, name, categories, substitutes, components, recipe_count):
         self.id = id
         self.name = name
         self.categories = categories
@@ -12,12 +11,12 @@ class Ingredient:
 
     def to_json(self):
         return {
-            'id': self.id,
-            'name': self.name,
-            'categories': self.categories,
-            'substitutes': self.substitutes,
-            'components': self.components,
-            'recipe_count': self.recipe_count
+            "id": self.id,
+            "name": self.name,
+            "categories": self.categories,
+            "substitutes": self.substitutes,
+            "components": self.components,
+            "recipe_count": self.recipe_count,
         }
 
     def __str__(self):
