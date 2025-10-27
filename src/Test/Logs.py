@@ -1,6 +1,8 @@
-from src.Shared.Logs.Logger_textfile import TxtFileLogger
+from src.Shared.Logs.custom_logger import CustomLogger
+from src.Shared.Logs.build_handlers import build_handlers
 
-logger = TxtFileLogger()
+handlers = build_handlers()
+logger = CustomLogger("AuditLogger", handlers=handlers)
 
 try:
     result1 = 10 / 2

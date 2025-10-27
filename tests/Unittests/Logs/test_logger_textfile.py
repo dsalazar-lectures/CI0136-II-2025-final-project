@@ -1,17 +1,11 @@
 import logging
 import unittest
 from pathlib import Path
-from unittest.mock import patch
-from src.Shared.Logs.Logger_textfile import TxtFileLogger
+from src.Shared.Logs.custom_logger import CustomLogger
+from src.Shared.Logs.text_file_handler import TxtFileHandler
 
 
-def make_file_handler(target: Path, level: int = logging.DEBUG) -> logging.Handler:
-    fh = logging.FileHandler(target, mode="a", encoding="utf-8")
-    fh.setLevel(level)
-    return fh
-
-
-class TxtFileLoggerTests(unittest.TestCase):
+class TxtFileHandlerTests(unittest.TestCase):
 
     def setUp(self):
         self.log_path = Path("testLogs.txt")
@@ -33,12 +27,8 @@ class TxtFileLoggerTests(unittest.TestCase):
         logger.logger.handlers.clear()
 
     def test_write_single_log_entry(self):
-        handler = make_file_handler(self.log_path)
-
-        with patch.object(
-            TxtFileLogger, "_build_default_handlers", return_value=[handler]
-        ):
-            logger = TxtFileLogger()
+        handler = TxtFileHandler(str(self.log_path))
+        logger = CustomLogger("TestLogger", handlers=[handler])
 
         logger.log(
             level="info",
@@ -52,19 +42,15 @@ class TxtFileLoggerTests(unittest.TestCase):
         self._flush_and_close(logger)
         content = self.log_path.read_text(encoding="utf-8")
 
-        self.assertIn("User: alice", content)
-        self.assertIn("Role: Chef", content)
-        self.assertIn("Action: Create recipe", content)
-        self.assertIn("ID Object: 101", content)
-        self.assertIn("Description: Created successfully", content)
+        self.assertIn("User:alice", content)
+        self.assertIn("Role:Chef", content)
+        self.assertIn("Action:Create recipe", content)
+        self.assertIn("ID:101", content)
+        self.assertIn("Created successfully", content)
 
     def test_append_multiple_entries(self):
-        handler = make_file_handler(self.log_path)
-
-        with patch.object(
-            TxtFileLogger, "_build_default_handlers", return_value=[handler]
-        ):
-            logger = TxtFileLogger()
+        handler = TxtFileHandler(str(self.log_path))
+        logger = CustomLogger("TestLogger", handlers=[handler])
 
         logger.log("info", "user1", "Role1", "Action1", 1, "desc1")
         logger.log("warning", "user2", "Role2", "Action2", 2, "desc2")
@@ -73,16 +59,12 @@ class TxtFileLoggerTests(unittest.TestCase):
         lines = self.log_path.read_text(encoding="utf-8").strip().splitlines()
 
         self.assertGreaterEqual(len(lines), 2)
-        self.assertIn("User: user1", lines[0])
-        self.assertIn("User: user2", lines[1])
+        self.assertIn("User:user1", lines[0])
+        self.assertIn("User:user2", lines[1])
 
     def test_log_format_contains_all_fields(self):
-        handler = make_file_handler(self.log_path)
-
-        with patch.object(
-            TxtFileLogger, "_build_default_handlers", return_value=[handler]
-        ):
-            logger = TxtFileLogger()
+        handler = TxtFileHandler(str(self.log_path))
+        logger = CustomLogger("TestLogger", handlers=[handler])
 
         logger.log("error", "bob", "User", "Delete recipe", 999, "Cannot delete")
 
@@ -90,10 +72,11 @@ class TxtFileLoggerTests(unittest.TestCase):
         line = self.log_path.read_text(encoding="utf-8").strip().splitlines()[-1]
 
         self.assertIn(" | ERROR | ", line)
-        self.assertRegex(
-            line,
-            r"User:\s+bob\s+\|\s+Role:\s+User\s+\|\s+Action:\s+Delete recipe\s+\|\s+ID Object:\s+999\s+\|\s+Description:\s+Cannot delete",
-        )
+        self.assertIn("User:bob", line)
+        self.assertIn("Role:User", line)
+        self.assertIn("Action:Delete recipe", line)
+        self.assertIn("ID:999", line)
+        self.assertIn("Cannot delete", line)
 
 
 if __name__ == "__main__":
