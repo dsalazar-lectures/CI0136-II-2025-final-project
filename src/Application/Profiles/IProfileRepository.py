@@ -7,6 +7,7 @@ class IProfileRepository(ABC):
     def create_profile(self, user_id):
         pass
 
+    # Favorite Menu Functions
     @abstractmethod
     def add_favorite_menu(self, user_id: str, menu_id: str) -> bool:
         """Add a menu to user's favorites. Returns True if successful."""

@@ -1,5 +1,5 @@
-from typing import List
 from Application.Profiles.IProfileRepository import IProfileRepository
+from typing import List
 
 
 class ProfileUseCase:
