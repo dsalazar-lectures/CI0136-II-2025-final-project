@@ -159,6 +159,74 @@ class testUserApplicationService(unittest.TestCase):
         self.assertIsNotNone(user)
         self.assertEqual(user.password, "hashed_newPassw!rd23")
 
+    def test_change_password_missing_fields(self):
+        # First register a user
+        register_data = {
+            "username": "testUser",
+            "password": "Passw@rd123",
+            "email": "test@example.com",
+        }
+        self.user_app_service.register_user(register_data)
+
+        # Then login
+        login_data = {"username": "testUser", "password": "Passw@rd123"}
+
+        user, response, status_code = self.user_app_service.login_user(login_data)
+
+        data = {"new_password": "newPassw!rd23"}
+
+        user, msg, status = self.user_app_service.change_password(user, data)
+
+        self.assertIsNone(user)
+        self.assertEqual(msg, {"error": "Missing field: old_password"})
+
+    def test_change_password_wrong_password(self):
+        # First register a user
+        register_data = {
+            "username": "testUser",
+            "password": "Passw@rd123",
+            "email": "test@example.com",
+        }
+        self.user_app_service.register_user(register_data)
+
+        # Then login
+        login_data = {"username": "testUser", "password": "Passw@rd123"}
+
+        user, response, status_code = self.user_app_service.login_user(login_data)
+
+        data = {"old_password": "Passw@r3", "new_password": "newPassw!rd23"}
+
+        user, msg, status = self.user_app_service.change_password(user, data)
+
+        self.assertIsNone(user)
+        self.assertEqual(msg, {"error": "Old password is incorrect"})
+
+    def test_change_password_invalid_format(self):
+        # First register a user
+        register_data = {
+            "username": "testUser",
+            "password": "Passw@rd123",
+            "email": "test@example.com",
+        }
+        self.user_app_service.register_user(register_data)
+
+        # Then login
+        login_data = {"username": "testUser", "password": "Passw@rd123"}
+
+        user, response, status_code = self.user_app_service.login_user(login_data)
+
+        data = {"old_password": "Passw@rd123", "new_password": "newpassw!rd23"}
+
+        user, msg, status = self.user_app_service.change_password(user, data)
+
+        self.assertIsNone(user)
+        self.assertEqual(
+            msg,
+            {
+                "error": "The new password does not meet the security requirements (minimum 8 characters, numbers, uppercase, symbols)."
+            },
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
