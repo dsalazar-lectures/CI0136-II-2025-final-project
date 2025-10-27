@@ -23,7 +23,7 @@ class testUserApplicationService(unittest.TestCase):
     def test_register_user_success(self):
         data = {
             "username": "testUser",
-            "password": "password123",
+            "password": "Passw@rd123",
             "email": "test@example.com",
         }
 
@@ -81,13 +81,13 @@ class testUserApplicationService(unittest.TestCase):
         # First register a user
         register_data = {
             "username": "testUser",
-            "password": "password123",
+            "password": "Passw@rd123",
             "email": "test@example.com",
         }
         self.user_app_service.register_user(register_data)
 
         # Then try to login
-        login_data = {"username": "testUser", "password": "password123"}
+        login_data = {"username": "testUser", "password": "Passw@rd123"}
 
         user, response, status_code = self.user_app_service.login_user(login_data)
 
@@ -137,6 +137,7 @@ class testUserApplicationService(unittest.TestCase):
         self.assertEqual(user_dto.email, "test@example.com")
         self.assertEqual(user_dto.role, "admin")
         self.assertTrue(user_dto.password.startswith("hashed_"))
+
 
 if __name__ == "__main__":
     unittest.main()

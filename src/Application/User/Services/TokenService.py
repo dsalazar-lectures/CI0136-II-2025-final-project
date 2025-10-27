@@ -14,7 +14,7 @@ class TokenService(ITokenService):
         now = datetime.datetime.now(tz=self.tz)
         payload = {
             "iat": now,
-            "exp": now + datetime.timedelta(minutes=60),
+            "exp": now + datetime.timedelta(minutes=5),
             "sub": str(user.id),
             "username": user.username,
         }
