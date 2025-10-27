@@ -1,7 +1,10 @@
 from __future__ import annotations
-
 from flask import Blueprint, jsonify, request
-import subprocess, sys, time, socket, webbrowser
+import subprocess
+import sys
+import time
+import socket
+import webbrowser
 from pathlib import Path
 
 dashboard_bp = Blueprint("dashboard", __name__)

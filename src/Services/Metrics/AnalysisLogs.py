@@ -1,5 +1,5 @@
-from typing import List, Dict, Callable
-import pandas as pd
+from typing import Dict
+from typing import Callable
 import streamlit as st
 
 #--------------------------------------------------------------------------------
@@ -9,7 +9,6 @@ MSG_EXEC_ERROR_TPL = "Error executing the metric: {}"
 
 #--------------------------------------------------------------------------------
 class AnalysisLogs:
-    # Example metric functions
     @staticmethod
     def top_users_least_active(df_list, start_date, end_date): 
         pass
@@ -23,7 +22,6 @@ class AnalysisLogs:
         "Least Active Users": top_users_least_active,
         "Most Active Users": top_users_most_active,
     }
-
 
     @staticmethod
     def show_analysis_logs(df_list, func, start_date, end_date):

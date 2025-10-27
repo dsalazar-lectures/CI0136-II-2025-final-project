@@ -1,6 +1,9 @@
 import streamlit as st
 from pathlib import Path
-from typing import Iterable, Literal, Callable, Dict
+from typing import Iterable
+from typing import Literal
+from typing import Callable
+from typing import Dict
 from Services.Metrics.DashboardGeneralLogs import GeneralData_Window
 from Services.Metrics.DashboardAnalysisLogs import Analysis_Window
 from Services.Metrics.AnalysisLogs import AnalysisLogs

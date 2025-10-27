@@ -1,5 +1,7 @@
-import json, logging, unittest, sys
-import pandas as pd
+import json
+import logging
+import unittest
+import sys
 import tempfile
 from pathlib import Path
 
@@ -65,7 +67,7 @@ class TestDashboardGeneralLogs(unittest.TestCase):
     def test_sidebar_select_files_empty(self):
         patch_multiselect, patch_info, patch_stop = MocksDashboardGeneralLogs.patch_sidebar_select_files_empty()
 
-        with patch_multiselect as mock_multiselect, patch_info as mock_info, patch_stop as mock_stop:
+        with patch_multiselect, patch_info as mock_info, patch_stop as mock_stop:
             GeneralData_Window.sidebar_select_files([Path("file1.json")])
             mock_info.assert_called_once()
             mock_stop.assert_called_once()

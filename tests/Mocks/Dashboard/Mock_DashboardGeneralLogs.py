@@ -1,9 +1,7 @@
 from unittest.mock import patch
 from pathlib import Path
 import pandas as pd
-
 from src.Services.Metrics.DashboardGeneralLogs import GeneralData_Window
-from src.Services.Metrics import GeneralLogs
 
 class MocksDashboardGeneralLogs:
     @staticmethod

@@ -1,6 +1,5 @@
 from unittest.mock import patch, MagicMock
 import pandas as pd
-from src.Services.Metrics import GeneralLogs
 
 class MocksGeneralLogs:
     @staticmethod
