@@ -6,6 +6,7 @@ from src.Application.User.Services.ValidationService import ValidationService
 from tests.Mocks.Users.mock_user_repo import MockUserRepository
 from tests.Mocks.Users.mock_encryption_service import MockEncryptionService
 from tests.Mocks.Users.mock_token_service import MockTokenService
+from tests.Mocks.Profile.mock_profile_service import MockProfileService
 
 
 class TestSessionService(unittest.TestCase):
@@ -15,12 +16,14 @@ class TestSessionService(unittest.TestCase):
         self.encryption_service = MockEncryptionService()
         self.validation_service = ValidationService()
         self.token_service = MockTokenService()
+        self.profile_service = MockProfileService()
 
         self.user_app_service = UserApplicationService(
             user_repository=self.user_repository,
             validation_service=self.validation_service,
             encryption_service=self.encryption_service,
             token_service=self.token_service,
+            profile_service=self.profile_service,
         )
 
     def test_valid_token(self):
