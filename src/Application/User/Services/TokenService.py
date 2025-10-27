@@ -2,9 +2,10 @@ import secrets
 import jwt
 import datetime
 import pytz
+from src.Application.Interfaces.ITokenService import ITokenService
 
 
-class TokenService:
+class TokenService(ITokenService):
 
     def __init__(self) -> None:
         self.tz = pytz.timezone("America/Costa_Rica")
