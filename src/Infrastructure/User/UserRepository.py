@@ -1,4 +1,5 @@
 from src.Application.Interfaces.IUserRepository import IUserRepository
+from src.Application.Profiles.Services.ProfileApplicationService import ProfileApplicationService
 from src.Model.User.User import User
 from src.Application.DTOs.UserDTO import UserDTO
 from src.Application.DTOs.UserResponseDTO import UserResponseDTO
@@ -53,6 +54,7 @@ class UserRepository(IUserRepository):
                 role=db_user["role"],
             )
         return None
+
     def get_user_by_token(self, token):
         db_user = self.user_csv.get_user_by_token(token)
         if db_user:

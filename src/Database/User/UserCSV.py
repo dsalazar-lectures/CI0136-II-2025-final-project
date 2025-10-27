@@ -79,6 +79,7 @@ class UserCSV:
                 if row["id"] == str(user_id):
                     return row
         return None
+
     def get_user_by_token(self, token):
         with open(self.file_path, "r", newline="") as file:
             reader = csv.DictReader(file)

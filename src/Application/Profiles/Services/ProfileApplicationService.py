@@ -1,9 +1,11 @@
-from src.Infrastructure.Profiles.ProfileRepository import ProfileRepository
+from src.Application.Interfaces.IProfileApplicationService import (
+    IProfileApplicationService,
+)
 
 
-class ProfileApplicationService:
-    def __init__(self, profile_repository=None):
-        self.profile_repository = profile_repository or ProfileRepository()
+class ProfileApplicationService(IProfileApplicationService):
+    def __init__(self, profile_repository):
+        self.profile_repository = profile_repository
 
     def create_profile(self, user_id: int):
         return self.profile_repository.create_profile(user_id)

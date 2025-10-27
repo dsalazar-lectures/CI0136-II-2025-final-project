@@ -4,6 +4,9 @@ from src.Application.User.Services.EncryptionService import EncryptionService
 from src.Application.User.Services.ValidationService import ValidationService
 from src.Application.User.Services.TokenService import TokenService
 from src.Infrastructure.User.UserRepository import UserRepository
+from src.Application.Profiles.Services.ProfileApplicationService import (
+    ProfileApplicationService,
+)
 
 auth_bp = Blueprint("auth", __name__)
 
@@ -11,12 +14,14 @@ user_repository = UserRepository()
 validation_service = ValidationService()
 encryption_service = EncryptionService()
 token_service = TokenService()
+profile_service = ProfileApplicationService()
 
 user_app_service = UserApplicationService(
     user_repository=user_repository,
     validation_service=validation_service,
     encryption_service=encryption_service,
     token_service=token_service,
+    profile_service=profile_service,
 )
 
 
