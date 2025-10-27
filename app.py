@@ -10,6 +10,7 @@ from src.API.Ingredients.IngredientsRoutes import ingredients_bp
 from src.API.Recipes.recipesRoutes import recipes_bp
 from src.API.Menu.menuRoutes import recipes_bp as menu_bp
 from src.API.AuthRoutes import auth_bp
+from src.API.Profiles.profileRoutes import profiles_bp
 
 
 def create_app():
@@ -22,6 +23,7 @@ def create_app():
     app.register_blueprint(recipes_bp, url_prefix="/api")
     app.register_blueprint(menu_bp, url_prefix="/api")
     app.register_blueprint(auth_bp, url_prefix="/auth")
+    app.register_blueprint(profiles_bp, url_prefix="/api")
 
     # Health check endpoint
     @app.route("/")
@@ -37,6 +39,9 @@ def create_app():
                 "GET /api/recipes/<id> - Get recipe by ID",
                 "GET /api/menu?category=<category> - Get all menu items",
                 "GET /api/menu/email - Email selected recipies to specific address",
+                "GET /api/menu/customized?user_id=<id>&category=<cat-optional> - GET all recipes based in favorite ingredients",
+                "GET /api/profiles/<user_id> - GET profile by user ID",
+                "PUT /api/profiles/<user_id>/favorites - PUT user ID and favorite ingredients",
             ],
         }
 
