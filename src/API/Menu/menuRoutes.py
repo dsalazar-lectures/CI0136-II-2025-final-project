@@ -3,6 +3,7 @@ from src.Application.Recipes import recipe_service
 
 recipes_bp = Blueprint("menu", __name__)
 
+
 @recipes_bp.route("/menu", methods=["GET"])
 def get_menu():
     category = request.args.get("category")
