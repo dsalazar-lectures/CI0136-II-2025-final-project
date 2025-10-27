@@ -3,6 +3,9 @@ from src.Application.Interfaces.IUserRepository import IUserRepository
 from src.Application.User.Services.ValidationService import ValidationService
 from src.Application.User.Services.EncryptionService import EncryptionService
 from src.Application.User.Services.TokenService import TokenService
+from src.Application.Profiles.Services.ProfileApplicationService import (
+    ProfileApplicationService,
+)
 
 
 class UserApplicationService:
@@ -11,6 +14,7 @@ class UserApplicationService:
         self.user_repository = user_repository
         self.encryption_service = EncryptionService()
         self.token_service = TokenService()
+        self.profile_service = ProfileApplicationService()
 
     def create_user_dto(self, data):
 
@@ -53,7 +57,7 @@ class UserApplicationService:
         if not user:
             return None, {"error": message}, status
 
-        self.user_repository.create_user_profile(user.id)
+        self.profile_service.create_profile(user.id)
         return user, {"message": message, "user": user_dto.to_dict()}, status
 
     def login_user(self, data):

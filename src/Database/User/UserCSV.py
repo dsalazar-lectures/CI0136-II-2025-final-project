@@ -56,7 +56,7 @@ class UserCSV:
                 if row["username"] == username:
                     return row
         return None
-    
+
     def get_user_by_id(self, user_id):
         with open(self.file_path, "r", newline="") as file:
             reader = csv.DictReader(file)

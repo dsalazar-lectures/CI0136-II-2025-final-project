@@ -17,7 +17,3 @@ class IUserRepository(ABC):
     @abstractmethod
     def get_user_by_id(self, user_id):
         pass
-
-    @abstractmethod
-    def create_user_profile(self, user_id):
-        pass
