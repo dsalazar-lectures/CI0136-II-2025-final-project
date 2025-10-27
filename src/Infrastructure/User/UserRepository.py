@@ -1,6 +1,7 @@
 from src.Application.Interfaces.IUserRepository import IUserRepository
 from src.Model.User.User import User
 from src.Application.DTOs.UserDTO import UserDTO
+from src.Application.DTOs.UserResponseDTO import UserResponseDTO
 from src.Database.User.UserCSV import UserCSV
 
 
@@ -37,5 +38,35 @@ class UserRepository(IUserRepository):
                 password=db_user["password"],
                 email=db_user["email"],
                 role=db_user["role"],
+                key=db_user["key"],
+                token=db_user["token"],
             )
         return None
+
+    def get_user_by_id(self, user_id):
+        db_user = self.user_csv.get_user_by_id(user_id)
+        if db_user:
+            return UserResponseDTO(
+                id=int(db_user["id"]),
+                username=db_user["username"],
+                email=db_user["email"],
+                role=db_user["role"],
+            )
+        return None
+
+    def get_user_by_token(self, token):
+        db_user = self.user_csv.get_user_by_token(token)
+        if db_user:
+            return UserDTO(
+                id=int(db_user["id"]),
+                username=db_user["username"],
+                password=db_user["password"],
+                email=db_user["email"],
+                role=db_user["role"],
+                key=db_user["key"],
+                token=db_user["token"],
+            )
+        return None
+
+    def update_user_token(self, username, token, key) -> bool:
+        return self.user_csv.update_user_token(username, token, key)
