@@ -21,16 +21,16 @@ class Ingredient:
 
     def __str__(self):
         return self.name
-    
+
     def format(self):
         """Replace all spaces with hyphens"""
-        self.name = self.name.replace(' ', '-')
+        self.name = self.name.replace(" ", "-")
         for index in range(len(self.categories)):
-            self.categories[index] = self.categories[index].replace(' ', '-')
+            self.categories[index] = self.categories[index].replace(" ", "-")
         for index in range(len(self.substitutes)):
-            self.substitutes[index] = self.substitutes[index].replace(' ', '-')
+            self.substitutes[index] = self.substitutes[index].replace(" ", "-")
         for index in range(len(self.components)):
-            self.components[index] = self.components[index].replace(' ', '-')
+            self.components[index] = self.components[index].replace(" ", "-")
 
     def has_substitutes(self):
         return len(self.substitutes) > 0

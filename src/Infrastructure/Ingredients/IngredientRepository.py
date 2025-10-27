@@ -22,38 +22,44 @@ class IngredientRepository:
                 return ingredient
         return None
 
-    def create_ingredient(self, name, categories,
-                          substitutes, components, recipe_count=0):
-        self._add(name, categories=categories, substitutes=substitutes,
-                  components=components, recipe_count=recipe_count)
+    def create_ingredient(
+        self, name, categories, substitutes, components, recipe_count=0
+    ):
+        self._add(
+            name,
+            categories=categories,
+            substitutes=substitutes,
+            components=components,
+            recipe_count=recipe_count,
+        )
 
     def add_recipe(self, id: int):
         ingredient = self._items.get(id)
-        if (ingredient is None):
+        if ingredient is None:
             return "ID is not valid"
         ingredient.add_recipe()
 
     def update_ingredient_categories(self, id: int, categories):
         ingredient = self._items.get(id)
-        if (ingredient is None):
+        if ingredient is None:
             return "ID is not valid"
         ingredient.change_categories(categories)
 
     def update_ingredient_substitutes(self, id: int, substitutes):
         ingredient = self._items.get(id)
-        if (ingredient is None):
+        if ingredient is None:
             return "ID is not valid"
         ingredient.change_substitutes(substitutes)
 
     def update_ingredient_components(self, id: int, components):
         ingredient = self._items.get(id)
-        if (ingredient is None):
+        if ingredient is None:
             return "ID is not valid"
         ingredient.change_components(components)
 
     def delete_ingredient(self, id: int):
         ingredient = self._items.pop(id, None)
-        if (ingredient is None):
+        if ingredient is None:
             return "ID is not valid"
 
     # part of the mocking

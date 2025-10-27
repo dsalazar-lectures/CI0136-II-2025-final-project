@@ -39,8 +39,7 @@ def create_new_ingredient():
     substitutes = request.json.get("substitutes")
     components = request.json.get("components")
 
-    ingredient_service.create_ingredient(name, categories,
-                                         substitutes, components)
+    ingredient_service.create_ingredient(name, categories, substitutes, components)
 
     return jsonify({"message": "Ingredient created successfully"}), 201
 
