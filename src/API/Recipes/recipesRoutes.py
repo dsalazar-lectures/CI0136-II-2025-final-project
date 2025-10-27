@@ -47,7 +47,9 @@ def delete_recipe(recipe_id):
 @recipes_bp.route("/recipes/<int:recipe_id>", methods=["PUT"])
 def update_recipe(recipe_id):
     updates = request.json or {}
-    status_code, response_data = recipesController.update_recipe_controller(recipe_id, updates)
+    status_code, response_data = recipesController.update_recipe_controller(
+        recipe_id, updates
+    )
     return jsonify(response_data), status_code
 
 
