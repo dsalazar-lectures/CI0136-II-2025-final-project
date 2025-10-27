@@ -8,7 +8,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "src"))
 # Import blueprints
 from src.API.Ingredients.IngredientsRoutes import ingredients_bp
 from src.API.Recipes.recipesRoutes import recipes_bp
-from src.API.Menu.menuRoutes import recipes_bp as menu_bp
+from src.API.Menu.menuRoutes import menu_bp
 from src.API.AuthRoutes import auth_bp
 
 
