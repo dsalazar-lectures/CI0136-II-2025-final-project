@@ -1,6 +1,7 @@
 import unittest
 from unittest.mock import patch
 from flask import Flask
+from src.Application.Menu import MenuUseCase
 from src.API.Menu.menuRoutes import menu_bp
 from tests.Mocks.Recipes.mock_recipe_repo import MockRecipe
 
@@ -39,6 +40,10 @@ class MenuEndpointTestCase(unittest.TestCase):
         data = response.get_json()
         self.assertEqual(len(data), 1)
         self.assertEqual(data[0]["name"], "recipe2")
+
+    def test_get_menu_emailPdf_invalid_address(self):
+        response = MenuUseCase.emailPdf(1, "test.gmail.com")
+        self.assertEqual(response, 400)
 
 
 if __name__ == "__main__":
