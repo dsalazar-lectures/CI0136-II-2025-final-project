@@ -54,7 +54,7 @@ class MockUserRepository(IUserRepository):
             if user.username == username:
                 user.token = token
         return False
-    
+
     def update_password(self, username: str, hashed_password: str):
         for user in self._users:
             if user.username == username:
