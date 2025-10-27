@@ -22,7 +22,7 @@ class MenuPdfAdapter(IMenuAdapter):
 
         recipe = "Menu solicitado"
 
-        pdfMenu.multi_cell(w=pdfMenu.w, txt=recipe, align="J")
+        pdfMenu.multi_cell(w=pdfMenu.w - 50, h=5, txt=recipe, align="J")
         pdfMenu.set_font(family="Times", size=15)
         pdfMenu.multi_cell(w=pdfMenu.w - 50, h=20, txt=" ", align="J")
 
