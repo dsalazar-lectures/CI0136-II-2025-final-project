@@ -1,6 +1,7 @@
 from unittest.mock import patch, MagicMock
 import pandas as pd
 
+
 class MocksGeneralLogs:
     @staticmethod
     def patch_st():

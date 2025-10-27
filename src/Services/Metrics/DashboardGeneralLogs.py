@@ -19,6 +19,7 @@ MSG_PICK = "Select at least one action to display logs."
 MSG_EMPTY_SELECTION = "The selected files are empty or not valid."
 # ------------------------------------------------------------------------------------
 
+
 class GeneralData_Window:
     @staticmethod
     def load_logs_from_json(file_path: Path) -> pd.DataFrame:
