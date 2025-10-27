@@ -1,5 +1,5 @@
-from typing import List, Dict, Callable
-import pandas as pd
+from typing import Dict
+from typing import Callable
 import streamlit as st
 from src.Application.Recipes import IRecipeRepository
 
@@ -11,13 +11,12 @@ MSG_EXEC_ERROR_TPL = "Error executing the metric: {}"
 
 # --------------------------------------------------------------------------------
 class AnalysisLogs:
-    # Example metric functions
     @staticmethod
-    def top_users_least_active(df_list, start_date, end_date):
+    def top_users_least_active():
         pass
 
     @staticmethod
-    def top_users_most_active(df_list, start_date, end_date):
+    def top_users_most_active():
         pass
 
     @staticmethod

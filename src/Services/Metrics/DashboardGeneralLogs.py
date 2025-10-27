@@ -4,10 +4,10 @@ from typing import Iterable, List
 import pandas as pd
 import streamlit as st
 
-from Metrics.GeneralLogs import GeneralLogs
+from Services.Metrics.GeneralLogs import GeneralLogs
 
 
-#------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------
 DATE_COL = "timestamp"
 USER_COL = "user"
 LEVEL_COL = "level"
@@ -17,7 +17,9 @@ LEVEL_GENERAL_DATA = "📊 General Data"
 
 MSG_PICK = "Select at least one action to display logs."
 MSG_EMPTY_SELECTION = "The selected files are empty or not valid."
-#------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------
+
+
 class GeneralData_Window:
     @staticmethod
     def load_logs_from_json(file_path: Path) -> pd.DataFrame:
