@@ -1,20 +1,22 @@
 from src.Application.DTOs.UserDTO import UserDTO
 from src.Application.Interfaces.IUserRepository import IUserRepository
-from src.Application.User.Services.ValidationService import ValidationService
-from src.Application.User.Services.EncryptionService import EncryptionService
-from src.Application.User.Services.TokenService import TokenService
-from src.Application.Profiles.Services.ProfileApplicationService import (
-    ProfileApplicationService,
-)
+from src.Application.Interfaces.IEncryptionService import IEncryptionService
+from src.Application.Interfaces.IValidationService import IValidationService
+from src.Application.Interfaces.ITokenService import ITokenService
 
 
 class UserApplicationService:
-    def __init__(self, user_repository: IUserRepository):
-        self.validation_service = ValidationService()
+    def __init__(
+        self,
+        user_repository: IUserRepository,
+        validation_service: IValidationService,
+        encryption_service: IEncryptionService,
+        token_service: ITokenService,
+    ):
+        self.validation_service = validation_service
         self.user_repository = user_repository
-        self.encryption_service = EncryptionService()
-        self.token_service = TokenService()
-        self.profile_service = ProfileApplicationService()
+        self.encryption_service = encryption_service
+        self.token_service = token_service
 
     def create_user_dto(self, data):
 
@@ -76,5 +78,17 @@ class UserApplicationService:
             return None, {"error": "Invalid username or password"}, 401
 
         token = self.token_service.generate_token(user)
+        self.user_repository.update_user_token(user.username, token, user.key)
 
         return user, {"message": "Login successful", "token": token}, 200
+
+    def verify_valid_session(self, data):
+        user = self.user_repository.get_user_by_token(data["token"])
+
+        if not user:
+            return None, {"error": "Invalid signature"}, 401
+
+        if self.token_service.verify_token(data["token"], user):
+            return user, {"message": "Valid session"}, 200
+        else:
+            return None, {"error": "Expired session"}, 401
