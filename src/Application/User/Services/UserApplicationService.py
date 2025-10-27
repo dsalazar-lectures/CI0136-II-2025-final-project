@@ -80,19 +80,21 @@ class UserApplicationService:
             self.validation_service.validate_request_data(data, required_fields)
         )
         if not is_valid:
-            return None, error_response, status_code
+            return None, error_response, None, status_code
 
         user = self.user_repository.get_user_by_username(data["username"])
         if not user:
-            return None, {"error": "Invalid username or password"}, 401
+            return None, {"error": "Invalid username or password"}, None, 401
 
         if not self.encryption_service.verify_password(data["password"], user.password):
-            return None, {"error": "Invalid username or password"}, 401
+            return None, {"error": "Invalid username or password"}, None, 401
 
         token = self.token_service.generate_token(user)
         self.user_repository.update_user_token(user.username, token, user.key)
 
-        return user, {"message": "Login successful", "token": token}, 200
+        print(token)
+
+        return user, {"message": "Login successful"}, token, 200
 
     def change_password(self, user, data):
         required_fields = ["old_password", "new_password"]

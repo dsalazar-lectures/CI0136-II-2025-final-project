@@ -92,17 +92,20 @@ class testUserApplicationService(unittest.TestCase):
         # Then try to login
         login_data = {"username": "testUser", "password": "Passw@rd123"}
 
-        user, response, status_code = self.user_app_service.login_user(login_data)
+        user, response, token, status_code = self.user_app_service.login_user(
+            login_data
+        )
 
         self.assertIsNotNone(user)
         self.assertEqual(status_code, 200)
         self.assertEqual(response["message"], "Login successful")
-        self.assertIn("token", response)
 
     def test_login_user_invalid_credentials(self):
         login_data = {"username": "nonexistentUser", "password": "password123"}
 
-        user, response, status_code = self.user_app_service.login_user(login_data)
+        user, response, token, status_code = self.user_app_service.login_user(
+            login_data
+        )
 
         self.assertIsNone(user)
         self.assertEqual(status_code, 401)
@@ -120,7 +123,9 @@ class testUserApplicationService(unittest.TestCase):
         # Try to login with wrong password
         login_data = {"username": "testUser", "password": "wrongpassword"}
 
-        user, response, status_code = self.user_app_service.login_user(login_data)
+        user, response, token, status_code = self.user_app_service.login_user(
+            login_data
+        )
 
         self.assertIsNone(user)
         self.assertEqual(status_code, 401)
@@ -153,7 +158,9 @@ class testUserApplicationService(unittest.TestCase):
         # Then login
         login_data = {"username": "testUser", "password": "Passw@rd123"}
 
-        user, response, status_code = self.user_app_service.login_user(login_data)
+        user, response, token, status_code = self.user_app_service.login_user(
+            login_data
+        )
 
         data = {"old_password": "Passw@rd123", "new_password": "newPassw!rd23"}
 
@@ -174,7 +181,9 @@ class testUserApplicationService(unittest.TestCase):
         # Then login
         login_data = {"username": "testUser", "password": "Passw@rd123"}
 
-        user, response, status_code = self.user_app_service.login_user(login_data)
+        user, response, token, status_code = self.user_app_service.login_user(
+            login_data
+        )
 
         data = {"new_password": "newPassw!rd23"}
 
@@ -195,7 +204,9 @@ class testUserApplicationService(unittest.TestCase):
         # Then login
         login_data = {"username": "testUser", "password": "Passw@rd123"}
 
-        user, response, status_code = self.user_app_service.login_user(login_data)
+        user, response, token, status_code = self.user_app_service.login_user(
+            login_data
+        )
 
         data = {"old_password": "Passw@r3", "new_password": "newPassw!rd23"}
 
@@ -216,7 +227,9 @@ class testUserApplicationService(unittest.TestCase):
         # Then login
         login_data = {"username": "testUser", "password": "Passw@rd123"}
 
-        user, response, status_code = self.user_app_service.login_user(login_data)
+        user, response, token, status_code = self.user_app_service.login_user(
+            login_data
+        )
 
         data = {"old_password": "Passw@rd123", "new_password": "newpassw!rd23"}
 

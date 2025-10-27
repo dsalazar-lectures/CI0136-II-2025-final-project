@@ -25,6 +25,8 @@ class UserRepository(IUserRepository):
                 password=created_user_data["password"],
                 email=created_user_data["email"],
                 role=created_user_data["role"],
+                key=created_user_data["key"],
+                token=created_user_data["token"],
             )
             return user_entity, "User created successfully", 201
         return None, "Failed to create user", 400
