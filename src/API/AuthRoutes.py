@@ -4,6 +4,7 @@ from src.Application.User.Services.EncryptionService import EncryptionService
 from src.Application.User.Services.ValidationService import ValidationService
 from src.Application.User.Services.TokenService import TokenService
 from src.Infrastructure.User.UserRepository import UserRepository
+from src.Infrastructure.Profiles.ProfileRepository import ProfileRepository
 from src.Application.Profiles.Services.ProfileApplicationService import (
     ProfileApplicationService,
 )
@@ -14,7 +15,7 @@ user_repository = UserRepository()
 validation_service = ValidationService()
 encryption_service = EncryptionService()
 token_service = TokenService()
-profile_service = ProfileApplicationService()
+profile_service = ProfileApplicationService(profile_repository=ProfileRepository())
 
 user_app_service = UserApplicationService(
     user_repository=user_repository,

@@ -1,5 +1,4 @@
 from src.Application.Interfaces.IUserRepository import IUserRepository
-from src.Application.Profiles.Services.ProfileApplicationService import ProfileApplicationService
 from src.Model.User.User import User
 from src.Application.DTOs.UserDTO import UserDTO
 from src.Application.DTOs.UserResponseDTO import UserResponseDTO
