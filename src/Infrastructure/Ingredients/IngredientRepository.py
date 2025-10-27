@@ -91,25 +91,25 @@ class IngredientRepository:
             recipe_count=11,
         )
         self._add(
-            "Whole Milk",
+            "Whole-Milk",
             categories=["dairy"],
             components=["lactose", "milk_protein"],
             recipe_count=55,
         )
         self._add(
-            "Almond Milk",
+            "Almond-Milk",
             categories=["plant_milk"],
             components=["almond"],
             recipe_count=13,
         )
         self._add(
-            "Wheat Flour",
+            "Wheat-Flour",
             categories=["grain"],
             components=["gluten"],
             recipe_count=60,
         )
         self._add(
-            "White Sugar",
+            "White-Sugar",
             categories=["sweetener"],
             components=[],
             recipe_count=75,
