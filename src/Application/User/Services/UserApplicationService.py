@@ -77,5 +77,17 @@ class UserApplicationService:
             return None, {"error": "Invalid username or password"}, 401
 
         token = self.token_service.generate_token(user)
+        self.user_repository.update_user_token(user.username, token, user.key)
 
         return user, {"message": "Login successful", "token": token}, 200
+
+    def verify_valid_session(self, data):
+        user = self.user_repository.get_user_by_token(data["token"])
+
+        if not user:
+            return None, {"error": "Invalid signature"}, 401
+
+        if self.token_service.verify_token(data["token"], user):
+            return user, {"message": "Valid session"}, 200
+        else:
+            return None, {"error": "Expired session"}, 401

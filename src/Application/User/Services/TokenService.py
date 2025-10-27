@@ -11,10 +11,11 @@ class TokenService(ITokenService):
         self.tz = pytz.timezone("America/Costa_Rica")
 
     def generate_token(self, user):
+        now = datetime.datetime.now(tz=self.tz)
         payload = {
-            "iat": datetime.datetime.now(tz=self.tz),
-            "exp": datetime.datetime.now(tz=self.tz) + datetime.timedelta(minutes=10),
-            "sub": user.id,
+            "iat": now,
+            "exp": now + datetime.timedelta(minutes=60),
+            "sub": str(user.id),
             "username": user.username,
         }
 
@@ -27,5 +28,11 @@ class TokenService(ITokenService):
         user.key = secrets.token_hex(32)
 
     @staticmethod
-    def verify_token(token):
-        pass
+    def verify_token(token, user):
+        try:
+            jwt.decode(token, user.key, algorithms=["HS256"])
+            return True
+        except jwt.ExpiredSignatureError:
+            return False
+
+        return False
