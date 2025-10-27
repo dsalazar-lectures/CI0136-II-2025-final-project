@@ -10,6 +10,7 @@ sys.path.append(str(Path(__file__).resolve().parents[2] / "Mocks"))
 from src.Services.Metrics.DashboardGeneralLogs import GeneralData_Window
 from tests.Mocks.Dashboard.Mock_DashboardGeneralLogs import MocksDashboardGeneralLogs
 
+
 class TestDashboardGeneralLogs(unittest.TestCase):
 
     def test_load_logs_from_json_valid(self):
@@ -32,12 +33,16 @@ class TestDashboardGeneralLogs(unittest.TestCase):
 
     def test_show_general_logs_window_valid(self):
         prev = logging.root.manager.disable
-        logging.disable(logging.WARNING)  
+        logging.disable(logging.WARNING)
         try:
             patch_sidebar, patch_load, patch_kpis, patch_charts, patch_table = (
                 MocksDashboardGeneralLogs.patch_show_general_logs_window_valid()
             )
-            with patch_sidebar, patch_load, patch_kpis as mock_kpis, patch_charts as mock_charts, patch_table as mock_table:
+            with (
+                patch_sidebar
+            ), (
+                patch_load
+            ), patch_kpis as mock_kpis, patch_charts as mock_charts, patch_table as mock_table:
                 GeneralData_Window.show_general_logs_window([Path("mock.json")])
                 mock_kpis.assert_called_once()
                 mock_charts.assert_called_once()
@@ -49,7 +54,9 @@ class TestDashboardGeneralLogs(unittest.TestCase):
         prev = logging.root.manager.disable
         logging.disable(logging.WARNING)
         try:
-            patch_sidebar, patch_warn, patch_stop = MocksDashboardGeneralLogs.patch_show_general_logs_window_empty()
+            patch_sidebar, patch_warn, patch_stop = (
+                MocksDashboardGeneralLogs.patch_show_general_logs_window_empty()
+            )
             with patch_sidebar, patch_warn as mock_warn, patch_stop as mock_stop:
                 GeneralData_Window.show_general_logs_window([])
                 mock_warn.assert_called_once()
@@ -57,15 +64,18 @@ class TestDashboardGeneralLogs(unittest.TestCase):
         finally:
             logging.disable(prev)
 
-
     def test_sidebar_select_files_valid(self):
         with MocksDashboardGeneralLogs.patch_sidebar_select_files_valid() as mock_multiselect:
-            result = GeneralData_Window.sidebar_select_files([Path("file1.json"), Path("file2.json")])
+            result = GeneralData_Window.sidebar_select_files(
+                [Path("file1.json"), Path("file2.json")]
+            )
             self.assertEqual(len(result), 1)
             mock_multiselect.assert_called_once()
 
     def test_sidebar_select_files_empty(self):
-        patch_multiselect, patch_info, patch_stop = MocksDashboardGeneralLogs.patch_sidebar_select_files_empty()
+        patch_multiselect, patch_info, patch_stop = (
+            MocksDashboardGeneralLogs.patch_sidebar_select_files_empty()
+        )
 
         with patch_multiselect, patch_info as mock_info, patch_stop as mock_stop:
             GeneralData_Window.sidebar_select_files([Path("file1.json")])

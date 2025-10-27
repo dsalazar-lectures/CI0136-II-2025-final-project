@@ -1,6 +1,7 @@
 import unittest
-import  sys
+import sys
 from pathlib import Path
+
 sys.path.append(str(Path(__file__).resolve().parents[3] / "src"))
 
 from src.Services.Metrics.Dashboard import LogsDashboard
@@ -9,8 +10,12 @@ from tests.Mocks.Dashboard.Mock_Dasboard import MocksLogsDashboard
 
 class TestLogsDashboard(unittest.TestCase):
     def test_get_available_json_file(self):
-        patch_exists, patch_glob, patch_warning, patch_stop = MocksLogsDashboard.patch_get_available_json_file()
-        with patch_exists, patch_glob, patch_warning as mock_warning, patch_stop as mock_stop:
+        patch_exists, patch_glob, patch_warning, patch_stop = (
+            MocksLogsDashboard.patch_get_available_json_file()
+        )
+        with (
+            patch_exists
+        ), patch_glob, patch_warning as mock_warning, patch_stop as mock_stop:
             dashboard = LogsDashboard(Path("/mock/dir"))
             files = dashboard.get_available_json_files()
             self.assertEqual(len(files), 2)
@@ -18,22 +23,30 @@ class TestLogsDashboard(unittest.TestCase):
             mock_stop.assert_not_called()
 
     def test_get_available_json_not_files(self):
-        patch_exists, patch_glob, patch_warning, patch_stop = MocksLogsDashboard.patch_get_available_json_not_files()
-        with patch_exists, patch_glob, patch_warning as mock_warning, patch_stop as mock_stop:
+        patch_exists, patch_glob, patch_warning, patch_stop = (
+            MocksLogsDashboard.patch_get_available_json_not_files()
+        )
+        with (
+            patch_exists
+        ), patch_glob, patch_warning as mock_warning, patch_stop as mock_stop:
             dashboard = LogsDashboard(Path("/mock/dir"))
             dashboard.get_available_json_files()
             mock_warning.assert_called_once()
             mock_stop.assert_called_once()
 
     def test_select_mode_Analysis(self):
-        with MocksLogsDashboard.patch_sidebar_selectbox("Logs Analysis") as mock_selectbox:
+        with MocksLogsDashboard.patch_sidebar_selectbox(
+            "Logs Analysis"
+        ) as mock_selectbox:
             dashboard = LogsDashboard(Path("/mock/dir"))
             mode = dashboard.select_mode()
             self.assertEqual(mode, "Logs Analysis")
             mock_selectbox.assert_called_once()
 
     def test_select_mode_General(self):
-        with MocksLogsDashboard.patch_sidebar_selectbox("General Data") as mock_selectbox:
+        with MocksLogsDashboard.patch_sidebar_selectbox(
+            "General Data"
+        ) as mock_selectbox:
             dashboard = LogsDashboard(Path("/mock/dir"))
             mode = dashboard.select_mode()
             self.assertEqual(mode, "General Data")

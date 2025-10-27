@@ -13,6 +13,7 @@ from src.API.AuthRoutes import auth_bp
 
 from src.API.Metrics.DashboardRoute import dashboard_bp
 
+
 def create_app():
     app = Flask(__name__)
 
@@ -23,7 +24,7 @@ def create_app():
     app.register_blueprint(recipes_bp, url_prefix="/api")
     app.register_blueprint(menu_bp, url_prefix="/api")
     app.register_blueprint(auth_bp, url_prefix="/auth")
-    app.register_blueprint(dashboard_bp, url_prefix='/api')
+    app.register_blueprint(dashboard_bp, url_prefix="/api")
 
     # Health check endpoint
     @app.route("/")

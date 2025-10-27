@@ -4,6 +4,8 @@ import streamlit as st
 USER_COL = "user"
 LEVEL_COL = "level"
 LEVEL_LOGS_DETAILS = "### 📋 Logs Details"
+
+
 class GeneralLogs:
     @staticmethod
     def show_kpis(df: pd.DataFrame):
@@ -48,4 +50,3 @@ class GeneralLogs:
             st.dataframe(df)
         else:
             st.info("No logs loaded or filters returned no results.")
-

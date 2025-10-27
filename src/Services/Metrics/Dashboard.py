@@ -10,6 +10,8 @@ from Services.Metrics.AnalysisLogs import AnalysisLogs
 
 
 Mode = Literal["General Data", "Logs Analysis"]
+
+
 class LogsDashboard:
     MODE_GENERAL: Mode = "General Data"
     MODE_ANALYSIS: Mode = "Logs Analysis"
@@ -20,7 +22,9 @@ class LogsDashboard:
     LEVEL_WARNING = "### ⚠️ No JSON files found in the folder."
 
     def __init__(self, logs_dir: Path | None = None) -> None:
-        self._logs_dir: Path = logs_dir or (Path(__file__).resolve().parents[2] / "Database" / "Logs")
+        self._logs_dir: Path = logs_dir or (
+            Path(__file__).resolve().parents[2] / "Database" / "Logs"
+        )
 
     def run(self) -> None:
         self.init_page()
@@ -29,7 +33,11 @@ class LogsDashboard:
         self.render_mode(mode, files)
 
     def init_page(self) -> None:
-        st.set_page_config(page_title=self.PAGE_TITLE, page_icon=self.PAGE_ICON, layout=self.PAGE_LAYOUT)
+        st.set_page_config(
+            page_title=self.PAGE_TITLE,
+            page_icon=self.PAGE_ICON,
+            layout=self.PAGE_LAYOUT,
+        )
 
     def get_available_json_files(self) -> list[Path]:
         folder = self._logs_dir
@@ -44,8 +52,14 @@ class LogsDashboard:
 
     def render_mode(self, mode: Mode, files: Iterable[Path]) -> None:
         handlers: Dict[Mode, Callable[[], None]] = {
-            self.MODE_GENERAL: (lambda: GeneralData_Window.show_general_logs_window(files)),
-            self.MODE_ANALYSIS: (lambda: Analysis_Window.show_analysis_logs_window(files, AnalysisLogs.analysis_registry)),
+            self.MODE_GENERAL: (
+                lambda: GeneralData_Window.show_general_logs_window(files)
+            ),
+            self.MODE_ANALYSIS: (
+                lambda: Analysis_Window.show_analysis_logs_window(
+                    files, AnalysisLogs.analysis_registry
+                )
+            ),
         }
 
         handler = handlers.get(mode)
@@ -59,6 +73,7 @@ class LogsDashboard:
         except Exception:
             st.subheader(str(mode))
             st.info("This view is not available at the moment.")
+
 
 if __name__ == "__main__":
     LogsDashboard().run()
