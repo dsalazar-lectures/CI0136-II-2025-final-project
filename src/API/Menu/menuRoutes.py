@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request
 from src.Application.Recipes import recipe_service
+from src.Application.Menu import menu_service
 from src.Application.Menu import MenuUseCase
 
 menu_bp = Blueprint("menu", __name__)
