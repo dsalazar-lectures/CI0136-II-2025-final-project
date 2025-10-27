@@ -1,6 +1,6 @@
-# src/Application/DTOs/UserResponseDTO.py
 class UserResponseDTO:
     """DTO solo para responses, sin datos sensibles"""
+
     def __init__(self, id, username, email, role="user"):
         self.id = id
         self.username = username
