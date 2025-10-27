@@ -11,6 +11,7 @@ from src.API.Recipes.recipesRoutes import recipes_bp
 from src.API.Menu.menuRoutes import menu_bp
 from src.API.AuthRoutes import auth_bp
 
+
 def create_app():
     app = Flask(__name__)
 
