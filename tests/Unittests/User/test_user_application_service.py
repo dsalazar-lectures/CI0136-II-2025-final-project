@@ -138,6 +138,27 @@ class testUserApplicationService(unittest.TestCase):
         self.assertEqual(user_dto.role, "admin")
         self.assertTrue(user_dto.password.startswith("hashed_"))
 
+    def test_change_password_success(self):
+        # First register a user
+        register_data = {
+            "username": "testUser",
+            "password": "Passw@rd123",
+            "email": "test@example.com",
+        }
+        self.user_app_service.register_user(register_data)
+
+        # Then login
+        login_data = {"username": "testUser", "password": "Passw@rd123"}
+
+        user, response, status_code = self.user_app_service.login_user(login_data)
+
+        data = {"old_password": "Passw@rd123", "new_password": "newPassw!rd23"}
+
+        user, msg, status = self.user_app_service.change_password(user, data)
+
+        self.assertIsNotNone(user)
+        self.assertEqual(user.password, "hashed_newPassw!rd23")
+
 
 if __name__ == "__main__":
     unittest.main()

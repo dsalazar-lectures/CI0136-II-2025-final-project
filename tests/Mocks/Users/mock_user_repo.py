@@ -49,7 +49,7 @@ class MockUserRepository(IUserRepository):
                 return user
         return None
 
-    def update_user_token(self, username, token, key) -> bool:
+    def update_user_token(self, username, token, key):
         for user in self._users:
             if user.username == username:
                 user.token = token
@@ -59,4 +59,5 @@ class MockUserRepository(IUserRepository):
         for user in self._users:
             if user.username == username:
                 user.password = hashed_password
-        return False
+                return True, "Password updated successfully", 200
+        return False, "Failed to update password", 400
