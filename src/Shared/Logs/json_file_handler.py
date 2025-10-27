@@ -4,16 +4,19 @@ from pathlib import Path
 
 
 class JsonFileHandler(logging.Handler):
-    def __init__(self, path: str, level: int = logging.INFO):
+    def __init__(self, base_dir: str = "src/database/Logs", level: int = logging.INFO):
         super().__init__(level)
-        self.path = Path(path)
-        self.path.parent.mkdir(parents=True, exist_ok=True)
+        self.base_dir = Path(base_dir)
+        self.base_dir.mkdir(parents=True, exist_ok=True)
         self.formatter = logging.Formatter(datefmt="%Y-%m-%d %H:%M:%S")
+
+    def _get_file_for_action(self, action: str) -> Path:
+        safe_action = str(action).strip().replace(" ", "_").lower() or "general"
+        return self.base_dir / f"{safe_action}.json"
 
     def emit(self, record: logging.LogRecord) -> None:
         try:
             timestamp = self.formatter.formatTime(record, self.formatter.datefmt)
-
             log_entry = {
                 "timestamp": timestamp,
                 "level": record.levelname,
@@ -24,10 +27,13 @@ class JsonFileHandler(logging.Handler):
                 "description": getattr(record, "description", "-"),
             }
 
+            action = getattr(record, "action", "general")
+            log_file = self._get_file_for_action(action)
+
             data = []
-            if self.path.exists():
+            if log_file.exists():
                 try:
-                    content = self.path.read_text(encoding="utf-8").strip()
+                    content = log_file.read_text(encoding="utf-8").strip()
                     if content:
                         data = json.loads(content)
                         if not isinstance(data, list):
@@ -36,7 +42,7 @@ class JsonFileHandler(logging.Handler):
                     data = []
 
             data.append(log_entry)
-            self.path.write_text(
+            log_file.write_text(
                 json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8"
             )
 

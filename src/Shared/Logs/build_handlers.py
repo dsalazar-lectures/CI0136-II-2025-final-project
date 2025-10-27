@@ -17,6 +17,6 @@ def build_handlers(out_dir: str = "src/database/Logs"):
     )
 
     txt_handler = TxtFileHandler(str(Path(out_dir) / "GeneralLogs.txt"))
-    json_handler = JsonFileHandler(str(Path(out_dir) / "ImportantLogs.json"))
+    json_handler = JsonFileHandler(str(Path(out_dir)))
 
     return [console, txt_handler, json_handler]
