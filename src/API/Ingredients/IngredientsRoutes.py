@@ -57,15 +57,17 @@ def update_ingredient():
     for field in ["categories", "substitutes", "components"]:
         if field in data and not isinstance(data[field], list):
             return jsonify({"error": f"{field} must be a list"}), 400
+        
+    if "components" in request.json:
+        result = ingredient_service.update_components(id, data["components"])
+        if result == "Error: base ingredient":
+            return jsonify({"error": "selected ingredient is base ingredient and has no components"}), 400
 
     if "categories" in request.json:
         ingredient_service.update_categories(id, data["categories"])
 
     if "substitutes" in request.json:
         ingredient_service.update_substitutes(id, data["substitutes"])
-
-    if "components" in request.json:
-        ingredient_service.update_components(id, data["components"])
 
     return jsonify({"message": "Ingredient updated successfully"}), 200
 
