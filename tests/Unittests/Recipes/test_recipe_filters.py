@@ -169,5 +169,69 @@ class TestDurationFilter(unittest.TestCase):
         self.assertEqual(len(filtered), 1)
         self.assertTrue(filtered[0].duration == 30)
 
+class TestCalificationFilter(unittest.TestCase):
+    
+    def test_calification_filter_minimum_rating(self):
+        """Test rating filter includes minimum rating"""
+        base = BaseRecipeFilter()
+        calification_filter = CalificationFilter(base, 4.0)
         
+        recipes = [
+            MockRecipe(califications_sumatory=40, califications_amount=10),  # 4.0
+            MockRecipe(califications_sumatory=45, califications_amount=10),  # 4.5
+            MockRecipe(califications_sumatory=30, califications_amount=10)   # 3.0
+        ]
+        
+        filtered = calification_filter.filter(recipes)
+        
+        self.assertEqual(len(filtered), 2)
+        self.assertTrue(all(r.califications_sumatory >= 40 for r in filtered))
+    
+    def test_calification_filter_exact_rating(self):
+        """Test rating filter includes recipes with exact rating"""
+        base = BaseRecipeFilter()
+        calification_filter = CalificationFilter(base, 4.0)
+        
+        recipes = [MockRecipe(califications_sumatory=40, califications_amount=10)]
+        
+        filtered = calification_filter.filter(recipes)
+        
+        self.assertEqual(len(filtered), 1)
+        self.assertTrue(filtered[0].califications_sumatory == 40)
+
+
+class TestIngredientsFilter(unittest.TestCase):
+    
+    def test_ingredients_filter_single_ingredient(self):
+        """Test ingredient filter finds recipes with an specific ingredient"""
+        base = BaseRecipeFilter()
+        ingredients_filter = IngredientsFilter(base, ["flour"])
+        
+        recipes = [
+            MockRecipe(ingredients=["flour", "sugar"]),
+            MockRecipe(ingredients=["milk", "eggs"]),
+            MockRecipe(ingredients=["flour", "butter"])
+        ]
+        
+        filtered = ingredients_filter.filter(recipes)
+        
+        self.assertEqual(len(filtered), 2)
+        self.assertTrue(all("flour" in r.ingredients for r in filtered))
+    
+    def test_ingredients_filter_partial_match(self):
+        """Test filter matches partial ingredients"""
+        base = BaseRecipeFilter()
+        ingredients_filter = IngredientsFilter(base, ["choc"])
+        
+        recipes = [
+            MockRecipe(ingredients=["chocolate chips"]),
+            MockRecipe(ingredients=["vanilla"])
+        ]
+        
+        filtered = ingredients_filter.filter(recipes)
+        
+        self.assertEqual(len(filtered), 1)
+        self.assertTrue(filtered[0].ingredients == ["chocolate chips"])
+
+
 
