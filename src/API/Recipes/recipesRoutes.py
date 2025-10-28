@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 from src.Application.Recipes import recipe_service
-from src.API.Recipes.recipesController import update_recipe_controller
+from src.API.Recipes import recipesController
 
 recipes_bp = Blueprint("recipes", __name__)
 
@@ -34,32 +34,22 @@ def get_recipes_by_ingredient(ingredient):
 @recipes_bp.route("/addrecipe", methods=["POST"])
 def create_recipe():
     data = request.json
-    username = "myUser"
-    recipe = recipe_service.create_recipe(data, username)
-    if recipe == -1:
-        return (
-            jsonify({"error": "Se necesita información adicional sobre la receta"}),
-            400,
-        )
-    return jsonify(recipe.to_dict())
+    status_code, response_data = recipesController.create_recipe_controller(data)
+    return jsonify(response_data), status_code
 
 
 @recipes_bp.route("/recipes/<int:recipe_id>", methods=["DELETE"])
 def delete_recipe(recipe_id):
-    username = "myUser"  # Change later to actual username
-    result = recipe_service.delete_recipe(recipe_id, username)
-    if result is None:
-        return jsonify({"error": "Receta no encontrada"}), 404
-    if result is False:
-        return jsonify({"error": "No autorizado para eliminar esta receta"}), 403
-    return jsonify({"message": "Receta eliminada", "recipe": result.__str__()})
+    status_code, response_data = recipesController.delete_recipe_controller(recipe_id)
+    return jsonify(response_data), status_code
 
 
 @recipes_bp.route("/recipes/<int:recipe_id>", methods=["PUT"])
 def update_recipe(recipe_id):
-    username = "myUser"  # Change later to actual username
     updates = request.json or {}
-    status_code, response_data = update_recipe_controller(recipe_id, updates, username)
+    status_code, response_data = recipesController.update_recipe_controller(
+        recipe_id, updates
+    )
     return jsonify(response_data), status_code
 
 
