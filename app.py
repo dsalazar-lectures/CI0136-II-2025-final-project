@@ -11,6 +11,8 @@ from src.API.Recipes.recipesRoutes import recipes_bp
 from src.API.Menu.menuRoutes import menu_bp
 from src.API.AuthRoutes import auth_bp
 
+from src.API.Metrics.DashboardRoute import dashboard_bp
+
 
 def create_app():
     app = Flask(__name__)
@@ -22,6 +24,7 @@ def create_app():
     app.register_blueprint(recipes_bp, url_prefix="/api")
     app.register_blueprint(menu_bp, url_prefix="/api")
     app.register_blueprint(auth_bp, url_prefix="/auth")
+    app.register_blueprint(dashboard_bp, url_prefix="/api")
 
     # Health check endpoint
     @app.route("/")
@@ -38,6 +41,7 @@ def create_app():
                 "GET /api/menu?category=<category> - Get all menu items",
                 "GET /api/menu/<category>/<count> - Generate N menus for a category",
                 "GET /api/menu/email - Email selected recipes to specific address",
+                "GET /api/Services/metrics/open-dashboard?port=8601",
             ],
         }
 
