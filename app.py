@@ -8,7 +8,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "src"))
 # Import blueprints
 from src.API.Ingredients.IngredientsRoutes import ingredients_bp
 from src.API.Recipes.recipesRoutes import recipes_bp
-from src.API.Menu.menuRoutes import recipes_bp as menu_bp
+from src.API.Menu.menuRoutes import menu_bp
 from src.API.AuthRoutes import auth_bp
 
 from src.API.Metrics.DashboardRoute import dashboard_bp
@@ -39,6 +39,7 @@ def create_app():
                 "GET /api/recipes - Get all recipes",
                 "GET /api/recipes/<id> - Get recipe by ID",
                 "GET /api/menu?category=<category> - Get all menu items",
+                "GET /api/menu/email - Email selected recipies to specific address",
                 "GET /api/Services/metrics/open-dashboard?port=8601",
             ],
         }
