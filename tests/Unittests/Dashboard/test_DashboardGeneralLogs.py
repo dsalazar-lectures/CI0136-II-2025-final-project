@@ -54,13 +54,17 @@ class TestDashboardGeneralLogs(unittest.TestCase):
         prev = logging.root.manager.disable
         logging.disable(logging.WARNING)
         try:
-            patch_sidebar, patch_warn, patch_stop = (
+            patch_sidebar, patch_warn, patch_stop, patch_filters, patch_apply = (
                 MocksDashboardGeneralLogs.patch_show_general_logs_window_empty()
             )
-            with patch_sidebar, patch_warn as mock_warn, patch_stop as mock_stop:
+            with (
+                patch_sidebar
+            ), patch_warn as mock_warn, patch_stop as mock_stop, (
+                patch_filters
+            ), patch_apply:
                 GeneralData_Window.show_general_logs_window([])
                 mock_warn.assert_called_once()
-                mock_stop.assert_called()
+                mock_stop.assert_called_once()
         finally:
             logging.disable(prev)
 
