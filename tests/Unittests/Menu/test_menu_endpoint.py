@@ -12,6 +12,16 @@ class MenuEndpointTestCase(unittest.TestCase):
         app.register_blueprint(menu_bp, url_prefix="/api")
         self.client = app.test_client()
 
+    @patch("src.Application.Recipes.recipe_service.get_recipes_by_category")
+    def test_get_menu_returns_empty_list_when_recipes_repo_empty(
+        self, mock_get_recipes
+    ):
+        mock_get_recipes.return_value = []
+        response = self.client.get("/api/menu?category=unknown")
+        self.assertEqual(response.status_code, 200)
+        data = response.get_json()
+        self.assertEqual(data, [{}])
+
     @patch("src.Application.Recipes.recipe_service.get_random_recipe_by_category")
     def test_get_menu_returns_one_random_recipe(self, mock_get_random_recipe):
         recipe = MockRecipe(1, "recipe1", ["category1", "category2"])

@@ -74,10 +74,10 @@ class AnalysisLogs:
     }
 
     @staticmethod
-    def show_analysis_logs(df_list, func, start_date, end_date):
+    def show_analysis_logs(df_list, func):
         if df_list and func:
             try:
-                func(df_list, start_date, end_date)
+                func(df_list)
             except Exception as e:
                 st.warning(MSG_EXEC_ERROR_TPL.format(e))
         else:
