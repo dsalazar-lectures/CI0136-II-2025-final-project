@@ -1,7 +1,8 @@
 from typing import Dict
 from typing import Callable
 import streamlit as st
-from src.Application.Recipes import IRecipeRepository
+from src.Application.Recipes.IRecipeRepository import IRecipeRepository
+from src.Infrastructure.Recipes.CSVRecipeRepository import CSVRecipeRepository
 
 # --------------------------------------------------------------------------------
 
@@ -20,7 +21,10 @@ class AnalysisLogs:
         pass
 
     @staticmethod
-    def top_most_search_recipes(df_list, start_date, end_date):
+    def top_most_search_recipes(
+        df_list, start_date, end_date, recipe_repo: IRecipeRepository | None = None
+    ):
+        recipe_repo = recipe_repo or CSVRecipeRepository()
         if df_list is None or len(df_list) == 0:
             st.text(MSG_NO_DATA_OR_FUNC)
         else:
@@ -36,7 +40,7 @@ class AnalysisLogs:
                 counts = df["Id_Producto"].value_counts().head(10)
                 recipes_counts = {}
                 for recipe_id in df["Id_Producto"].unique():
-                    recipe = IRecipeRepository.recipe_repository.get_by_id(recipe_id)
+                    recipe = recipe_repo.get_by_id(recipe_id)
                     if recipe:
                         recipes_counts[recipe.to_dict()["name"]] = counts[recipe_id]
 
