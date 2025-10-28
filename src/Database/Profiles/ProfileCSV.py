@@ -99,8 +99,7 @@ class ProfileCSV:
         # Return the updated row
         return self.get_profile(user_id)
 
-    # TODO(JM) Check if User's team is ok with these functions
-    def get_profile_by_user_id(self, user_id: str):
+    def get_profile_by_user_id(self, user_id: int):
         """Get a profile by user_id"""
         with open(self.file_path, "r", newline="") as file:
             reader = csv.DictReader(file)
@@ -126,7 +125,7 @@ class ProfileCSV:
                     }
         return None
 
-    def update_profile(self, user_id: str, profile_data: dict):
+    def update_profile(self, user_id: int, profile_data: dict):
         """Update a profile by user_id"""
         rows = []
         updated = False
