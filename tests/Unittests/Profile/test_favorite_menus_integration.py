@@ -31,7 +31,7 @@ class TestFavoriteMenusIntegration(unittest.TestCase):
         self.assertTrue(self.repo.is_menu_in_favorites("1", "menu1"))
 
     def test_remove_favorite_menu(self):
-        '''Test removing a favorite menu'''
+        """Test removing a favorite menu"""
         # Add favorite menu first
         self.repo.add_favorite_menu("1", "menu1")
 

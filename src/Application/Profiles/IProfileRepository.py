@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Optional
-from src.Model.Profiles.Profiles import Profile
+
 
 class IProfileRepository(ABC):
     @abstractmethod
