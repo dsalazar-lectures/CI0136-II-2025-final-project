@@ -1,8 +1,10 @@
 from src.Application.Profiles.IProfileRepository import IProfileRepository
 from src.Model.Profiles.Profiles import Profile
 
+
 class MockProfileAndFavoriteFoods(IProfileRepository):
     """Mock implementation of IProfileRepository for testing"""
+
     def __init__(self):
         self.profiles = {}
 
@@ -10,10 +12,7 @@ class MockProfileAndFavoriteFoods(IProfileRepository):
         if user_id in self.profiles:
             return None
         profile = Profile(
-            user_id=user_id,
-            favorite_foods=[],
-            unfavorite_foods=[],
-            favorite_menus=[]
+            user_id=user_id, favorite_foods=[], unfavorite_foods=[], favorite_menus=[]
         )
         self.profiles[user_id] = profile
         return profile

@@ -38,7 +38,7 @@ class ProfileCSV:
             writer.writerow(new_profile)
 
         return new_profile
-    
+
     def get_profile(self, user_id: int):
         if not os.path.exists(self.file_path):
             return None
@@ -73,9 +73,13 @@ class ProfileCSV:
                         if field_name not in fieldnames or field_name == "user_id":
                             continue
                         if isinstance(field_value, list):
-                            merged[field_name] = ";".join(field_value) if field_value else ""
+                            merged[field_name] = (
+                                ";".join(field_value) if field_value else ""
+                            )
                         else:
-                            merged[field_name] = field_value if field_value is not None else ""
+                            merged[field_name] = (
+                                field_value if field_value is not None else ""
+                            )
                     rows.append(merged)
                 else:
                     rows.append(csv_row)

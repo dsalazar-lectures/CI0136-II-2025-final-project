@@ -7,7 +7,14 @@ from src.Application.Menu.CustomizedMenuService import CustomizedMenuService
 
 class FakeRecipe:
     """Mock recipe class for testing purposes"""
-    def __init__(self, title: str, ingredients: List[str], categories: Optional[List[str]] = None, rating: int = 0):
+
+    def __init__(
+        self,
+        title: str,
+        ingredients: List[str],
+        categories: Optional[List[str]] = None,
+        rating: int = 0,
+    ):
         self.title = title
         self.ingredients = ingredients
         self.categories = categories or []
@@ -16,6 +23,7 @@ class FakeRecipe:
 
 class FakeRecipeService:
     """Mock recipe service for testing"""
+
     def __init__(self, recipes: List[FakeRecipe]):
         self._recipes = list(recipes)
 
@@ -32,14 +40,18 @@ class FakeRecipeService:
         return out
 
 
-def build_sut(recipes: List[FakeRecipe], require_all: bool = False) -> CustomizedMenuService:
+def build_sut(
+    recipes: List[FakeRecipe], require_all: bool = False
+) -> CustomizedMenuService:
     """Helper function to build the System Under Test"""
-    return CustomizedMenuService(service=FakeRecipeService(recipes), require_all=require_all)
+    return CustomizedMenuService(
+        service=FakeRecipeService(recipes), require_all=require_all
+    )
 
 
 class TestICustomizedMenuServiceInterface(unittest.TestCase):
     """Test cases for the CustomizedMenuService interface"""
-    
+
     def test_interface_signature(self):
         """Verify the interface declares recommend_by_favorites with correct signature"""
         self.assertTrue(hasattr(ICustomizedMenuService, "recommend_by_favorites"))
@@ -57,11 +69,30 @@ class TestCustomizedMenuServiceBehavior(unittest.TestCase):
     def setUp(self):
         """Initialize test recipes"""
         self.recipes = [
-            FakeRecipe("Pasta al Pollo", ["Pollo", "Pasta", "Tomate"], ["almuerzo"], rating=4),
-            FakeRecipe("Ensalada Caprese", ["Tomate", "Albahaca", "Queso"], ["almuerzo", "cena"], rating=5),
-            FakeRecipe("Tofu Salteado", ["Tofu", "Jengibre", "Ajo"], ["cena"], rating=3),
-            FakeRecipe("Sopa de Verduras", ["Zanahoria", "Apio", "Tomate"], ["almuerzo"], rating=2),
-            FakeRecipe("Pizza Margherita", ["Tomate", "Queso", "Albahaca"], ["almuerzo", "cena"], rating=5),
+            FakeRecipe(
+                "Pasta al Pollo", ["Pollo", "Pasta", "Tomate"], ["almuerzo"], rating=4
+            ),
+            FakeRecipe(
+                "Ensalada Caprese",
+                ["Tomate", "Albahaca", "Queso"],
+                ["almuerzo", "cena"],
+                rating=5,
+            ),
+            FakeRecipe(
+                "Tofu Salteado", ["Tofu", "Jengibre", "Ajo"], ["cena"], rating=3
+            ),
+            FakeRecipe(
+                "Sopa de Verduras",
+                ["Zanahoria", "Apio", "Tomate"],
+                ["almuerzo"],
+                rating=2,
+            ),
+            FakeRecipe(
+                "Pizza Margherita",
+                ["Tomate", "Queso", "Albahaca"],
+                ["almuerzo", "cena"],
+                rating=5,
+            ),
         ]
 
     def test_no_favorites_returns_empty(self):
@@ -81,14 +112,20 @@ class TestCustomizedMenuServiceBehavior(unittest.TestCase):
         """Test combined filtering by favorites and category"""
         sut = build_sut(self.recipes)
         result = sut.recommend_by_favorites(["tomate"], "almuerzo", limit=10)
-        self.assertTrue(all("almuerzo" in [c.lower() for c in r.categories] for r in result))
-        self.assertTrue(all(any("tomate" in i.lower() for i in r.ingredients) for r in result))
+        self.assertTrue(
+            all("almuerzo" in [c.lower() for c in r.categories] for r in result)
+        )
+        self.assertTrue(
+            all(any("tomate" in i.lower() for i in r.ingredients) for r in result)
+        )
 
     def test_empty_category(self):
         """Test behavior with empty category"""
         sut = build_sut(self.recipes)
         result = sut.recommend_by_favorites(["tomate"], "", limit=10)
-        self.assertTrue(all(any("tomate" in i.lower() for i in r.ingredients) for r in result))
+        self.assertTrue(
+            all(any("tomate" in i.lower() for i in r.ingredients) for r in result)
+        )
         self.assertTrue(len(result) > 0)
 
     def test_invalid_favorites_type(self):
@@ -114,7 +151,7 @@ class TestCustomizedMenuServiceBehavior(unittest.TestCase):
         """Test require_all mode for multiple ingredients"""
         sut = build_sut(self.recipes, require_all=True)
         result = sut.recommend_by_favorites(["tomate", "queso"])
-        
+
         # Verify that each recipe contains all favorite ingredients
         for recipe in result:
             ingredients_lower = [i.lower() for i in recipe.ingredients]
@@ -122,8 +159,10 @@ class TestCustomizedMenuServiceBehavior(unittest.TestCase):
                 favorite_lower = favorite.lower()
                 # Check that the favorite ingredient is present in the recipe ingredients
                 self.assertTrue(
-                    any(favorite_lower in ingredient for ingredient in ingredients_lower),
-                    f"La receta {recipe.title} no contiene el ingrediente favorito '{favorite}'"
+                    any(
+                        favorite_lower in ingredient for ingredient in ingredients_lower
+                    ),
+                    f"La receta {recipe.title} no contiene el ingrediente favorito '{favorite}'",
                 )
 
 

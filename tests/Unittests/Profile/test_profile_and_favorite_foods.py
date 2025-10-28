@@ -1,5 +1,8 @@
 import unittest
-from tests.Mocks.Profile.mock_profile_and_favorite_foods import MockProfileAndFavoriteFoods
+from tests.Mocks.Profile.mock_profile_and_favorite_foods import (
+    MockProfileAndFavoriteFoods,
+)
+
 
 class TestProfileAndFavoriteFoods(unittest.TestCase):
     def setUp(self):
@@ -33,7 +36,7 @@ class TestProfileAndFavoriteFoods(unittest.TestCase):
         # Update favorite foods
         new_favorites = ["pasta", "pizza"]
         updated_profile = self.repo.update_favorite_foods(1, new_favorites)
-        
+
         self.assertIsNotNone(updated_profile)
         self.assertEqual(updated_profile.favorite_foods, new_favorites)
 

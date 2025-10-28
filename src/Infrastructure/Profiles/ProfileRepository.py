@@ -3,6 +3,7 @@ from src.Model.Profiles.Profiles import Profile
 from src.Database.Profiles.ProfileCSV import ProfileCSV
 from typing import Optional
 
+
 class ProfileRepository(IProfileRepository):
     def __init__(self, csv_file_path="profiles.csv"):
         self.profile_database = ProfileCSV(csv_file_path)
@@ -28,15 +29,17 @@ class ProfileRepository(IProfileRepository):
         data = self.profile_database.get_profile(user_id)
         if not data:
             return None
-        return Profile (
-            user_id = int(data["user_id"]),
+        return Profile(
+            user_id=int(data["user_id"]),
             favorite_foods=data["favorite_foods"],
             unfavorite_foods=data["unfavorite_foods"],
             favorite_menus=data["favorite_menus"],
         )
-    
+
     def update_favorite_foods(self, user_id, favorites) -> Optional[Profile]:
-        updated = self.profile_database.update_fields(user_id, {"favorite_foods": favorites})
+        updated = self.profile_database.update_fields(
+            user_id, {"favorite_foods": favorites}
+        )
         if not updated:
             return None
         return Profile(
