@@ -35,6 +35,7 @@ def set_favorites(user_id: int):
         return jsonify({"error": "Perfil no encontrado"}), 404
     return jsonify(updated.to_dict()), 200
 
+
 @profiles_bp.route("/profiles/<string:user_id>/favorite-menus", methods=["GET"])
 def get_favorite_menus(user_id: str):
     """Get all favorite menus for a user"""

@@ -98,6 +98,7 @@ class ProfileCSV:
 
         # Return the updated row
         return self.get_profile(user_id)
+
     # TODO(JM) Check if User's team is ok with these functions
     def get_profile_by_user_id(self, user_id: str):
         """Get a profile by user_id"""

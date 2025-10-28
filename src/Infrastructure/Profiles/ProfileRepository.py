@@ -49,6 +49,7 @@ class ProfileRepository(IProfileRepository):
             unfavorite_foods=updated["unfavorite_foods"],
             favorite_menus=updated["favorite_menus"],
         )
+
     def get_profile_by_user_id(self, user_id: str) -> Optional[dict]:
         return self.profile_database.get_profile_by_user_id(user_id)
 
