@@ -16,3 +16,4 @@ PyJWT==2.10.1
 pytz==2025.2
 fpdf==1.7.2
 pandas==2.3.3
+streamlit==1.50.0
