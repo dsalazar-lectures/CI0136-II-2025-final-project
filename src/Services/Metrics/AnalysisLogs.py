@@ -6,6 +6,9 @@ from datetime import timedelta
 import pandas as pd
 from src.Application.Recipes.IRecipeRepository import IRecipeRepository
 from src.Infrastructure.Recipes.CSVRecipeRepository import CSVRecipeRepository
+from pathlib import Path
+import sys
+sys.path.append(str(Path(__file__).resolve().parents[3] / "src"))
 
 # --------------------------------------------------------------------------------
 
