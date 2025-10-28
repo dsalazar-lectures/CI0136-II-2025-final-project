@@ -26,3 +26,12 @@ class MockProfileAndFavoriteFoods(IProfileRepository):
         profile = self.profiles[user_id]
         profile.favorite_foods = favorites
         return profile
+
+    def get_favorite_menus(user_id):
+        pass
+
+    def is_menu_in_favorites(user_id, menu_id):
+        pass
+
+    def get_profile_by_user_id(user_id):
+        pass
