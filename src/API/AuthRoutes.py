@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, make_response
+from flask import Blueprint, request, jsonify
 from src.Application.User.Services.UserApplicationService import UserApplicationService
 from src.Application.User.Services.EncryptionService import EncryptionService
 from src.Application.User.Services.ValidationService import ValidationService
@@ -42,37 +42,9 @@ def register():
 def login():
     data = request.get_json()
 
-    user, response, token, status_code = user_app_service.login_user(data)
+    user, response, status_code = user_app_service.login_user(data)
 
     if not user:
         return jsonify(response), status_code
 
-    response_with_header = make_response(jsonify(response), status_code)
-    response_with_header.headers["Authorization"] = f"Bearer {token}"
-
-    return response_with_header
-
-
-@auth_bp.route("/change-password", methods=["POST"])
-# TODO(@Paulette): add jwt_required decorator
-def change_password():
-    if "Authorization" not in request.headers or not request.headers["Authorization"]:
-        return jsonify({"error": "Missing signature"}), 401
-
-    # Request username, old_password, and new_password
-    data = request.get_json()
-
-    username = request.json.get("username")
-    if not username:
-        return jsonify({"error": "User not authenticated"}), 401
-
-    header = request.headers
-    user, response, status_code = user_app_service.verify_valid_session(
-        header, username
-    )
-
-    if not user:
-        return jsonify(response), status_code
-
-    _, response, status_code = user_app_service.change_password(user, data)
     return jsonify(response), status_code

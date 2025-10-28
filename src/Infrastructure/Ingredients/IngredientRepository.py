@@ -1,5 +1,7 @@
 from typing import Dict, List, Optional
-from src.Model.Ingredients.Ingredients import Ingredient
+
+from Model.Ingredients.Ingredients import Ingredient
+
 
 class IngredientRepository:
     def __init__(self) -> None:
@@ -19,53 +21,6 @@ class IngredientRepository:
             if ingredient.name.lower() == ingredient_name.lower():
                 return ingredient
         return None
-    
-    def get_by_category(self, ingredient_category: str) -> List[Ingredient]:
-        matching_ingredients = []
-        for ingredient in self._items.values():
-            if ingredient_category.lower() in [cat.lower() for cat in ingredient.categories]:
-                matching_ingredients.append(ingredient)
-        return matching_ingredients
-
-    def create_ingredient(
-        self, name, categories, substitutes, components, recipe_count=0
-    ):
-        self._add(
-            name,
-            categories=categories,
-            substitutes=substitutes,
-            components=components,
-            recipe_count=recipe_count,
-        )
-
-    def add_recipe(self, id: int):
-        ingredient = self._items.get(id)
-        if ingredient is None:
-            return "ID is not valid"
-        ingredient.add_recipe()
-
-    def update_ingredient_categories(self, id: int, categories):
-        ingredient = self._items.get(id)
-        if ingredient is None:
-            return "ID is not valid"
-        ingredient.change_categories(categories)
-
-    def update_ingredient_substitutes(self, id: int, substitutes):
-        ingredient = self._items.get(id)
-        if ingredient is None:
-            return "ID is not valid"
-        ingredient.change_substitutes(substitutes)
-
-    def update_ingredient_components(self, id: int, components):
-        ingredient = self._items.get(id)
-        if ingredient is None:
-            return "ID is not valid"
-        ingredient.change_components(components)
-
-    def delete_ingredient(self, id: int):
-        ingredient = self._items.pop(id, None)
-        if ingredient is None:
-            return "ID is not valid"
 
     # part of the mocking
     def _add(
@@ -102,25 +57,25 @@ class IngredientRepository:
             recipe_count=11,
         )
         self._add(
-            "Whole-Milk",
+            "Whole Milk",
             categories=["dairy"],
             components=["lactose", "milk_protein"],
             recipe_count=55,
         )
         self._add(
-            "Almond-Milk",
+            "Almond Milk",
             categories=["plant_milk"],
             components=["almond"],
             recipe_count=13,
         )
         self._add(
-            "Wheat-Flour",
+            "Wheat Flour",
             categories=["grain"],
             components=["gluten"],
             recipe_count=60,
         )
         self._add(
-            "White-Sugar",
+            "White Sugar",
             categories=["sweetener"],
             components=[],
             recipe_count=75,

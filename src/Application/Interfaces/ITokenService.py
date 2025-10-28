@@ -12,5 +12,5 @@ class ITokenService(ABC):
         pass
 
     @abstractmethod
-    def verify_token(self, token, user):
+    def verify_token(self, token):
         pass
