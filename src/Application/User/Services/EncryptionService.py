@@ -1,7 +1,8 @@
 import bcrypt
+from src.Application.Interfaces.IEncryptionService import IEncryptionService
 
 
-class EncryptionService:
+class EncryptionService(IEncryptionService):
 
     @staticmethod
     def hash_password(password: str) -> str:

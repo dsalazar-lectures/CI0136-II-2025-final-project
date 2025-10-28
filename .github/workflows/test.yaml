@@ -17,7 +17,8 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          # include any requirements*.txt files under the repo in the cache key
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements*.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-
       - name: Install dependencies
@@ -28,6 +29,9 @@ jobs:
       - name: Run tests
         env:
           PYTHONPATH: .:src
+          pip install fpdf
+          pip install -r requirements.txt
+      - name: Run tests
         run: |
           python -m unittest discover -v
 
@@ -47,7 +51,7 @@ jobs:
       - name: Run ruff lint (check only)
         run: |
           # run ruff over tracked python files
-          ruff check tests/Mocks/mock_ingredients.py tests/Unittests/Ingredients/test_ingredient_service.py
+          ruff check $(git ls-files '*.py')
 
   format_check:
     runs-on: ubuntu-latest
@@ -65,4 +69,4 @@ jobs:
       - name: Run Black (check only)
         run: |
           # check formatting for tracked python files; fail CI if not formatted
-          black --check tests/Mocks/mock_ingredients.py tests/Unittests/Ingredients/test_ingredient_service.py
+          black --check $(git ls-files '*.py')
