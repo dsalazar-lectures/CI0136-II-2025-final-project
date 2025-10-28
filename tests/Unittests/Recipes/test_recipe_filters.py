@@ -62,4 +62,81 @@ class TestAuthorFilter(unittest.TestCase):
 
         self.assertEqual(len(filtered), 2)
         self.assertTrue(all(r.author == "John Doe" for r in filtered))
-        
+
+    def test_author_filter_case_sensitive(self):
+        """Test author filter is case sensitive"""
+        base = BaseRecipeFilter()
+        author_filter = AuthorFilter(base, "JOHN DOE")
+
+        recipes = [
+            MockRecipe(author="john doe"),
+            MockRecipe(author="Jane Smith")
+        ]
+
+        filtered = author_filter.filter(recipes)
+
+        self.assertEqual(len(filtered), 1)
+        self.assertEqual(filtered[0].author, "john doe")
+
+    def test_author_filter_no_matches(self):
+        """Test author filters returns an empty list if there are no matches"""
+        base = BaseRecipeFilter()
+        author_filter = AuthorFilter(base, "NA")
+
+        recipes = [
+            MockRecipe(author="John Doe"),
+            MockRecipe(author="Jane Smith")
+        ]
+
+        filtered = author_filter.filter(recipes)
+
+        self.assertEqual(len(filtered), 0)
+
+class TestCategoryFilter(unittest.TestCase):
+
+    def test_category_filter_single_category(self):
+        """Test category filter finds recipes with an specific category"""
+        base = BaseRecipeFilter()
+        category_filter = CategoryFilter(base, ["dessert"])
+
+        recipes = [
+            MockRecipe(categories=["dessert"]),
+            MockRecipe(categories=["breakfast"]),
+            MockRecipe(categories=["dessert"])
+        ]
+
+        filtered = category_filter.filter(recipes)
+
+        self.assertEqual(len(filtered), 2)
+        self.assertTrue(all(r.categories == ['dessert'] for r in filtered))
+
+    def test_category_filter_multiple_categories(self):
+        """Test category filter finds recipes with multiple categories"""
+        base = BaseRecipeFilter()
+        category_filter = CategoryFilter(base, ["dessert", "breakfast"])
+
+        recipes = [
+            MockRecipe(categories=["dessert"]),
+            MockRecipe(categories=["breakfast"]),
+            MockRecipe(categories=["dinner"])
+        ]
+
+        filtered = category_filter.filter(recipes)
+
+        self.assertEqual(len(filtered), 2)
+        self.assertTrue(all(r.categories == ['dessert'] or ['breakfast'] for r in filtered))
+
+    def test_category_filter_case_sensitive(self):
+        """Test category filter is not case sensitive"""
+        base = BaseRecipeFilter()
+        category_filter = CategoryFilter(base, ["DESSeRT"])
+
+        recipes = [MockRecipe(categories=["dessert"])]
+
+        filtered = category_filter.filter(recipes)
+
+        self.assertEqual(len(filtered), 1)
+        self.assertTrue(filtered[0].categories == ["dessert"])
+
+    
+
