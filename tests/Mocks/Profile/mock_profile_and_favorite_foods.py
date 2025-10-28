@@ -27,18 +27,6 @@ class MockProfileAndFavoriteFoods(IProfileRepository):
         profile.favorite_foods = favorites
         return profile
 
-    def get_profile_by_user_id(self, user_id: int) -> dict:
-        """Return a plain dict for compatibility with some callers/tests"""
-        profile = self.profiles.get(user_id)
-        if not profile:
-            return None
-        return {
-            "user_id": profile.user_id,
-            "favorite_foods": profile.favorite_foods,
-            "unfavorite_foods": profile.unfavorite_foods,
-            "favorite_menus": profile.favorite_menus,
-        }
-
     # Favorite Menu helpers
     def add_favorite_menu(self, user_id: int, menu_id: str) -> bool:
         profile = self.profiles.get(user_id)
