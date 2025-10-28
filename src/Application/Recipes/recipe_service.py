@@ -20,7 +20,7 @@ def get_recipes_by_ingredient(ingredient):
 
 def create_recipe(recipe_data, username):
     recipe_data["author"] = username
-    if not validate_data(recipe_data):
+    if not validate_create_data(recipe_data):
         return -1
     return recipe_repository.add_recipe(recipe_data)
 
@@ -56,6 +56,24 @@ def validate_data(recipe_data) -> bool:
             if not isinstance(value, (int, float)):
                 return False
     return True
+
+
+def validate_create_data(recipe_data) -> bool:
+    required_fields = [
+        "name",
+        "categories",
+        "ingredients",
+        "duration",
+        "instructions",
+        "portions",
+        "author",
+    ]
+
+    for field in required_fields:
+        if field not in recipe_data:
+            return False
+
+    return validate_data(recipe_data)
 
 
 def get_recipes_by_category(category):
