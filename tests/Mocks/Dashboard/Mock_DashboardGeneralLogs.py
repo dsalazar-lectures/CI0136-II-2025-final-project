@@ -40,6 +40,14 @@ class MocksDashboardGeneralLogs:
             patch.object(GeneralData_Window, "sidebar_select_files", return_value=[]),
             patch("src.Services.Metrics.DashboardGeneralLogs.st.warning"),
             patch("src.Services.Metrics.DashboardGeneralLogs.st.stop"),
+            patch(
+                "src.Services.Metrics.DashboardGeneralLogs.GeneralData_Window.sidebar_filters",
+                return_value=(None, None, [], []),
+            ),
+            patch(
+                "src.Services.Metrics.DashboardGeneralLogs.GeneralData_Window.apply_filters",
+                return_value=pd.DataFrame(),  # evita KeyError en DataFrames vacíos
+            ),
         )
 
     @staticmethod

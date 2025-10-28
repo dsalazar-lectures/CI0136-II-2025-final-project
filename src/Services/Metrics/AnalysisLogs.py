@@ -16,7 +16,8 @@ ERROR_LEVELS = {"ERROR"}  # Only errors only (no warnings)
 # --------------------------------------------------------------------------------
 class AnalysisLogs:
     @staticmethod
-    def top_users_least_active(df_list, start_date, end_date):
+    def top_users_least_active():
+
         pass
 
     @staticmethod
@@ -89,10 +90,10 @@ class AnalysisLogs:
     }
 
     @staticmethod
-    def show_analysis_logs(df_list, func, start_date, end_date):
+    def show_analysis_logs(df_list, func):
         if df_list and func:
             try:
-                func(df_list, start_date, end_date)
+                func(df_list)
             except Exception as e:
                 st.warning(MSG_EXEC_ERROR_TPL.format(e))
         else:
