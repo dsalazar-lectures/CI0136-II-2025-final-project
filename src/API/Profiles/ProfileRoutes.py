@@ -36,8 +36,8 @@ def set_favorites(user_id: int):
     return jsonify(updated.to_dict()), 200
 
 
-@profiles_bp.route("/profiles/<string:user_id>/favorite-menus", methods=["GET"])
-def get_favorite_menus(user_id: str):
+@profiles_bp.route("/profiles/<int:user_id>/favorite-menus", methods=["GET"])
+def get_favorite_menus(user_id: int):
     """Get all favorite menus for a user"""
     try:
         favorite_menus = profile_use_case.get_favorite_menus(user_id)
@@ -46,8 +46,8 @@ def get_favorite_menus(user_id: str):
         return jsonify({"error": str(e)}), 500
 
 
-@profiles_bp.route("/profiles/<string:user_id>/favorite-menus", methods=["POST"])
-def add_favorite_menu(user_id: str):
+@profiles_bp.route("/profiles/<int:user_id>/favorite-menus", methods=["POST"])
+def add_favorite_menu(user_id: int):
     """Add a menu to user's favorites"""
     try:
         data = request.get_json(silent=True) or {}
@@ -78,7 +78,8 @@ def add_favorite_menu(user_id: str):
         return jsonify({"error": str(e)}), 500
 
 
-@profiles_bp.route("/profiles/<string:user_id>/favorite-menus", methods=["DELETE"])
+@profiles_bp.route("/profiles/<int:user_id>/favorite-menus", methods=["DELETE"])
+def remove_favorite_menu(user_id: int):
     """Remove a menu from user's favorites"""
     try:
         data = request.get_json(silent=True) or {}
