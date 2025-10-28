@@ -31,7 +31,7 @@ class TestValidationService(unittest.TestCase):
 
     def test_validate_userdata_success(self):
         is_valid, error = self.validation_service.validate_userdata(
-            "testuser", "password123", "test@example.com"
+            "testuser", "test@example.com"
         )
 
         self.assertTrue(is_valid)
@@ -39,7 +39,7 @@ class TestValidationService(unittest.TestCase):
 
     def test_validate_userdata_invalid_email(self):
         is_valid, error = self.validation_service.validate_userdata(
-            "testuser", "password123", "invalid-email"
+            "testuser", "invalid-email"
         )
 
         self.assertFalse(is_valid)
@@ -47,19 +47,49 @@ class TestValidationService(unittest.TestCase):
 
     def test_validate_userdata_short_username(self):
         is_valid, error = self.validation_service.validate_userdata(
-            "ab", "password123", "test@example.com"
+            "ab", "test@example.com"
         )
 
         self.assertFalse(is_valid)
         self.assertEqual(error, "Username must be at least 3 characters long")
 
-    def test_validate_userdata_short_password(self):
-        is_valid, error = self.validation_service.validate_userdata(
-            "testuser", "123", "test@example.com"
+    def test_validate_password_format_success(self):
+        is_valid, msg = self.validation_service.validate_password_format(
+            "Validp4ssw!rd"
+        )
+
+        self.assertTrue(is_valid)
+        self.assertEqual(msg, "Password format is valid.")
+
+    def test_validate_short_password(self):
+        is_valid, error = self.validation_service.validate_password_format("123")
+
+        self.assertFalse(is_valid)
+        self.assertEqual(error, "Password must be at least 8 characters long.")
+
+    def test_validate_password_in_lower_case(self):
+        is_valid, error = self.validation_service.validate_password_format(
+            "invalidp4ss!rd"
         )
 
         self.assertFalse(is_valid)
-        self.assertEqual(error, "Password must be at least 6 characters long")
+        self.assertEqual(error, "Password must contain at least one uppercase letter.")
+
+    def test_validate_password_without_num(self):
+        is_valid, error = self.validation_service.validate_password_format(
+            "Invalidpass!rd"
+        )
+
+        self.assertFalse(is_valid)
+        self.assertEqual(error, "Password must contain at least one number.")
+
+    def test_validate_password_without_special_char(self):
+        is_valid, error = self.validation_service.validate_password_format(
+            "Invalidp4sswrd"
+        )
+
+        self.assertFalse(is_valid)
+        self.assertEqual(error, "Password must contain at least one special character.")
 
 
 if __name__ == "__main__":
