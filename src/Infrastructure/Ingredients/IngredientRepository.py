@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional
+from typing import List, Optional
 from src.Model.Ingredients.Ingredients import Ingredient
 from src.Model.Ingredients.BaseIngredient import BaseIngredient
 from src.Model.Ingredients.CompositeIngredient import CompositeIngredient
@@ -9,26 +9,28 @@ class IngredientRepository:
         self._items: dict[int, Ingredient] = {}
         self._next_id: int = 1
         self._seed()  # mock data
-    
+
     def get_all(self) -> List[Ingredient]:
         return sorted(self._items.values(), key=lambda x: x.name.lower())
-    
+
     def get_by_id(self, ingredient_id: int) -> Optional[Ingredient]:
         return self._items.get(ingredient_id)
-    
+
     def get_by_name(self, ingredient_name: str) -> Optional[Ingredient]:
         for ingredient in self._items.values():
             if ingredient.name.lower() == ingredient_name.lower():
                 return ingredient
         return None
-    
+
     def get_by_category(self, ingredient_category: str) -> List[Ingredient]:
         matching_ingredients = []
         for ingredient in self._items.values():
-            if ingredient_category.lower() in [cat.lower() for cat in ingredient.categories]:
+            if ingredient_category.lower() in [
+                cat.lower() for cat in ingredient.categories
+            ]:
                 matching_ingredients.append(ingredient)
         return matching_ingredients
-    
+
     # part of the mocking
     def _add(
         self,
@@ -41,13 +43,13 @@ class IngredientRepository:
     ) -> None:
         ing_id = self._next_id
         self._next_id += 1
-        if components is None or components is []:
+        if components is None or components == []:
             self._items[ing_id] = BaseIngredient(
                 id=ing_id,
                 name=name,
                 categories=list(categories or []),
                 substitutes=list(substitutes or []),
-                recipe_count=int(recipe_count)
+                recipe_count=int(recipe_count),
             )
         else:
             self._items[ing_id] = CompositeIngredient(
@@ -56,11 +58,19 @@ class IngredientRepository:
                 categories=list(categories or []),
                 substitutes=list(substitutes or []),
                 components=list(components or []),
-                recipe_count=int(recipe_count)
+                recipe_count=int(recipe_count),
             )
 
-    def create_ingredient(self, name, categories, substitutes, components, recipe_count=0):
-        self._add(name, categories=categories, substitutes=substitutes, components=components, recipe_count=recipe_count)
+    def create_ingredient(
+        self, name, categories, substitutes, components, recipe_count=0
+    ):
+        self._add(
+            name,
+            categories=categories,
+            substitutes=substitutes,
+            components=components,
+            recipe_count=recipe_count,
+        )
 
     def add_recipe(self, id: int):
         ingredient = self._items.get(id)
@@ -92,7 +102,7 @@ class IngredientRepository:
         ingredient = self._items.pop(id, None)
         if ingredient is None:
             return "ID is not valid"
-    
+
     def _seed(self) -> None:
         self._add(
             "Butter",

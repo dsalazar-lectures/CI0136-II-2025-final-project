@@ -23,7 +23,7 @@ class Ingredient(ABC):
             self.categories[index] = self.categories[index].replace(" ", "-")
         for index in range(len(self.substitutes)):
             self.substitutes[index] = self.substitutes[index].replace(" ", "-")
-        
+
     def get_recipe_count(self) -> int:
         return self.recipe_count
 

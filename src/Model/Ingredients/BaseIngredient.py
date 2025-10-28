@@ -22,5 +22,5 @@ class BaseIngredient(Ingredient):
             "type": "base",
             "categories": list(self.categories),
             "substitutes": list(self.substitutes),
-            "recipe_count": self.recipe_count
+            "recipe_count": self.recipe_count,
         }
