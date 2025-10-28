@@ -1,51 +1,50 @@
-# Here goes the ingredient object
-class Ingredient:
-    def __init__(self, id, name, categories, substitutes, components, recipe_count):
-        self.id = id
-        self.name = name
-        self.categories = categories
-        self.substitutes = substitutes
-        self.components = components
-        self.recipe_count = recipe_count
-        self.format()
+from abc import ABC, abstractmethod
+from typing import List, Dict
 
-    def to_json(self):
-        return {
-            "id": self.id,
-            "name": self.name,
-            "categories": self.categories,
-            "substitutes": self.substitutes,
-            "components": self.components,
-            "recipe_count": self.recipe_count,
-        }
 
-    def __str__(self):
+class Ingredient(ABC):
+    def __init__(self) -> None:
+        self.id = None
+        self.name = None
+        self.categories = []
+        self.substitutes = []
+        self.recipe_count = 0
+
+    def get_id(self):
+        return self.id
+
+    def __str__(self) -> str:
         return self.name
 
-    def format(self):
+    def _format_fields(self) -> None:
         """Replace all spaces with hyphens"""
         self.name = self.name.replace(" ", "-")
         for index in range(len(self.categories)):
             self.categories[index] = self.categories[index].replace(" ", "-")
         for index in range(len(self.substitutes)):
             self.substitutes[index] = self.substitutes[index].replace(" ", "-")
-        for index in range(len(self.components)):
-            self.components[index] = self.components[index].replace(" ", "-")
+        
+    def get_recipe_count(self) -> int:
+        return self.recipe_count
 
-    def has_substitutes(self):
+    def has_substitutes(self) -> bool:
         return len(self.substitutes) > 0
 
-    def is_base_ingredient(self):
-        return len(self.components) == 0
-
-    def add_recipe(self):
+    def add_recipe(self) -> None:
         self.recipe_count = self.recipe_count + 1
 
-    def change_categories(self, categories):
-        self.categories = categories
+    def update_categories(self, categories: List[str]) -> None:
+        self.categories = list(categories or [])
+        self._format_fields()
 
-    def change_substitutes(self, substitutes):
-        self.substitutes = substitutes
+    def update_substitutes(self, substitutes: List[str]) -> None:
+        self.substitutes = list(substitutes or [])
+        self._format_fields()
 
-    def change_components(self, components):
-        self.components = components
+    @abstractmethod
+    def is_base_ingredient(self) -> bool:
+        pass
+
+    @abstractmethod
+    def to_json(self) -> Dict:
+        pass
