@@ -2,7 +2,6 @@ from src.Application.Interfaces.IProfileApplicationService import (
     IProfileApplicationService,
 )
 from src.Model.Profiles.Profiles import Profile
-from src.Application.Profiles.IProfileRepository import IProfileRepository
 from typing import List, Optional
 
 
