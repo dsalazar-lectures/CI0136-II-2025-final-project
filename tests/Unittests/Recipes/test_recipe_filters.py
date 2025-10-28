@@ -1,5 +1,4 @@
 import unittest
-from unittest.mock import MagicMock
 from src.Application.Recipes.BaseRecipeFilter import BaseRecipeFilter
 from src.Application.Recipes.AuthorFilter import AuthorFilter
 from src.Application.Recipes.CategoryFilter import CategoryFilter
