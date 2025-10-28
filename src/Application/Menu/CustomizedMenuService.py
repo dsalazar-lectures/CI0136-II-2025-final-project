@@ -10,20 +10,20 @@ from .CustomizedMenuHandlers import (
 
 LIMIT_OF_INGREDIENTS = 10
 
-def _ensure_list(val):
-    if isinstance(val, str):
-        return [x.strip() for x in val.split(";") if x.strip()]
-    return val or []
+def _ensure_list(value):
+    if isinstance(value, str):
+        return [item.strip() for item in value.split(";") if item.strip()]
+    return value or []
 
-def _norm(s: str) -> str:
-    return s.replace("-", " ").strip().lower()
+def _norm(text: str) -> str:
+    return text.replace("-", " ").strip().lower()
 
 class CustomizedMenuService:
     def __init__(self, service=None, require_all: bool = False):
         self.recipe_service = service or recipe_service
         self.require_all = require_all
 
-        # Construye la cadena una vez
+        # Build the chain once
         self._chain = (
             FavoritesFilterHandler()
                 .set_next(CategoryFilterHandler())
@@ -31,7 +31,7 @@ class CustomizedMenuService:
                 .set_next(LimitHandler())
         )
 
-        # Guarda referencia a la cabeza de la cadena
+        # Store reference to chain head
         self._head = FavoritesFilterHandler()
         self._head.set_next(CategoryFilterHandler()).set_next(ScoreAndSortHandler()).set_next(LimitHandler())
 
@@ -41,14 +41,14 @@ class CustomizedMenuService:
         limit: int = LIMIT_OF_INGREDIENTS,
         category: Optional[str] = None,
     ):
-        # Normaliza favoritos
-        favs = [_norm(f) for f in _ensure_list(favorites) if isinstance(f, str) and f.strip()]
+        # Normalize favorite ingredients
+        favorite_ingredients = [_norm(favorite) for favorite in _ensure_list(favorites) if isinstance(favorite, str) and favorite.strip()]
 
-        # Trae todas las recetas (la cadena se encargará del filtrado/orden/limit)
+        # Get all recipes (chain will handle filtering/sorting/limit)
         all_recipes = self.recipe_service.get_all_recipes()
 
         ctx = MenuContext(
-            favorites=favs,
+            favorites=favorite_ingredients,
             category=category,
             require_all=self.require_all,
             limit=limit,
