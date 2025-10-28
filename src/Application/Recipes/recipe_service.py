@@ -1,3 +1,4 @@
+import random
 from src.Infrastructure.Recipes.CSVRecipeRepository import CSVRecipeRepository
 from src.Application.Recipes.FilterComposer import FilterComposer
 
@@ -59,4 +60,11 @@ def validate_data(recipe_data) -> bool:
 
 def get_recipes_by_category(category):
     return recipe_repository.find_by_category(category)
-    return True
+
+
+def get_random_recipe_by_category(category):
+    recipes = recipe_repository.find_by_category(category)
+    if not recipes:
+        return None
+
+    return random.choice(recipes)
