@@ -25,6 +25,30 @@ class ProfileRepository(IProfileRepository):
             )
         return None
 
+    def get_profile(self, user_id) -> Optional[Profile]:
+        data = self.profile_database.get_profile(user_id)
+        if not data:
+            return None
+        return Profile(
+            user_id=int(data["user_id"]),
+            favorite_foods=data["favorite_foods"],
+            unfavorite_foods=data["unfavorite_foods"],
+            favorite_menus=data["favorite_menus"],
+        )
+
+    def update_favorite_foods(self, user_id, favorites) -> Optional[Profile]:
+        updated = self.profile_database.update_fields(
+            user_id, {"favorite_foods": favorites}
+        )
+        if not updated:
+            return None
+        return Profile(
+            user_id=int(updated["user_id"]),
+            favorite_foods=updated["favorite_foods"],
+            unfavorite_foods=updated["unfavorite_foods"],
+            favorite_menus=updated["favorite_menus"],
+        )
+
     def get_profile_by_user_id(self, user_id: str) -> Optional[dict]:
         return self.profile_database.get_profile_by_user_id(user_id)
 
