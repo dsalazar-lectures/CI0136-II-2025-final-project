@@ -1,5 +1,6 @@
 from typing import List, Optional
-from src.Infrastructure.Ingredients.IngredientRepository import IngredientRepository
+from src.Infrastructure.Ingredients.IngredientRepository \
+        import IngredientRepository
 from src.Model.Ingredients.Ingredients import Ingredient
 
 
@@ -18,6 +19,9 @@ class IngredientUseCase:
     def get_ingredient_by_name(self, ingredient_name: str) -> Optional[Ingredient]:
         """Get a specific ingredient by its name."""
         return self.repository.get_by_name(ingredient_name)
+   
+    def get_ingredients_by_category (self, ingredient_category: str) -> List[Ingredient]:
+        return self.repository.get_by_category (ingredient_category)
 
     def create_ingredient(
         self, name, categories, substitutes, components, recipe_count=0

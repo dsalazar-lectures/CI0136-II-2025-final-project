@@ -1,7 +1,5 @@
 from typing import Dict, List, Optional
-
 from src.Model.Ingredients.Ingredients import Ingredient
-
 
 class IngredientRepository:
     def __init__(self) -> None:
@@ -21,6 +19,13 @@ class IngredientRepository:
             if ingredient.name.lower() == ingredient_name.lower():
                 return ingredient
         return None
+    
+    def get_by_category(self, ingredient_category: str) -> List[Ingredient]:
+        matching_ingredients = []
+        for ingredient in self._items.values():
+            if ingredient_category.lower() in [cat.lower() for cat in ingredient.categories]:
+                matching_ingredients.append(ingredient)
+        return matching_ingredients
 
     def create_ingredient(
         self, name, categories, substitutes, components, recipe_count=0
