@@ -21,7 +21,7 @@ class CompositeIngredient(Ingredient):
         self.recipe_count = recipe_count
         self._format_fields()
 
-    def update_components(self, components: List[Ingredient]) -> None:
+    def update_components(self, components: List[str]) -> None:
         self.components = list(components or [])
 
     def is_base_ingredient(self) -> bool:

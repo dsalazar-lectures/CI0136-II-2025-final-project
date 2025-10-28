@@ -55,7 +55,7 @@ class IngredientRepository:
                 name=name,
                 categories=list(categories or []),
                 substitutes=list(substitutes or []),
-                components=list(components),
+                components=list(components or []),
                 recipe_count=int(recipe_count)
             )
 
@@ -86,16 +86,7 @@ class IngredientRepository:
             return "ID is not valid"
         if ingredient.is_base_ingredient():
             return "Error: base ingredient"
-
-        # Check if all components are existing ingredients
-        sub_ingredients = []
-        for comp in components:
-            sub_ing = self.get_by_name(comp)
-            if sub_ing is None:
-                return "Error: invalid component"
-            sub_ingredients.append(sub_ing)
-
-        ingredient.update_commponents(sub_ingredients)
+        ingredient.update_commponents(components)
 
     def delete_ingredient(self, id: int):
         ingredient = self._items.pop(id, None)
