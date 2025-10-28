@@ -13,3 +13,11 @@ class IUserRepository(ABC):
     @abstractmethod
     def get_user_by_username(self, username):
         pass
+
+    @abstractmethod
+    def update_password(self, username: str, hashed_password: str):
+        pass
+
+    @abstractmethod
+    def get_user_by_id(self, user_id):
+        pass
