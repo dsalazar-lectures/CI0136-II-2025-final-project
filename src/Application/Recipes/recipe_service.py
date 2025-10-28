@@ -57,16 +57,22 @@ def validate_data(recipe_data) -> bool:
                 return False
     return True
 
+
 def validate_create_data(recipe_data) -> bool:
     required_fields = [
-        "name", "categories", "ingredients",
-        "duration", "instructions", "portions", "author"
+        "name",
+        "categories",
+        "ingredients",
+        "duration",
+        "instructions",
+        "portions",
+        "author",
     ]
 
     for field in required_fields:
         if field not in recipe_data:
             return False
-        
+
     return validate_data(recipe_data)
 
 
