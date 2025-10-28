@@ -9,10 +9,12 @@ system_recipes = []
 
 def load_recipes():
     global system_recipes
+    system_recipes.clear()
+
     with open(PATH, mode="r", encoding="utf-8") as file:
         reader = csv.DictReader(file)
-        system_recipes = [
-            Recipe(
+        for row in reader:
+            recipe = Recipe(
                 row["id"],
                 row["name"],
                 row["categories"],
@@ -25,8 +27,7 @@ def load_recipes():
                 row["calificationsAmount"],
                 row["usersUsedRecipe"],
             )
-            for row in reader
-        ]
+            system_recipes.append(recipe)
 
 
 load_recipes()
