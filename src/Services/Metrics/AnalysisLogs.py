@@ -1,5 +1,4 @@
-from typing import List, Dict, Callable
-from typing import Callable
+from typing import Callable, Dict, List
 import pandas as pd
 import streamlit as st
 
