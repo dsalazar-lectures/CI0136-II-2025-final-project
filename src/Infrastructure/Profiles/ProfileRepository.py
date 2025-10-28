@@ -2,7 +2,6 @@ from typing import Optional
 from src.Application.Profiles.IProfileRepository import IProfileRepository
 from src.Model.Profiles.Profiles import Profile
 from src.Database.Profiles.ProfileCSV import ProfileCSV
-from typing import Optional
 
 
 class ProfileRepository(IProfileRepository):
