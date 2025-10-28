@@ -16,11 +16,6 @@ class IProfileRepository(ABC):
     def update_favorite_foods(self, user_id, favorites) -> Optional[Profile]:
         pass
 
-    @abstractmethod
-    def get_profile_by_user_id(self, user_id: int) -> Optional[dict]:
-        """Return profile dict or None if not found"""
-        pass
-
     # Favorite Menu Functions
     @abstractmethod
     def add_favorite_menu(self, user_id: int, menu_id: str) -> bool:
