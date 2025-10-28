@@ -2,14 +2,7 @@ import unittest
 from unittest.mock import patch, Mock
 from flask import Flask
 from src.API.Ingredients.IngredientsRoutes import ingredients_bp
-from tests.Mocks.mock_ingredients import (
-    INGREDIENT_1,
-    INGREDIENT_2,
-    INGREDIENT_3,
-    SIMPLE_INGREDIENT_1,
-    SIMPLE_INGREDIENT_2,
-    SIMPLE_INGREDIENT_3,
-)
+
 
 class IngredientServiceTestCase(unittest.TestCase):
     def setUp(self):
@@ -17,97 +10,157 @@ class IngredientServiceTestCase(unittest.TestCase):
         app.register_blueprint(ingredients_bp)
         self.client = app.test_client()
 
-class IngredientServiceTestCase(unittest.TestCase):
-    def setUp(self):
-        app = Flask(__name__)
-        app.register_blueprint(ingredients_bp)
-        self.client = app.test_client()
-
-    # --- GET simplified ingredients ---
-    @patch("src.API.Ingredients.IngredientsRoutes.ingredient_service")
-    def test_get_all_ingredients_simplified(self, mock_service):
-        mock_service.get_all_ingredients.return_value = [
-            SIMPLE_INGREDIENT_1,
-            SIMPLE_INGREDIENT_2,
-            SIMPLE_INGREDIENT_3,
-        ]
-
-        response = self.client.get("/api/ingredients?simple=true")
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.json), 3)
-        self.assertEqual(response.json[0]["name"], SIMPLE_INGREDIENT_1["name"])
-
-    # --- Search ingredients by name ---
-    @patch("src.API.Ingredients.IngredientsRoutes.ingredient_service")
-    def test_search_ingredients_by_name(self, mock_service):
-        mock_service.search_ingredients_by_name.return_value = [
-            INGREDIENT_1,
-            INGREDIENT_2,
-        ]
-
-        response = self.client.post(
-            "/api/ingredients/search",
-            json={"name": "Onion"},
-        )
-
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.json), 2)
-        self.assertEqual(response.json[0]["name"], INGREDIENT_1["name"])
-
-    # --- Search ingredients simplified ---
-    @patch("src.API.Ingredients.IngredientsRoutes.ingredient_service")
-    def test_search_ingredients_simplified(self, mock_service):
-        mock_service.search_ingredients_simplified.return_value = [
-            SIMPLE_INGREDIENT_1,
-            SIMPLE_INGREDIENT_2,
-        ]
-
-        response = self.client.post(
-            "/api/ingredients/search?simple=true",
-            json={"name": "Salt"},
-        )
-
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.json), 2)
-        self.assertEqual(response.json[0]["name"], SIMPLE_INGREDIENT_1["name"])
-
-    # --- Create ingredient ---
     @patch("src.API.Ingredients.IngredientsRoutes.ingredient_service")
     def test_create_ingredient_valid(self, mock_service):
-        mock_service.create_ingredient.return_value = INGREDIENT_3
+        """Test POST /ingredients/create with valid data"""
+        mock_service.create_ingredient.return_value = None
 
         response = self.client.post(
-            "/api/ingredients/create",
-            json=INGREDIENT_3,
+            "/ingredients/create",
+            json={
+                "name": "Oat Milk",
+                "categories": ["plant_milk"],
+                "substitutes": ["almond_milk", "soy_milk"],
+                "components": ["oats", "gluten"],
+            },
         )
 
         self.assertEqual(response.status_code, 201)
-        self.assertEqual(response.json["name"], INGREDIENT_3["name"])
+        data = response.get_json()
+        self.assertEqual(data["message"], "Ingredient created successfully")
+        mock_service.create_ingredient.assert_called_once_with(
+            "Oat Milk", ["plant_milk"], ["almond_milk", "soy_milk"], ["oats", "gluten"]
+        )
 
-    # --- Update categories ---
+    @patch("src.API.Ingredients.IngredientsRoutes.ingredient_service")
+    def test_create_ingredient_not_valid(self, mock_service):
+        """Test POST /ingredients/create without name field"""
+        mock_service.create_ingredient.return_value = None
+
+        response = self.client.post(
+            "/ingredients/create",
+            json={
+                "categories": ["plant_milk"],
+                "substitutes": ["almond_milk", "soy_milk"],
+                "components": ["oats", "gluten"],
+            },
+        )
+
+        self.assertEqual(response.status_code, 404)
+        data = response.get_json()
+        self.assertEqual(data["error"], "Ingredient name is required")
+        mock_service.create_ingredient.assert_not_called()
+
     @patch("src.API.Ingredients.IngredientsRoutes.ingredient_service")
     def test_update_categories(self, mock_service):
-        mock_service.get_ingredient_by_id.return_value = INGREDIENT_1
-        mock_service.update_categories.return_value = INGREDIENT_1
+        """Test POST /ingredients/update with categories field"""
+        mock_ing = Mock()
+        mock_service.get_ingredient_by_id.return_value = mock_ing
 
-        response = self.client.put(
-            "/api/ingredients/update",
-            json={"id": 1, "categories": ["spice", "fresh"]},
+        response = self.client.post(
+            "/ingredients/update", json={"id": 1, "categories": ["dairy", "fat"]}
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json["id"], 1)
+        data = response.get_json()
+        self.assertEqual(data["message"], "Ingredient updated successfully")
+        mock_service.update_categories.assert_called_once_with(1, ["dairy", "fat"])
 
-    # --- Delete ingredient ---
     @patch("src.API.Ingredients.IngredientsRoutes.ingredient_service")
-    def test_delete_ingredient(self, mock_service):
-        mock_service.get_ingredient_by_id.return_value = INGREDIENT_2
-        mock_service.delete_ingredient.return_value = True
+    def test_update_substitutes(self, mock_service):
+        """Test POST /ingredients/update with substitutes field"""
+        mock_ing = Mock()
+        mock_service.get_ingredient_by_id.return_value = mock_ing
 
-        response = self.client.delete("/api/ingredients/delete?id=2")
+        response = self.client.post(
+            "/ingredients/update",
+            json={"id": 1, "substitutes": ["Almond Milk", "Oat Milk"]},
+        )
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json["message"], "Ingredient deleted successfully")
+        data = response.get_json()
+        self.assertEqual(data["message"], "Ingredient updated successfully")
+        mock_service.update_substitutes.assert_called_once_with(
+            1, ["Almond Milk", "Oat Milk"]
+        )
+
+    @patch("src.API.Ingredients.IngredientsRoutes.ingredient_service")
+    def test_update_components(self, mock_service):
+        """Test POST /ingredients/update with components field"""
+        mock_ing = Mock()
+        mock_service.get_ingredient_by_id.return_value = mock_ing
+
+        response = self.client.post(
+            "/ingredients/update", json={"id": 1, "components": ["soy", "plant oils"]}
+        )
+
+        self.assertEqual(response.status_code, 200)
+        data = response.get_json()
+        self.assertEqual(data["message"], "Ingredient updated successfully")
+        mock_service.update_components.assert_called_once_with(1, ["soy", "plant oils"])
+
+    @patch("src.API.Ingredients.IngredientsRoutes.ingredient_service")
+    def test_update_all(self, mock_service):
+        """Test POST /ingredients/update with all fields"""
+        mock_ing = Mock()
+        mock_service.get_ingredient_by_id.return_value = mock_ing
+
+        response = self.client.post(
+            "/ingredients/update",
+            json={
+                "id": 1,
+                "categories": ["plant_milk"],
+                "substitutes": ["almond_milk", "soy_milk"],
+                "components": ["oats", "gluten"],
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        data = response.get_json()
+        self.assertEqual(data["message"], "Ingredient updated successfully")
+        mock_service.update_categories.assert_called_once_with(1, ["plant_milk"])
+        mock_service.update_substitutes.assert_called_once_with(
+            1, ["almond_milk", "soy_milk"]
+        )
+        mock_service.update_components.assert_called_once_with(1, ["oats", "gluten"])
+
+    @patch("src.API.Ingredients.IngredientsRoutes.ingredient_service")
+    def test_update_id_not_found(self, mock_service):
+        """Test POST /ingredients/update without ID field"""
+        mock_service.get_ingredient_by_id.return_value = None
+
+        response = self.client.post(
+            "/ingredients/update", json={"id": 999, "categories": ["plant_milk"]}
+        )
+
+        self.assertEqual(response.status_code, 404)
+        data = response.get_json()
+        self.assertEqual(data["message"], "Ingredient not found")
+        mock_service.update_categories.assert_not_called()
+
+    @patch("src.API.Ingredients.IngredientsRoutes.ingredient_service")
+    def test_delete_ingredient_success(self, mock_service):
+        """Test POST /ingredients/delete"""
+        mock_service.delete_ingredient.return_value = None
+
+        response = self.client.post("/ingredients/delete", json={"id": 1})
+
+        self.assertEqual(response.status_code, 200)
+        data = response.get_json()
+        self.assertEqual(data["message"], "Ingredient deleted successfully")
+        mock_service.delete_ingredient.assert_called_once()
+
+    @patch("src.API.Ingredients.IngredientsRoutes.ingredient_service")
+    def test_delete_ingredient_id_not_found(self, mock_service):
+        """Test POST /ingredients/delete without ID field"""
+        mock_service.delete_ingredient.return_value = "ID is not valid"
+
+        response = self.client.post("/ingredients/delete", json={"id": 999})
+
+        self.assertEqual(response.status_code, 404)
+        data = response.get_json()
+        self.assertEqual(data["error"], "Ingredient not found")
+        mock_service.delete_ingredient.assert_called_once()
 
 
 if __name__ == "__main__":
