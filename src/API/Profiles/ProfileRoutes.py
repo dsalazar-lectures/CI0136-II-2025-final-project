@@ -50,7 +50,7 @@ def get_favorite_menus(user_id: str):
 def add_favorite_menu(user_id: str):
     """Add a menu to user's favorites"""
     try:
-        data = request.get_json()
+        data = request.get_json(silent=True) or {}
         menu_id = data.get("menu_id")
 
         if not menu_id:
@@ -78,12 +78,15 @@ def add_favorite_menu(user_id: str):
         return jsonify({"error": str(e)}), 500
 
 
-@profiles_bp.route(
-    "/profiles/<string:user_id>/favorite-menus/<string:menu_id>", methods=["DELETE"]
-)
-def remove_favorite_menu(user_id: str, menu_id: str):
+@profiles_bp.route("/profiles/<string:user_id>/favorite-menus", methods=["DELETE"])
     """Remove a menu from user's favorites"""
     try:
+        data = request.get_json(silent=True) or {}
+        menu_id = data.get("menu_id")
+
+        if not menu_id:
+            return jsonify({"error": "menu_id is required"}), 400
+
         success = profile_use_case.remove_favorite_menu(user_id, menu_id)
 
         if success:

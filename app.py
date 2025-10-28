@@ -47,7 +47,7 @@ def create_app():
                 "PUT /api/profiles/<user_id>/favorites - PUT user ID and favorite ingredients",
                 "GET /api/profiles/<user_id>/favorite-menus - Get user's favorite menus",
                 "POST /api/profiles/<user_id>/favorite-menus - Add menu to favorites",
-                "DELETE /api/profiles/<user_id>/favorite-menus/<menu_id> - Remove menu from favorites",
+                "DELETE /api/profiles/<user_id>/favorite-menus - Remove menu from favorites",
                 "GET /api/menu/<category>/<count> - Generate N menus for a category",
                 "GET /api/Services/metrics/open-dashboard?port=8601",
             ],
