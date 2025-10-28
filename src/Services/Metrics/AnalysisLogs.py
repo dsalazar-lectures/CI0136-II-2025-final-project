@@ -72,7 +72,6 @@ class AnalysisLogs:
     def top_users_least_active():
         pass
 
-
     analysis_registry: Dict[str, Callable[..., None]] = {
         "Least Active Users": top_users_least_active,
         "Users with Most Logins": top_users_most_active,
