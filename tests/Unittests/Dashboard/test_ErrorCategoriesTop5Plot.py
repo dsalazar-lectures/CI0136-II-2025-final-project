@@ -2,12 +2,12 @@ import unittest
 from unittest.mock import patch
 import pandas as pd
 
-from src.Metrics.AnalysisLogs import AnalysisLogs
+from src.Services.Metrics.AnalysisLogs import AnalysisLogs
 
 
 class ErrorCategoriesPlotTest(unittest.TestCase):
 
-    @patch("src.Metrics.AnalysisLogs.st")
+    @patch("src.Services.Metrics.AnalysisLogs.st")
     def test_no_data_shows_info(self, mock_st):
         AnalysisLogs.top_error_categories(
             df_list=[],
@@ -18,7 +18,7 @@ class ErrorCategoriesPlotTest(unittest.TestCase):
         mock_st.info.assert_called_once()
         mock_st.bar_chart.assert_not_called()
 
-    @patch("src.Metrics.AnalysisLogs.st")
+    @patch("src.Services.Metrics.AnalysisLogs.st")
     def test_missing_columns_shows_info(self, mock_st):
         # Missing 'level'
         bad = pd.DataFrame(
@@ -36,7 +36,7 @@ class ErrorCategoriesPlotTest(unittest.TestCase):
         mock_st.info.assert_called()  # warns about missing columns
         mock_st.bar_chart.assert_not_called()
 
-    @patch("src.Metrics.AnalysisLogs.st")
+    @patch("src.Services.Metrics.AnalysisLogs.st")
     def test_counts_only_error_level_and_category_mapping(self, mock_st):
         # Only ERROR rows should be counted; WARNING/INFO are ignored
         df = pd.DataFrame(
@@ -74,7 +74,7 @@ class ErrorCategoriesPlotTest(unittest.TestCase):
         assert series_passed.to_dict() == {"Recipes": 2, "Authentication": 2}
         mock_st.dataframe.assert_called_once()
 
-    @patch("src.Metrics.AnalysisLogs.st")
+    @patch("src.Services.Metrics.AnalysisLogs.st")
     def test_date_range_is_applied(self, mock_st):
         df = pd.DataFrame(
             {
