@@ -15,4 +15,4 @@ platformdirs==4.5.0
 pytokens==0.2.0
 PyJWT==2.10.1
 pytz==2025.2
-fpdf==1.7.2
+
