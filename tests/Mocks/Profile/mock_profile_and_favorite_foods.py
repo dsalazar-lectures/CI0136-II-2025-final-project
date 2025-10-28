@@ -27,11 +27,45 @@ class MockProfileAndFavoriteFoods(IProfileRepository):
         profile.favorite_foods = favorites
         return profile
 
-    def get_favorite_menus(user_id):
-        pass
+    def get_profile_by_user_id(self, user_id: str) -> dict:
+        """Return a plain dict for compatibility with some callers/tests"""
+        profile = self.profiles.get(user_id)
+        if not profile:
+            return None
+        return {
+            "user_id": profile.user_id,
+            "favorite_foods": profile.favorite_foods,
+            "unfavorite_foods": profile.unfavorite_foods,
+            "favorite_menus": profile.favorite_menus,
+        }
 
-    def is_menu_in_favorites(user_id, menu_id):
-        pass
+    # Favorite Menu helpers
+    def add_favorite_menu(self, user_id: str, menu_id: str) -> bool:
+        profile = self.profiles.get(user_id)
+        if not profile:
+            return False
+        if menu_id in profile.favorite_menus:
+            return False
+        profile.favorite_menus.append(menu_id)
+        return True
 
-    def get_profile_by_user_id(user_id):
-        pass
+    def remove_favorite_menu(self, user_id: str, menu_id: str) -> bool:
+        profile = self.profiles.get(user_id)
+        if not profile:
+            return False
+        if menu_id not in profile.favorite_menus:
+            return False
+        profile.favorite_menus.remove(menu_id)
+        return True
+
+    def get_favorite_menus(self, user_id: str) -> list:
+        profile = self.profiles.get(user_id)
+        if not profile:
+            return []
+        return list(profile.favorite_menus)
+
+    def is_menu_in_favorites(self, user_id: str, menu_id: str) -> bool:
+        profile = self.profiles.get(user_id)
+        if not profile:
+            return False
+        return menu_id in profile.favorite_menus
