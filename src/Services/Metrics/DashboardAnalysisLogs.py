@@ -63,9 +63,11 @@ class Analysis_Window:
                     df[DATE_COL] = pd.to_datetime(df[DATE_COL], errors="coerce")
                 out.append({NAME_KEY: f.stem, DATA_KEY: df})
         return out
-    
+
     @staticmethod
-    def sidebar_analysis_selector(analysis_registry: Dict[str, Callable[..., None]]) -> Tuple[str | None, Callable[..., None] | None]:
+    def sidebar_analysis_selector(
+        analysis_registry: Dict[str, Callable[..., None]],
+    ) -> Tuple[str | None, Callable[..., None] | None]:
         st.sidebar.header(LABEL_SELECT_ANALYSIS)
         options = list(analysis_registry.keys())
         if not options:
