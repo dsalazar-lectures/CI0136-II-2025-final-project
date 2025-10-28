@@ -138,5 +138,36 @@ class TestCategoryFilter(unittest.TestCase):
         self.assertEqual(len(filtered), 1)
         self.assertTrue(filtered[0].categories == ["dessert"])
 
-    
+class TestDurationFilter(unittest.TestCase):
+
+    def test_duration_filter_max_duration(self):
+        """Test duration filter filters recipes by max time"""
+        base = BaseRecipeFilter()
+        duration_filter = DurationFilter(base, 30)
+        
+        recipes = [
+            MockRecipe(duration=20),
+            MockRecipe(duration=30),
+            MockRecipe(duration=45),
+            MockRecipe(duration=15)
+        ]
+        
+        filtered = duration_filter.filter(recipes)
+        
+        self.assertEqual(len(filtered), 3)
+        self.assertTrue(all(r.duration <= 30 for r in filtered))
+
+    def test_duration_filter_exact_match(self):
+        """Test duration filter includes recipes with exact duration"""
+        base = BaseRecipeFilter()
+        duration_filter = DurationFilter(base, 30)
+        
+        recipes = [MockRecipe(duration=30)]
+        
+        filtered = duration_filter.filter(recipes)
+        
+        self.assertEqual(len(filtered), 1)
+        self.assertTrue(filtered[0].duration == 30)
+
+        
 
