@@ -105,43 +105,49 @@ class IngredientRepository:
     def _seed(self) -> None:
         self._add(
             "Butter",
-            categories=["dairy", "fat"],
-            components=["lactose", "milk_protein"],
+            categories=["lactose", "milk_protein", "fat"],
+            substitutes=["Margarine"],
             recipe_count=42,
         )
         self._add(
             "Margarine",
-            categories=["fat"],
-            components=["soy", "plant_oils"],
+            categories=["soy", "plant_oils", "fat"],
             recipe_count=11,
         )
         self._add(
             "Whole Milk",
-            categories=["dairy"],
-            components=["lactose", "milk_protein"],
+            categories=["lactose", "milk_protein"],
+            substitutes=["Almond Milk"],
             recipe_count=55,
         )
         self._add(
             "Almond Milk",
-            categories=["plant_milk"],
-            components=["almond"],
+            categories=["plant_milk", "almond"],
             recipe_count=13,
         )
         self._add(
             "Wheat Flour",
-            categories=["grain"],
-            components=["gluten"],
+            categories=["grain", "gluten"],
             recipe_count=60,
         )
         self._add(
             "White Sugar",
             categories=["sweetener"],
-            components=[],
             recipe_count=75,
         )
         self._add(
             "Egg",
-            categories=["protein"],
-            components=["egg_protein"],
+            categories=["protein", "egg_protein"],
             recipe_count=50,
+        )
+        self._add(
+            "Strawberry",
+            categories=["fruit"],
+            recipe_count=5,
+        )
+        self._add(
+            "Strawberry Jam",
+            categories=["sweet"],
+            components=["Strawberry", "White Sugar"],
+            recipe_count=13,
         )

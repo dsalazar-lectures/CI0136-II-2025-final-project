@@ -19,6 +19,7 @@ class CompositeIngredient(Ingredient):
         self.substitutes = list(substitutes or [])
         self.components = list(components or [])
         self.recipe_count = recipe_count
+        self._format_fields()
 
     def update_components(self, components: List[Ingredient]) -> None:
         self.components = list(components or [])
