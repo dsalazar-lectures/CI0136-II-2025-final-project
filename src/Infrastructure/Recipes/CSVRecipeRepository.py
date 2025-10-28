@@ -1,22 +1,24 @@
 import csv
-from src.Database.Recipes.RecipesSchema import system_recipes, PATH
+from src.Database.Recipes.RecipesSchema import system_recipes, PATH, load_recipes
 from src.Model.Recipes.Recipes import Recipe
 from src.Application.Recipes.IRecipeRepository import IRecipeRepository
 
 # storage for user-created recipes separate from CSV system_recipes
-user_recipes = []
 
 
 class CSVRecipeRepository(IRecipeRepository):
     def get_all(self):
-        return system_recipes + user_recipes
+        load_recipes()
+        return system_recipes
 
     def get_by_id(self, recipe_id):
+        load_recipes()
         return next(
             (recipe for recipe in system_recipes if recipe.id == recipe_id), None
         )
 
     def find_by_ingredient(self, ingredient):
+        load_recipes()
         ingredient = ingredient.lower()
         return [
             recipe
@@ -94,6 +96,7 @@ class CSVRecipeRepository(IRecipeRepository):
                 )
 
     def add_recipe(self, recipe_data):
+        load_recipes()
         recipe_data["id"] = max((recipe.id for recipe in system_recipes), default=0) + 1
         recipe = self.build_recipe(recipe_data)
         system_recipes.append(recipe)
@@ -136,6 +139,7 @@ class CSVRecipeRepository(IRecipeRepository):
         return recipe
 
     def find_by_category(self, category):
+        load_recipes()
         category = category.lower()
         return [
             recipe

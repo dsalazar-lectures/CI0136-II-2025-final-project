@@ -74,6 +74,10 @@ def validate_create_data(recipe_data) -> bool:
             return False
 
     return validate_data(recipe_data)
+  
+  
+def get_recipes_by_category(category):
+    return recipe_repository.find_by_category(category)
 
 
 def get_random_recipe_by_category(category):

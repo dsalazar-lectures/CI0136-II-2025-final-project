@@ -39,7 +39,8 @@ def create_app():
                 "GET /api/recipes - Get all recipes",
                 "GET /api/recipes/<id> - Get recipe by ID",
                 "GET /api/menu?category=<category> - Get all menu items",
-                "GET /api/menu/email - Email selected recipies to specific address",
+                "GET /api/menu/<category>/<count> - Generate N menus for a category",
+                "GET /api/menu/email - Email selected recipes to specific address",
                 "GET /api/Services/metrics/open-dashboard?port=8601",
             ],
         }
