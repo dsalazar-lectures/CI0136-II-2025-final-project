@@ -1,4 +1,4 @@
-from Application.Profiles.IProfileRepository import IProfileRepository
+from src.Application.Profiles.IProfileRepository import IProfileRepository
 from typing import List
 
 
@@ -25,3 +25,7 @@ class ProfileUseCase:
     def get_favorite_menus(self, user_id: str) -> List[str]:
         """Get all favorite menu IDs for a user"""
         return self.profile_repository.get_favorite_menus(user_id)
+
+    def is_menu_in_favorites(self, user_id: str, menu_id: str) -> bool:
+        """Check if a menu is in user's favorites"""
+        return self.profile_repository.is_menu_in_favorites(user_id, menu_id)
