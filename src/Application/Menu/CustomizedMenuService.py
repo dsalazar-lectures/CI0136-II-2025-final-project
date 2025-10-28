@@ -1,5 +1,6 @@
 from typing import List, Optional
 from src.Application.Recipes import recipe_service
+from src.Application.Menu.ICustomizedMenuService import ICustomizedMenuService
 from .CustomizedMenuHandlers import (
     MenuContext,
     FavoritesFilterHandler,
@@ -18,7 +19,7 @@ def _ensure_list(value):
 def _norm(text: str) -> str:
     return text.replace("-", " ").strip().lower()
 
-class CustomizedMenuService:
+class CustomizedMenuService(ICustomizedMenuService):
     def __init__(self, service=None, require_all: bool = False):
         self.recipe_service = service or recipe_service
         self.require_all = require_all
@@ -38,8 +39,8 @@ class CustomizedMenuService:
     def recommend_by_favorites(
         self,
         favorites: List[str] | str,
-        limit: int = LIMIT_OF_INGREDIENTS,
         category: Optional[str] = None,
+        limit: int = LIMIT_OF_INGREDIENTS
     ):
         # Normalize favorite ingredients
         favorite_ingredients = [_norm(favorite) for favorite in _ensure_list(favorites) if isinstance(favorite, str) and favorite.strip()]
