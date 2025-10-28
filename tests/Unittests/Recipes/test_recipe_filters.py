@@ -233,5 +233,241 @@ class TestIngredientsFilter(unittest.TestCase):
         self.assertEqual(len(filtered), 1)
         self.assertTrue(filtered[0].ingredients == ["chocolate chips"])
 
+class TestPortionsFilter(unittest.TestCase):
+    
+    def test_portions_filter_range(self):
+        """Test portion filter filters by range"""
+        base = BaseRecipeFilter()
+        portions_filter = PortionsFilter(base, "2-6")
+        
+        recipes = [
+            MockRecipe(portions=2),
+            MockRecipe(portions=4),
+            MockRecipe(portions=8),
+            MockRecipe(portions=1)
+        ]
+        
+        filtered = portions_filter.filter(recipes)
+        
+        self.assertEqual(len(filtered), 2)
+        self.assertTrue(all(r.portions == 2 or 4 for r in filtered))
+    
+    def test_portions_filter_minimum_only(self):
+        """Test filter accepts min portions only"""
+        base = BaseRecipeFilter()
+        portions_filter = PortionsFilter(base, "4-")
+        
+        recipes = [
+            MockRecipe(portions=2),
+            MockRecipe(portions=4),
+            MockRecipe(portions=10)
+        ]
+        
+        filtered = portions_filter.filter(recipes)
+        
+        self.assertEqual(len(filtered), 2)
+        self.assertTrue(all(r.portions == 4 or 10 for r in filtered))
+    
+    def test_portions_filter_exact_value(self):
+        """Test filter accepts exact portion"""
+        base = BaseRecipeFilter()
+        portions_filter = PortionsFilter(base, "4")
+        
+        recipes = [
+            MockRecipe(portions=4),
+            MockRecipe(portions=2)
+        ]
+        
+        filtered = portions_filter.filter(recipes)
+        
+        self.assertEqual(len(filtered), 1)
+        self.assertTrue(filtered[0].portions == 4)
+
+class TestDislikesFilter(unittest.TestCase):
+    
+    def test_dislikes_filter_excludes_ingredients(self):
+        """Test dislike filters exclude depending on ingredient"""
+        base = BaseRecipeFilter()
+        dislikes_filter = DislikesFilter(base, ["chocolate"])
+        
+        recipes = [
+            MockRecipe(ingredients=["flour", "sugar"]),
+            MockRecipe(ingredients=["peanuts", "chocolate"]),
+            MockRecipe(ingredients=["almonds", "honey"])
+        ]
+        
+        filtered = dislikes_filter.filter(recipes)
+        
+        self.assertEqual(len(filtered), 2)
+        self.assertTrue(all(r.ingredients == ["flour", "sugar"] or ["almonds", "honey"] for r in filtered))
+    
+    def test_dislikes_filter_partial_match(self):
+        """Test filter detects partial ingredients"""
+        base = BaseRecipeFilter()
+        dislikes_filter = DislikesFilter(base, ["nut"])
+        
+        recipes = [
+            MockRecipe(ingredients=["coconut milk"]),
+            MockRecipe(ingredients=["flour"])
+        ]
+        
+        filtered = dislikes_filter.filter(recipes)
+        
+        self.assertEqual(len(filtered), 1)
+        self.assertEqual(filtered[0].ingredients, ["flour"])
+    
+    def test_dislikes_filter_multiple_dislikes(self):
+        """Test filter handles multiple undesired ingredients"""
+        base = BaseRecipeFilter()
+        dislikes_filter = DislikesFilter(base, ["flour", "butter"])
+        
+        recipes = [
+            MockRecipe(ingredients=["flour", "eggs"]),
+            MockRecipe(ingredients=["milk", "butter"]),
+            MockRecipe(ingredients=["almonds", "honey"])
+        ]
+        
+        filtered = dislikes_filter.filter(recipes)
+        
+        self.assertEqual(len(filtered), 1)
+        self.assertEqual(filtered[0].ingredients, ["almonds", "honey"])
+
+class TestFilterComposer(unittest.TestCase):
+    
+    def test_filter_composer_single_filter(self):
+        """Test FilterComposer applies one filter correctly"""
+        composer = FilterComposer()
+        recipes = [
+            MockRecipe(author="John Doe"),
+            MockRecipe(author="Jane Smith")
+        ]
+        
+        filter_criteria = {"author": "John Doe"}
+        filtered = composer.apply_filters(recipes, filter_criteria)
+        
+        self.assertEqual(len(filtered), 1)
+        self.assertEqual(filtered[0].author, "John Doe")
+    
+    def test_filter_composer_multiple_filters(self):
+        """Test FilterComposer chains different filters"""
+        composer = FilterComposer()
+        recipes = [
+            MockRecipe(author="John Doe", duration=20, categories=["dessert"]),
+            MockRecipe(author="John Doe", duration=45, categories=["dessert"]),
+            MockRecipe(author="Jane Smith", duration=20, categories=["dessert"])
+        ]
+        
+        filter_criteria = {
+            "author": "John Doe",
+            "duration": 30
+        }
+        filtered = composer.apply_filters(recipes, filter_criteria)
+        
+        self.assertEqual(len(filtered), 1)
+        self.assertEqual(filtered[0].duration, 20)
+    
+    def test_filter_composer_empty_criteria(self):
+        """Test FilterComposer returns all recipes if there is no criteria"""
+        composer = FilterComposer()
+        recipes = [MockRecipe(), MockRecipe(), MockRecipe()]
+        
+        filtered = composer.apply_filters(recipes, {})
+        
+        self.assertEqual(len(filtered), 3)
+    
+    def test_filter_composer_ignores_invalid_values(self):
+        """Test FilterComposer ignores invalid values"""
+        composer = FilterComposer()
+        recipes = [MockRecipe(), MockRecipe()]
+        
+        filter_criteria = {
+            "author": None,
+            "duration": "",
+            "category": ["dessert"]
+        }
+        filtered = composer.apply_filters(recipes, filter_criteria)
+        
+        self.assertEqual(len(filtered), 2)
+    
+    def test_filter_composer_complex_chain(self):
+        """Integration test, complex filter chain"""
+        composer = FilterComposer()
+        recipes = [
+            MockRecipe(
+                author="John Doe",
+                duration=25,
+                categories=["dessert"],
+                ingredients=["chocolate", "flour"],
+                portions=4,
+                califications_sumatory=45,
+                califications_amount=10
+            ),
+            MockRecipe(
+                author="Jane Smith",
+                duration=20,
+                categories=["dessert"],
+                ingredients=["vanilla", "sugar"],
+                portions=6,
+                califications_sumatory=30,
+                califications_amount=10
+            ),
+            MockRecipe(
+                author="John Doe",
+                duration=35,
+                categories=["main course"],
+                ingredients=["chicken", "rice"],
+                portions=4,
+                califications_sumatory=40,
+                califications_amount=10
+            )
+        ]
+        
+        filter_criteria = {
+            "author": "John Doe",
+            "duration": 30,
+            "category": ["dessert"],
+            "ingredients": ["chocolate"],
+            "rating": 4.0
+        }
+        
+        filtered = composer.apply_filters(recipes, filter_criteria)
+        
+        self.assertEqual(len(filtered), 1)
+        self.assertEqual(filtered[0].author, "John Doe")
+        self.assertTrue("chocolate" in filtered[0].ingredients)
+    
+    def test_filter_composer_with_dislikes(self):
+        """Test FilterComposer handles dislike filter correctly"""
+        composer = FilterComposer()
+        recipes = [
+            MockRecipe(ingredients=["flour", "eggs"]),
+            MockRecipe(ingredients=["peanuts", "chocolate"]),
+            MockRecipe(ingredients=["almonds", "honey"])
+        ]
+        
+        filter_criteria = {"dislikes": ["flour"]}
+        filtered = composer.apply_filters(recipes, filter_criteria)
+        
+        self.assertEqual(len(filtered), 2)
+        self.assertTrue(all(r.ingredients == ["peanuts", "chocolate"] or ["almonds", "honey"] for r in filtered))
+    
+    def test_filter_composer_all_filters_no_results(self):
+        """Test FilterComposer returns an empty list if there are no matches"""
+        composer = FilterComposer()
+        recipes = [
+            MockRecipe(author="John Doe", duration=50),
+            MockRecipe(author="Jane Smith", duration=60)
+        ]
+        
+        filter_criteria = {
+            "author": "Bob Johnson",
+            "duration": 30
+        }
+        
+        filtered = composer.apply_filters(recipes, filter_criteria)
+        
+        self.assertEqual(len(filtered), 0)
+
+
 
 
