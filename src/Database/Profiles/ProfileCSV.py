@@ -39,7 +39,7 @@ class ProfileCSV:
 
         return new_profile
 
-    def get_profile(self, user_id: int):
+    def get_profile(self, user_id: int) -> dict:
         if not os.path.exists(self.file_path):
             return None
         with open(self.file_path, "r", newline="") as file:
@@ -49,9 +49,21 @@ class ProfileCSV:
                 if csv_row.get("user_id") == str(user_id):
                     return {
                         "user_id": int(csv_row.get("user_id", 0)),
-                        "favorite_foods": csv_row.get("favorite_foods", ""),
-                        "unfavorite_foods": csv_row.get("unfavorite_foods", ""),
-                        "favorite_menus": csv_row.get("favorite_menus", ""),
+                        "favorite_foods": (
+                            csv_row.get("favorite_foods", "").split(";")
+                            if csv_row.get("favorite_foods", "")
+                            else []
+                        ),
+                        "unfavorite_foods": (
+                            csv_row.get("unfavorite_foods", "").split(";")
+                            if csv_row.get("unfavorite_foods", "")
+                            else []
+                        ),
+                        "favorite_menus": (
+                            csv_row.get("favorite_menus", "").split(";")
+                            if csv_row.get("favorite_menus", "")
+                            else []
+                        ),
                     }
         return None
 
@@ -99,34 +111,7 @@ class ProfileCSV:
         # Return the updated row
         return self.get_profile(user_id)
 
-    # TODO(JM) Check if User's team is ok with these functions
-    def get_profile_by_user_id(self, user_id: str):
-        """Get a profile by user_id"""
-        with open(self.file_path, "r", newline="") as file:
-            reader = csv.DictReader(file)
-            for row in reader:
-                if row["user_id"] == str(user_id):
-                    return {
-                        "user_id": row["user_id"],
-                        "favorite_foods": (
-                            row["favorite_foods"].split(";")
-                            if row["favorite_foods"]
-                            else []
-                        ),
-                        "unfavorite_foods": (
-                            row["unfavorite_foods"].split(";")
-                            if row["unfavorite_foods"]
-                            else []
-                        ),
-                        "favorite_menus": (
-                            row["favorite_menus"].split(";")
-                            if row["favorite_menus"]
-                            else []
-                        ),
-                    }
-        return None
-
-    def update_profile(self, user_id: str, profile_data: dict):
+    def update_profile(self, user_id: int, profile_data: dict):
         """Update a profile by user_id"""
         rows = []
         updated = False

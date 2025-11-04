@@ -31,9 +31,9 @@ class TestProfileRepository(unittest.TestCase):
         # Assert
         self.assertIsInstance(result, Profile)
         self.assertEqual(result.user_id, 1)
-        self.assertEqual(result.favorite_foods, "")
-        self.assertEqual(result.unfavorite_foods, "")
-        self.assertEqual(result.favorite_menus, "")
+        self.assertEqual(result.favorite_foods, [])
+        self.assertEqual(result.unfavorite_foods, [])
+        self.assertEqual(result.favorite_menus, [])
 
     def test_create_profile_multiple_users(self):
         # Act
