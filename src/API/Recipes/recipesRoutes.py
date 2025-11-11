@@ -1,12 +1,15 @@
 from flask import Blueprint, jsonify, request
 from src.Application.Recipes import recipe_service
+from src.API.Recipes import recipesController
 
 recipes_bp = Blueprint("recipes", __name__)
+
 
 @recipes_bp.route("/recipes", methods=["GET"])
 def get_all_recipes():
     recipes = recipe_service.get_all_recipes()
     return jsonify([recipe.__str__() for recipe in recipes])
+
 
 @recipes_bp.route("/recipes/<int:recipe_id>", methods=["GET"])
 def get_recipe(recipe_id):
@@ -15,47 +18,77 @@ def get_recipe(recipe_id):
         return jsonify({"error": "Receta no encontrada"}), 404
     return jsonify(recipe.to_dict())
 
+
 @recipes_bp.route("/recipes/<string:ingredient>", methods=["GET"])
 def get_recipes_by_ingredient(ingredient):
     recipes = recipe_service.get_recipes_by_ingredient(ingredient)
     if not recipes:
-        return jsonify({"message": f"No se encontraron recetas con '{ingredient}'"}), 404
-    
+        return (
+            jsonify({"message": f"No se encontraron recetas con '{ingredient}'"}),
+            404,
+        )
+
     return jsonify([recipe.__str__() for recipe in recipes])
+
 
 @recipes_bp.route("/addrecipe", methods=["POST"])
 def create_recipe():
     data = request.json
-    required_fields = ["name", "categories", "ingredients", "duration", "instructions", "portions"]
-    username = "myUser"
+    status_code, response_data = recipesController.create_recipe_controller(data)
+    return jsonify(response_data), status_code
 
-    if not all(field in data for field in required_fields):
-        return jsonify({"error": "Se necesita información adicional sobre la receta"}), 400
-
-    recipe = recipe_service.create_recipe(data, username)
-    return jsonify(recipe.to_dict())
 
 @recipes_bp.route("/recipes/<int:recipe_id>", methods=["DELETE"])
 def delete_recipe(recipe_id):
-    username = "myUser"  # Change later to actual username
-    result = recipe_service.delete_recipe(recipe_id, username)
-    if result is None:
-        return jsonify({"error": "Receta no encontrada"}), 404
-    if result is False:
-        return jsonify({"error": "No autorizado para eliminar esta receta"}), 403
-    return jsonify({"message": "Receta eliminada", "recipe": result.to_dict()})
+    status_code, response_data = recipesController.delete_recipe_controller(recipe_id)
+    return jsonify(response_data), status_code
+
 
 @recipes_bp.route("/recipes/<int:recipe_id>", methods=["PUT"])
 def update_recipe(recipe_id):
-    username = "myUser"  # Change later to actual username
     updates = request.json or {}
+    status_code, response_data = recipesController.update_recipe_controller(
+        recipe_id, updates
+    )
+    return jsonify(response_data), status_code
 
-    allowed_fields = {"name", "categories", "ingredients", "duration", "instructions", "portions"}
-    safe_updates = {k: v for k, v in updates.items() if k in allowed_fields}
 
-    result = recipe_service.update_recipe(recipe_id, safe_updates, username)
-    if result is None:
-        return jsonify({"error": "Receta no encontrada"}), 404
-    if result is False:
-        return jsonify({"error": "No autorizado para editar esta receta"}), 403
-    return jsonify(result.to_dict())
+@recipes_bp.route("/recipes/filter", methods=["POST"])
+def filter_recipes():
+    filter_criteria = request.json or {}
+
+    # Validate and convert types if needed
+    if "duration" in filter_criteria and filter_criteria["duration"] is not None:
+        try:
+            filter_criteria["duration"] = int(filter_criteria["duration"])
+        except (ValueError, TypeError):
+            return jsonify({"error": "Duration debe ser un número"}), 400
+
+    if "rating" in filter_criteria and filter_criteria["rating"] is not None:
+        try:
+            filter_criteria["rating"] = float(filter_criteria["rating"])
+        except (ValueError, TypeError):
+            return jsonify({"error": "Rating debe ser un número"}), 400
+
+    filtered_recipes = recipe_service.filter_recipes(filter_criteria)
+
+    if not filtered_recipes:
+        return (
+            jsonify(
+                {
+                    "message": "No se encontraron recetas con los filtros aplicados",
+                    "recipes": [],
+                }
+            ),
+            200,
+        )
+
+    return (
+        jsonify(
+            {
+                "count": len(filtered_recipes),
+                "recipes": [recipe.to_dict() for recipe in filtered_recipes],
+            }
+        ),
+        200,
+    )
