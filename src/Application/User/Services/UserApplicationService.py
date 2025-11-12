@@ -6,7 +6,7 @@ from src.Application.Interfaces.IUserRepository import IUserRepository
 from src.Application.Interfaces.IEncryptionService import IEncryptionService
 from src.Application.Interfaces.IValidationService import IValidationService
 from src.Application.Interfaces.ITokenService import ITokenService
-
+import jwt
 
 class UserApplicationService:
     def __init__(
@@ -66,6 +66,8 @@ class UserApplicationService:
 
         user_dto = self.create_user_dto(data)
 
+        user_dto.key = self.token_service.generate_key()
+
         user, message, status = self.user_repository.create_user(user_dto)
 
         if not user:
@@ -90,9 +92,6 @@ class UserApplicationService:
             return None, {"error": "Invalid username or password"}, None, 401
 
         token = self.token_service.generate_token(user)
-        self.user_repository.update_user_token(user.username, token, user.key)
-
-        print(token)
 
         return user, {"message": "Login successful"}, token, 200
 
@@ -159,3 +158,31 @@ class UserApplicationService:
             return user, {"message": "Valid session"}, 200
         else:
             return None, {"error": "Expired session"}, 401
+        
+    def regenerate_key(self, headers):
+        auth = headers.get("Authorization", "")
+        parts = auth.split()
+        if len(parts) != 2 or parts[0].lower() != "bearer":
+            return None, {"error": "Missing or invalid Authorization header"}, 401
+        token = parts[1].strip()
+        if not token:
+            return None, {"error": "Missing token"}, 401
+
+        try:
+            payload = jwt.decode(token, options={"verify_signature": False})
+            username = payload.get("username")
+            if not username:
+                return None, {"error": "Invalid token payload"}, 401
+        except jwt.InvalidTokenError:
+            return None, {"error": "Invalid token"}, 401
+
+        user, resp, status = self.verify_valid_session(headers, username)
+        if not user:
+            return None, resp, status
+
+        new_key = self.token_service.generate_key()
+        ok = self.user_repository.update_user_key(username, new_key)
+        if not ok:
+            return None, {"error": "Failed to rotate key"}, 500
+
+        return user, {"message": "Key regenerated successfully"}, 200
