@@ -1,6 +1,6 @@
 class User:
     def __init__(
-        self, id, username, password, email, role="user", key=None, token=None
+        self, id, username, password, email, role="user", key=None
     ):
         self.id = id
         self.username = username
@@ -8,7 +8,6 @@ class User:
         self.email = email
         self.role = role
         self.key = key
-        self.token = token
 
     def to_dict(self):
         # Turn user object into a dictionary
@@ -19,5 +18,4 @@ class User:
             "email": self.email,
             "role": self.role,
             "key": self.key,
-            "token": self.token,
         }
