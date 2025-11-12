@@ -8,6 +8,7 @@ from src.Application.Interfaces.IValidationService import IValidationService
 from src.Application.Interfaces.ITokenService import ITokenService
 import jwt
 
+
 class UserApplicationService:
     def __init__(
         self,
@@ -158,7 +159,7 @@ class UserApplicationService:
             return user, {"message": "Valid session"}, 200
         else:
             return None, {"error": "Expired session"}, 401
-        
+
     def regenerate_key(self, headers):
         auth = headers.get("Authorization", "")
         parts = auth.split()

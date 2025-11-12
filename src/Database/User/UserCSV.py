@@ -13,9 +13,7 @@ class UserCSV:
         if not os.path.exists(self.file_path):
             with open(self.file_path, "w", newline="") as file:
                 writer = csv.writer(file)
-                writer.writerow(
-                    ["id", "username", "password", "email", "role", "key"]
-                )
+                writer.writerow(["id", "username", "password", "email", "role", "key"])
 
     def user_exists(self, username, email):
         with open(self.file_path, "r", newline="") as file:
@@ -98,7 +96,7 @@ class UserCSV:
                 "password",
                 "email",
                 "role",
-                "key"
+                "key",
             ]
             if "key" not in fieldnames:
                 fieldnames.append("key")

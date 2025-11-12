@@ -78,6 +78,7 @@ def change_password():
     _, response, status_code = user_app_service.change_password(user, data)
     return jsonify(response), status_code
 
+
 @auth_bp.route("/regenerate-key", methods=["POST"])
 def regenerate_key():
     auth = request.headers.get("Authorization", "")
@@ -94,7 +95,9 @@ def regenerate_key():
     except jwt.InvalidTokenError:
         return jsonify({"error": "Invalid token"}), 401
 
-    user, resp, status = user_app_service.verify_valid_session(request.headers, username)
+    user, resp, status = user_app_service.verify_valid_session(
+        request.headers, username
+    )
     if not user:
         return jsonify(resp), status
 
