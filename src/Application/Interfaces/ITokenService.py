@@ -8,8 +8,8 @@ class ITokenService(ABC):
         pass
 
     @abstractmethod
-    def generate_key(self, user):
-        pass
+    def generate_key(self) -> str:
+        ...
 
     @abstractmethod
     def verify_token(self, token, user):
