@@ -21,3 +21,7 @@ class IUserRepository(ABC):
     @abstractmethod
     def get_user_by_id(self, user_id):
         pass
+
+    @abstractmethod
+    def update_user_key(self, username, new_key) -> bool:
+        pass
