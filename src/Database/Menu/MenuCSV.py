@@ -2,6 +2,7 @@ import csv
 import os
 from src.Model.Menu.Menu import Menu
 
+
 class MenuCSV:
     def __init__(self, file_path):
         self.file_path = file_path
@@ -12,9 +13,7 @@ class MenuCSV:
         if not os.path.exists(self.file_path):
             with open(self.file_path, "w", newline="") as file:
                 writer = csv.writer(file)
-                writer.writerow(
-                    ["menu_id", "recipes"]
-                )
+                writer.writerow(["menu_id", "recipes"])
 
     def menu_exists(self, menu_id: int) -> bool:
         with open(self.file_path, "r", newline="") as file:
@@ -30,7 +29,9 @@ class MenuCSV:
             with open(self.file_path, "r", newline="") as file:
                 reader = csv.DictReader(file)
                 # Collect existing IDs
-                ids = [int(row["menu_id"]) for row in reader if row["menu_id"].isdigit()]
+                ids = [
+                    int(row["menu_id"]) for row in reader if row["menu_id"].isdigit()
+                ]
                 if ids:
                     next_id = max(ids) + 1
 

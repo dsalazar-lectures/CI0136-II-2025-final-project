@@ -2,6 +2,7 @@ from src.Model.Menu.Menu import Menu
 from src.Database.Menu.MenuCSV import MenuCSV
 from src.Application.Menu.IMenuRepository import IMenuRepository
 
+
 class MenuRepository(IMenuRepository):
     def __init__(self, csv_file_path="src/Database/Menu/menus.csv"):
         self.menu_csv = MenuCSV(csv_file_path)
@@ -9,10 +10,7 @@ class MenuRepository(IMenuRepository):
     def get_menu_by_id(self, menu_id: int) -> Menu:
         db_menu = self.menu_csv.get_menu_by_id(menu_id)
         if db_menu:
-            return Menu(
-                id=int(db_menu["menu_id"]),
-                recipes=db_menu["recipes"]
-            )
+            return Menu(id=int(db_menu["menu_id"]), recipes=db_menu["recipes"])
         return None
 
     def create_menu(self, menu: Menu):

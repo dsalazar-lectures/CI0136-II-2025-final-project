@@ -1,5 +1,6 @@
 from typing import List
 
+
 class Menu:
     def __init__(self, menu_id: int):
         self.menu_id = menu_id  # TODO: assign based on csv file

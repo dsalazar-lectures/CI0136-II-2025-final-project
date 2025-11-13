@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from src.Model.Menu.Menu import Menu
 
+
 class IMenuRepository(ABC):
     @abstractmethod
     def get_menu_by_id(self, menu_id: int) -> Menu:
@@ -25,4 +26,3 @@ class IMenuRepository(ABC):
     @abstractmethod
     def menu_exists(self, menu_id: int) -> bool:
         pass
-
