@@ -12,9 +12,11 @@ class CustomLogger:
         if cls._instance is None:
             cls._instance = super(CustomLogger, cls).__new__(cls)
             cls._instance._instance_id = f"SID-{uuid.uuid4().hex[:8]}"
-            print(f"[INFO] Singleton CustomLogger inicializado con ID {cls._instance._instance_id}")
+            print(
+                f"[INFO] Singleton CustomLogger inicializado con ID {cls._instance._instance_id}"
+            )
         return cls._instance
-    
+
     def __init__(
         self,
         name: str = "AppLogger",
@@ -23,7 +25,7 @@ class CustomLogger:
     ) -> None:
         if hasattr(self, "_initialized") and self._initialized:
             return
-        
+
         self.logger = logging.getLogger(name)
         self.logger.setLevel(level)
         self.logger.propagate = False
