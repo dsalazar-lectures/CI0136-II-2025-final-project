@@ -24,7 +24,6 @@ class MockUserRepository(IUserRepository):
             email=user_dto.email,
             role=user_dto.role,
             key="mock_key",
-            token=user_dto.token,
         )
 
         mock_user = MockUser(
@@ -34,7 +33,6 @@ class MockUserRepository(IUserRepository):
             email=user_dto.email,
             role=user_dto.role,
             key="mock_key",
-            token=user_dto.token,
         )
         self._users.append(mock_user)
         self._next_id += 1
@@ -53,16 +51,11 @@ class MockUserRepository(IUserRepository):
                 return user
         return None
 
-    def get_user_by_token(self, token):
-        for user in self._users:
-            if user.token == token:
-                return user
-        return None
-
-    def update_user_token(self, username, token, key):
+    def update_user_key(self, username: str, new_key: str) -> bool:
         for user in self._users:
             if user.username == username:
-                user.token = token
+                user.key = new_key
+                return True
         return False
 
     def update_password(self, username: str, hashed_password: str):

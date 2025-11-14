@@ -36,6 +36,8 @@ def create_app():
             "endpoints": [
                 "POST /auth/register",
                 "POST /auth/login",
+                "POST /auth/regenerate-key",
+                "POST /auth/change-password",
                 "GET /api/ingredients - Get all ingredients",
                 "GET /api/ingredients/<id> - Get ingredient by ID",
                 "GET /api/recipes - Get all recipes",

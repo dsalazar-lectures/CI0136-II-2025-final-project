@@ -19,13 +19,10 @@ class TokenService(ITokenService):
             "username": user.username,
         }
 
-        self.generate_key(user)
-
         return jwt.encode(payload, user.key, algorithm="HS256")
 
-    @staticmethod
-    def generate_key(user):
-        user.key = secrets.token_hex(32)
+    def generate_key(self) -> str:
+        return secrets.token_hex(32)
 
     @staticmethod
     def verify_token(token, user):

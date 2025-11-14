@@ -26,7 +26,6 @@ class UserRepository(IUserRepository):
                 email=created_user_data["email"],
                 role=created_user_data["role"],
                 key=created_user_data["key"],
-                token=created_user_data["token"],
             )
             return user_entity, "User created successfully", 201
         return None, "Failed to create user", 400
@@ -41,7 +40,6 @@ class UserRepository(IUserRepository):
                 email=db_user["email"],
                 role=db_user["role"],
                 key=db_user["key"],
-                token=db_user["token"],
             )
         return None
 
@@ -56,25 +54,11 @@ class UserRepository(IUserRepository):
             )
         return None
 
-    def get_user_by_token(self, token):
-        db_user = self.user_csv.get_user_by_token(token)
-        if db_user:
-            return UserDTO(
-                id=int(db_user["id"]),
-                username=db_user["username"],
-                password=db_user["password"],
-                email=db_user["email"],
-                role=db_user["role"],
-                key=db_user["key"],
-                token=db_user["token"],
-            )
-        return None
-
-    def update_user_token(self, username, token, key) -> bool:
-        return self.user_csv.update_user_token(username, token, key)
-
     def update_password(self, username, hashed_password):
         updated = self.user_csv.update_password(username, hashed_password)
         if updated:
             return True, "Password updated successfully", 200
         return False, "Failed to update password", 400
+
+    def update_user_key(self, username, new_key) -> bool:
+        return self.user_csv.update_user_key(username, new_key)
