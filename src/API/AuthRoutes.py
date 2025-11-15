@@ -108,6 +108,7 @@ def regenerate_key():
 
     return jsonify({"message": "Key regenerated successfully"}), 200
 
+
 @auth_bp.route("/delete-account", methods=["DELETE"])
 def delete_account():
     auth = request.headers.get("Authorization", "")

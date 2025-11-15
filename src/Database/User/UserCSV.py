@@ -145,7 +145,7 @@ class UserCSV:
             return True, "Password updated successfully", 200
 
         return False, "Failed to update password", 400
-    
+
     def delete_user(self, user_id: int) -> bool:
         """Delete a user by user_id"""
         rows = []

@@ -141,7 +141,7 @@ class ProfileCSV:
                 writer.writerows(rows)
 
         return updated
-    
+
     def delete_profile(self, user_id: int) -> bool:
         """Delete a profile by user_id"""
         rows = []

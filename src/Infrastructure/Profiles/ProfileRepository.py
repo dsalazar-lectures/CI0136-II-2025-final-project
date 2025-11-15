@@ -102,7 +102,7 @@ class ProfileRepository(IProfileRepository):
     def is_menu_in_favorites(self, user_id: int, menu_id: str) -> bool:
         """Check if a menu is in user's favorites"""
         return menu_id in self.get_favorite_menus(user_id)
-    
+
     def delete_profile(self, user_id: int) -> bool:
         """Delete a user's profile.
         Returns True if successful. False on failure."""
