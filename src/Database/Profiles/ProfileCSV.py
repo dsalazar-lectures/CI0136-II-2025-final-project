@@ -141,3 +141,25 @@ class ProfileCSV:
                 writer.writerows(rows)
 
         return updated
+    
+    def delete_profile(self, user_id: int) -> bool:
+        """Delete a profile by user_id"""
+        rows = []
+        deleted = False
+
+        with open(self.file_path, "r", newline="") as file:
+            reader = csv.DictReader(file)
+            fieldnames = reader.fieldnames
+            for row in reader:
+                if row["user_id"] == str(user_id):
+                    deleted = True
+                    continue  # Skip adding this row to the new list
+                rows.append(row)
+
+        if deleted:
+            with open(self.file_path, "w", newline="") as file:
+                writer = csv.DictWriter(file, fieldnames=fieldnames)
+                writer.writeheader()
+                writer.writerows(rows)
+
+        return deleted

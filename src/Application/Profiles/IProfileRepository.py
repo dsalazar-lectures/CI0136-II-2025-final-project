@@ -6,6 +6,7 @@ from src.Model.Profiles.Profiles import Profile
 class IProfileRepository(ABC):
     @abstractmethod
     def create_profile(self, user_id):
+        """Create a new profile for a user."""
         pass
 
     @abstractmethod
@@ -37,4 +38,10 @@ class IProfileRepository(ABC):
     @abstractmethod
     def is_menu_in_favorites(self, user_id: int, menu_id: str) -> bool:
         """Check if a menu is in user's favorites."""
+        pass
+
+    @abstractmethod
+    def delete_profile(self, user_id: int) -> bool:
+        """Delete a user's profile.
+        Returns True if successful. False on failure."""
         pass

@@ -107,3 +107,37 @@ def regenerate_key():
         return jsonify({"error": "Failed to rotate key"}), 500
 
     return jsonify({"message": "Key regenerated successfully"}), 200
+
+@auth_bp.route("/delete-account", methods=["DELETE"])
+def delete_account():
+    auth = request.headers.get("Authorization", "")
+    parts = auth.split()
+    if len(parts) != 2 or parts[0].lower() != "bearer":
+        return jsonify({"error": "Missing or invalid Authorization header"}), 401
+    token = parts[1].strip()
+
+    try:
+        payload = jwt.decode(token, options={"verify_signature": False})
+        username = payload.get("username")
+        if not username:
+            return jsonify({"error": "Invalid token payload"}), 401
+    except jwt.InvalidTokenError:
+        return jsonify({"error": "Invalid token"}), 401
+
+    user, resp, status = user_app_service.verify_valid_session(
+        request.headers, username
+    )
+    if not user:
+        return jsonify(resp), status
+
+    # Delete user profile
+    profile_deleted = profile_service.delete_profile(user.id)
+    if not profile_deleted:
+        return jsonify({"error": "Failed to delete user profile"}), 500
+
+    # Delete user account
+    user_deleted = user_repository.delete_user(user.id)
+    if not user_deleted:
+        return jsonify({"error": "Failed to delete user account"}), 500
+
+    return jsonify({"message": "User account and profile deleted successfully"}), 200
