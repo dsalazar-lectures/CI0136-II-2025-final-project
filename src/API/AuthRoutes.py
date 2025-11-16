@@ -21,7 +21,7 @@ encryption_service = EncryptionService()
 token_service = TokenService()
 profile_service = ProfileApplicationService(profile_repository=ProfileRepository())
 
-account_service = AccountApplicationService(
+account_app_service = AccountApplicationService(
     user_repository=user_repository,
     profile_service=profile_service,
     token_service=token_service,
@@ -128,7 +128,7 @@ def delete_account():
         return jsonify({"error": "Username to delete is required"}), 400
 
     # Call the service to delete the user account
-    user, response, status_code = account_service.delete_user_account(
+    user, response, status_code = account_app_service.delete_user_account(
         request.headers, username_to_delete
     )
 
