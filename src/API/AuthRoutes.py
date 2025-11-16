@@ -131,13 +131,20 @@ def delete_account():
     if not user:
         return jsonify(resp), status
 
+    # Search user to delete
+    json_user = request.get_json()
+    username_to_delete = json_user.get("username")
+    user_to_delete = user_repository.get_user_by_username(username_to_delete)
+    if not user_to_delete:
+        return jsonify({"error": "User not found"}), 404
+
     # Delete user profile
-    profile_deleted = profile_service.delete_profile(user.id)
+    profile_deleted = profile_service.delete_profile(user_to_delete.id)
     if not profile_deleted:
         return jsonify({"error": "Failed to delete user profile"}), 500
 
     # Delete user account
-    user_deleted = user_repository.delete_user(user.id)
+    user_deleted = user_repository.delete_user(user_to_delete.id)
     if not user_deleted:
         return jsonify({"error": "Failed to delete user account"}), 500
 
