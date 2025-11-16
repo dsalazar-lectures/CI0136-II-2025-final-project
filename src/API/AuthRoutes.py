@@ -67,6 +67,27 @@ def login():
 def login_google():
     return redirect(url_for("google.login"))
 
+# User will be redirected here after login
+@auth_bp.route("/login-google/callback", methods=["POST"])
+def login_google_callback():
+
+    if not google.authorized:
+        return jsonify({"error:" "User not authenticated"}), 401
+    
+    resp = google.get("https://www.googleapis.com/oauth2/v3/userinfo")
+
+    if not resp.ok:
+        return jsonify({"error:" "Couldn't get information from Google"}), 401
+    
+    user_info = resp.json()
+
+    if "email" not in user_info:
+        return jsonify({"error": "Couldn't get information from Google"}), 401
+    
+    # TODO(@Paulette): make login method only with email
+
+    return jsonify({"add proper login response here"}), 200
+    
 
 
 @auth_bp.route("/change-password", methods=["POST"])
