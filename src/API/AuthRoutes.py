@@ -1,4 +1,5 @@
-from flask import Blueprint, request, jsonify, make_response
+from flask import Blueprint, request, jsonify, make_response, redirect, url_for
+from flask_dance.contrib.google import make_google_blueprint, google
 import jwt
 from src.Application.User.Services.UserApplicationService import UserApplicationService
 from src.Application.User.Services.EncryptionService import EncryptionService
@@ -26,6 +27,15 @@ user_app_service = UserApplicationService(
     profile_service=profile_service,
 )
 
+# Configuración para Google OAuth
+google_bp = make_google_blueprint(
+    client_id="ID",
+    client_secret="secret",
+    redirect_to="google_login_callback",
+    scope=[
+        "scopes",
+    ]
+)
 
 @auth_bp.route("/register", methods=["POST"])
 def register():
@@ -52,6 +62,11 @@ def login():
     response_with_header.headers["Authorization"] = f"Bearer {token}"
 
     return response_with_header
+
+@auth_bp.route("/login-google", methods=["POST"])
+def login_google():
+    return redirect(url_for("google.login"))
+
 
 
 @auth_bp.route("/change-password", methods=["POST"])

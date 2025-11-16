@@ -9,7 +9,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "src"))
 from src.API.Ingredients.IngredientsRoutes import ingredients_bp
 from src.API.Recipes.recipesRoutes import recipes_bp
 from src.API.Menu.menuRoutes import menu_bp
-from src.API.AuthRoutes import auth_bp
+from src.API.AuthRoutes import auth_bp, google_bp
 from src.API.Profiles.ProfileRoutes import profiles_bp
 
 from src.API.Metrics.DashboardRoute import dashboard_bp
@@ -25,6 +25,7 @@ def create_app():
     app.register_blueprint(recipes_bp, url_prefix="/api")
     app.register_blueprint(menu_bp, url_prefix="/api")
     app.register_blueprint(auth_bp, url_prefix="/auth")
+    app.register_blueprint(google_bp, url_prefix="/auth/google")
     app.register_blueprint(profiles_bp, url_prefix="/api")
     app.register_blueprint(dashboard_bp, url_prefix="/api")
 
