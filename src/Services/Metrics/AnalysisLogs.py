@@ -80,13 +80,8 @@ class AnalysisLogs:
         st.bar_chart(counts)
         st.dataframe(counts.rename_axis("category").reset_index(name="errors"))
 
-    @staticmethod
-    def top_users_most_active():
-        pass
-
     analysis_registry: Dict[str, Callable[..., None]] = {
-        "Least Active Users": top_users_least_active,
-        "Error Categories (Top 5)": top_error_categories,
+        "Error Categories (Top 5)": top_error_categories
     }
 
     @staticmethod
