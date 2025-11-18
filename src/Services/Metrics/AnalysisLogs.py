@@ -22,9 +22,7 @@ class AnalysisLogs:
         pass
 
     @staticmethod
-    def top_most_search_recipes(
-        df_list, recipe_repo: IRecipeRepository | None = None
-    ):        
+    def top_most_search_recipes(df_list, recipe_repo: IRecipeRepository | None = None):
         recipe_repo = recipe_repo or CSVRecipeRepository()
         if df_list is None or len(df_list) == 0:
             st.text(MSG_NO_DATA_OR_FUNC)
