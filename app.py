@@ -38,6 +38,7 @@ def create_app():
                 "POST /auth/login",
                 "POST /auth/regenerate-key",
                 "POST /auth/change-password",
+                "DELETE /auth/delete-account - Deletes user account",
                 "GET /api/ingredients - Get all ingredients",
                 "GET /api/ingredients/<id> - Get ingredient by ID",
                 "GET /api/recipes - Get all recipes",
