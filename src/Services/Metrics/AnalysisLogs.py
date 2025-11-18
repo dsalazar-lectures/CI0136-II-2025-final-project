@@ -16,13 +16,6 @@ MSG_EXEC_ERROR_TPL = "Error executing the metric: {}"
 
 # --------------------------------------------------------------------------------
 class AnalysisLogs:
-    @staticmethod
-    def top_users_least_active():
-        pass
-
-    @staticmethod
-    def top_users_most_active():
-        pass
 
     @staticmethod
     def top_most_search_recipes(df_list, recipe_repo: IRecipeRepository | None = None):
@@ -81,8 +74,6 @@ class AnalysisLogs:
                 st.bar_chart(recipes_counts)
 
     analysis_registry: Dict[str, Callable[..., None]] = {
-        "Least Active Users": top_users_least_active,
-        "Most Active Users": top_users_most_active,
         "Most Searched Recipes": top_most_search_recipes,
         "Least Searched Recipes": top_least_search_recipes,
     }
