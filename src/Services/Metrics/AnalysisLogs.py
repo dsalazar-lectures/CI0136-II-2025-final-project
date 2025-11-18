@@ -11,6 +11,7 @@ import sys
 
 sys.path.append(str(Path(__file__).resolve().parents[3] / "src"))
 
+
 # --------------------------------------------------------------------------------
 
 MSG_NO_DATA_OR_FUNC = "No data or metrics available to display."
@@ -21,7 +22,6 @@ MSG_EXEC_ERROR_TPL = "Error executing the metric: {}"
 class AnalysisLogs:
     @staticmethod
     def top_users_least_active():
-
         pass
 
     @staticmethod
@@ -29,9 +29,7 @@ class AnalysisLogs:
         pass
 
     @staticmethod
-    def top_most_search_recipes(
-        df_list, start_date, end_date, recipe_repo: IRecipeRepository | None = None
-    ):
+    def top_most_search_recipes(df_list, recipe_repo: IRecipeRepository | None = None):
         recipe_repo = recipe_repo or CSVRecipeRepository()
         if df_list is None or len(df_list) == 0:
             st.text(MSG_NO_DATA_OR_FUNC)
