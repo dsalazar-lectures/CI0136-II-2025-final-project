@@ -15,6 +15,7 @@ class IMenuRepository(ABC):
     def update_menu(self, menu: Menu):
         pass
 
+    # TODO(): Implement delete and list methods
     # @abstractmethod
     # def delete_menu(self, menu_id: int):
     #     pass

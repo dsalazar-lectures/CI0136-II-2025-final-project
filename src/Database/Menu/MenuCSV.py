@@ -14,7 +14,7 @@ class MenuCSV:
             with open(self.file_path, "w", newline="") as file:
                 writer = csv.writer(file)
                 writer.writerow(
-                    ["menu_id", "breakfast_id", "lunch_id", "dinner_id", "dessert_id"]
+                    ["menu_id", "breakfast_recipe_id", "lunch_recipe_id", "dinner_recipe_id", "dessert_recipe_id"]
                 )
 
     def menu_exists(self, menu_id: int) -> bool:
@@ -39,10 +39,10 @@ class MenuCSV:
 
         new_menu = {
             "menu_id": str(next_id),
-            "breakfast_id": str(menu.breakfast),
-            "lunch_id": str(menu.lunch),
-            "dinner_id": str(menu.dinner),
-            "dessert_id": str(menu.dessert),
+            "breakfast_recipe_id": str(menu.breakfast),
+            "lunch_recipe_id": str(menu.lunch),
+            "dinner_recipe_id": str(menu.dinner),
+            "dessert_recipe_id": str(menu.dessert),
         }
 
         # Appends new menu to CSV file
@@ -51,10 +51,10 @@ class MenuCSV:
                 file,
                 fieldnames=[
                     "menu_id",
-                    "breakfast_id",
-                    "lunch_id",
-                    "dinner_id",
-                    "dessert_id",
+                    "breakfast_recipe_id",
+                    "lunch_recipe_id",
+                    "dinner_recipe_id",
+                    "dessert_recipe_id",
                 ],
             )
             writer.writerow(new_menu)
