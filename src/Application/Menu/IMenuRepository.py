@@ -20,7 +20,7 @@ class IMenuRepository(ABC):
     #     pass
 
     # @abstractmethod
-    # def list_menus\(self) -> list:
+    # def list_menus(self) -> list:
     #     pass
 
     @abstractmethod

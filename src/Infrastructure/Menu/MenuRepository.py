@@ -10,7 +10,13 @@ class MenuRepository(IMenuRepository):
     def get_menu_by_id(self, menu_id: int) -> Menu:
         db_menu = self.menu_csv.get_menu_by_id(menu_id)
         if db_menu:
-            return Menu(id=int(db_menu["menu_id"]), recipes=db_menu["recipes"])
+            return Menu(
+                menu_id=int(db_menu["menu_id"]),
+                breakfast_id=int(db_menu["breakfast_id"]),
+                lunch_id=int(db_menu["lunch_id"]),
+                dinner_id=int(db_menu["dinner_id"]),
+                dessert_id=int(db_menu["dessert_id"]),
+            )
         return None
 
     def create_menu(self, menu: Menu):
@@ -20,8 +26,11 @@ class MenuRepository(IMenuRepository):
         created_menu_data = self.menu_csv.create_menu(menu)
         if created_menu_data:
             menu_entity = Menu(
-                id=int(created_menu_data["menu_id"]),
-                recipes=created_menu_data["recipes"],
+                menu_id=int(created_menu_data["menu_id"]),
+                breakfast_id=int(created_menu_data["breakfast_id"]),
+                lunch_id=int(created_menu_data["lunch_id"]),
+                dinner_id=int(created_menu_data["dinner_id"]),
+                dessert_id=int(created_menu_data["dessert_id"]),
             )
             return menu_entity, "Menu created successfully", 201
         return None, "Failed to create menu", 400
