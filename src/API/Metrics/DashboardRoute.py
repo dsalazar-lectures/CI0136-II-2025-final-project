@@ -39,7 +39,6 @@ def _start_streamlit_if_needed(port: int) -> bool:
         return True
 
     dashboard_py = _find_dashboard_py()
-    repo_root = dashboard_py.parents[2]
 
     cmd = [
         sys.executable,
