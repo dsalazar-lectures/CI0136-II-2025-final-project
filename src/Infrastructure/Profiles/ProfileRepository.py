@@ -19,9 +19,21 @@ class ProfileRepository(IProfileRepository):
         if created_profile_data:
             return Profile(
                 user_id=int(created_profile_data["user_id"]),
-                favorite_foods=created_profile_data["favorite_foods"],
-                unfavorite_foods=created_profile_data["unfavorite_foods"],
-                favorite_menus=created_profile_data["favorite_menus"],
+                favorite_foods=(
+                    created_profile_data["favorite_foods"].split(";")
+                    if created_profile_data["favorite_foods"]
+                    else []
+                ),
+                unfavorite_foods=(
+                    created_profile_data["unfavorite_foods"].split(";")
+                    if created_profile_data["unfavorite_foods"]
+                    else []
+                ),
+                favorite_menus=(
+                    created_profile_data["favorite_menus"].split(";")
+                    if created_profile_data["favorite_menus"]
+                    else []
+                ),
             )
         return None
 
@@ -49,47 +61,44 @@ class ProfileRepository(IProfileRepository):
             favorite_menus=updated["favorite_menus"],
         )
 
-    def get_profile_by_user_id(self, user_id: str) -> Optional[dict]:
-        return self.profile_database.get_profile_by_user_id(user_id)
-
     # Favorite Menu Functions
-    def add_favorite_menu(self, user_id: str, menu_id: str) -> bool:
+    def add_favorite_menu(self, user_id: int, menu_id: str) -> bool:
         """Add a menu to user's favorites, check for duplicates beforehand
         Returns True if successful. False on failure."""
-        profile_data = self.get_profile_by_user_id(user_id)
+        profile_data = self.get_profile(user_id)
         if not profile_data:
             return False  # Can't add to non-existent profile
 
-        favorite_menus = profile_data.get("favorite_menus", [])
+        favorite_menus = profile_data.favorite_menus
         favorite_menus.append(menu_id)
-        profile_data["favorite_menus"] = favorite_menus
+        profile_data.favorite_menus = favorite_menus
 
-        return self.profile_database.update_profile(user_id, profile_data)
+        return self.profile_database.update_profile(user_id, profile_data.to_dict())
 
-    def remove_favorite_menu(self, user_id: str, menu_id: str) -> bool:
+    def remove_favorite_menu(self, user_id: int, menu_id: str) -> bool:
         """Remove a menu from user's favorites, check if it's there beforehand.
         Returns True if successful. False on failure."""
-        profile_data = self.get_profile_by_user_id(user_id)
+        profile_data = self.get_profile(user_id)
         # Duplicate check,
         # the one in the use case also happens to check for the user
         if not profile_data:
             return False  # Can't remove from non-existent profile
 
-        favorite_menus = profile_data.get("favorite_menus", [])
+        favorite_menus = profile_data.favorite_menus
         if menu_id in favorite_menus:
             favorite_menus.remove(menu_id)
 
-        profile_data["favorite_menus"] = favorite_menus
-        return self.profile_database.update_profile(user_id, profile_data)
+        profile_data.favorite_menus = favorite_menus
+        return self.profile_database.update_profile(user_id, profile_data.to_dict())
 
-    def get_favorite_menus(self, user_id: str) -> list:
+    def get_favorite_menus(self, user_id: int) -> list:
         """Get all favorite menu IDs for a user"""
-        profile_data = self.get_profile_by_user_id(user_id)
+        profile_data = self.get_profile(user_id)
         if not profile_data:
             return []
 
-        return profile_data.get("favorite_menus", [])
+        return profile_data.favorite_menus
 
-    def is_menu_in_favorites(self, user_id: str, menu_id: str) -> bool:
+    def is_menu_in_favorites(self, user_id: int, menu_id: str) -> bool:
         """Check if a menu is in user's favorites"""
         return menu_id in self.get_favorite_menus(user_id)
