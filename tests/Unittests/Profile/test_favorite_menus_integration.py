@@ -23,38 +23,38 @@ class TestFavoriteMenusIntegration(unittest.TestCase):
     def test_add_and_retrieve_favorite_menu(self):
         """Test adding and retrieving a favorite menu"""
         # Add favorite menu
-        result = self.repo.add_favorite_menu("1", "menu1")
+        result = self.repo.add_favorite_menu(1, "menu1")
         self.assertTrue(result)
 
         # Check if it's in favorites
         # Use the is_menu_in_favorites method
-        self.assertTrue(self.repo.is_menu_in_favorites("1", "menu1"))
+        self.assertTrue(self.repo.is_menu_in_favorites(1, "menu1"))
 
     def test_remove_favorite_menu(self):
         """Test removing a favorite menu"""
         # Add favorite menu first
-        self.repo.add_favorite_menu("1", "menu1")
+        self.repo.add_favorite_menu(1, "menu1")
 
         # Now remove it
-        result = self.repo.remove_favorite_menu("1", "menu1")
+        result = self.repo.remove_favorite_menu(1, "menu1")
 
         # Verify removal
         self.assertTrue(result)
-        self.assertFalse(self.repo.is_menu_in_favorites("1", "menu1"))
+        self.assertFalse(self.repo.is_menu_in_favorites(1, "menu1"))
 
     def test_persistence_across_repository_instances(self):
         """Test data persistence across different repository instances"""
         # Add favorite menu with first repo instance
-        self.repo.add_favorite_menu("1", "menu1")
-        self.repo.add_favorite_menu("1", "menu2")
-        self.repo.add_favorite_menu("2", "menu3")
+        self.repo.add_favorite_menu(1, "menu1")
+        self.repo.add_favorite_menu(1, "menu2")
+        self.repo.add_favorite_menu(2, "menu3")
 
         # Create a new repo, with the same CSV
         new_repo = ProfileRepository(self.test_csv)
 
         # Verify data persisted
-        user1_favorites = new_repo.get_favorite_menus("1")
-        user2_favorites = new_repo.get_favorite_menus("2")
+        user1_favorites = new_repo.get_favorite_menus(1)
+        user2_favorites = new_repo.get_favorite_menus(2)
 
         # User 1
         self.assertEqual(len(user1_favorites), 2)
@@ -68,14 +68,14 @@ class TestFavoriteMenusIntegration(unittest.TestCase):
     def test_multiple_users_favorite_menus_isolation(self):
         """Test that CSV correctly stores and isolates multiple user profiles"""
         # Add different favorites for different users
-        self.repo.add_favorite_menu("1", "menu1")
-        self.repo.add_favorite_menu("1", "menu2")
-        self.repo.add_favorite_menu("2", "menu3")
-        self.repo.add_favorite_menu("2", "menu4")
+        self.repo.add_favorite_menu(1, "menu1")
+        self.repo.add_favorite_menu(1, "menu2")
+        self.repo.add_favorite_menu(2, "menu3")
+        self.repo.add_favorite_menu(2, "menu4")
 
         # Verify isolation
-        user1_favorites = self.repo.get_favorite_menus("1")
-        user2_favorites = self.repo.get_favorite_menus("2")
+        user1_favorites = self.repo.get_favorite_menus(1)
+        user2_favorites = self.repo.get_favorite_menus(2)
 
         # Verify length
         self.assertEqual(len(user1_favorites), 2)
@@ -91,16 +91,16 @@ class TestFavoriteMenusIntegration(unittest.TestCase):
         """Test handling a large number of favorite menus"""
         # Add 50 favorite menus
         for i in range(50):
-            result = self.repo.add_favorite_menu("1", f"menu{i}")
+            result = self.repo.add_favorite_menu(1, f"menu{i}")
             self.assertTrue(result)
 
         # Verify all were added
-        favorites = self.repo.get_favorite_menus("1")
+        favorites = self.repo.get_favorite_menus(1)
         self.assertEqual(len(favorites), 50)
 
         # Verify persistence
         new_repo = ProfileRepository(self.test_csv)
-        favorites_reloaded = new_repo.get_favorite_menus("1")
+        favorites_reloaded = new_repo.get_favorite_menus(1)
         self.assertEqual(len(favorites_reloaded), 50)
 
         # Verify a few random ones
@@ -111,16 +111,16 @@ class TestFavoriteMenusIntegration(unittest.TestCase):
     def test_favorite_menu_functions_no_user_error(self):
         """Test favorite menu functions handle non-existent users gracefully"""
         # Non-existent user
-        result = self.repo.add_favorite_menu("999", "menuX")
+        result = self.repo.add_favorite_menu(999, "menuX")
         self.assertFalse(result)
 
-        result = self.repo.remove_favorite_menu("999", "menuX")
+        result = self.repo.remove_favorite_menu(999, "menuX")
         self.assertFalse(result)
 
-        result = self.repo.get_favorite_menus("999")
+        result = self.repo.get_favorite_menus(999)
         self.assertEqual(result, [])
 
     def test_empty_favorite_menus(self):
         """Test retrieving favorite menus when none have been added"""
-        favorites = self.repo.get_favorite_menus("1")
+        favorites = self.repo.get_favorite_menus(1)
         self.assertEqual(favorites, [])  # Should be empty list

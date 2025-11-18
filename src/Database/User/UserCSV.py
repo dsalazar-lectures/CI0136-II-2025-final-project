@@ -13,9 +13,7 @@ class UserCSV:
         if not os.path.exists(self.file_path):
             with open(self.file_path, "w", newline="") as file:
                 writer = csv.writer(file)
-                writer.writerow(
-                    ["id", "username", "password", "email", "role", "key", "token"]
-                )
+                writer.writerow(["id", "username", "password", "email", "role", "key"])
 
     def user_exists(self, username, email):
         with open(self.file_path, "r", newline="") as file:
@@ -43,7 +41,6 @@ class UserCSV:
             "email": user_dto.email,
             "role": user_dto.role,
             "key": getattr(user_dto, "key", "") or "",
-            "token": "",
         }
 
         # Appends new user to CSV file
@@ -57,7 +54,6 @@ class UserCSV:
                     "email",
                     "role",
                     "key",
-                    "token",
                 ],
             )
             writer.writerow(new_user)
@@ -89,7 +85,7 @@ class UserCSV:
 
         return None
 
-    def update_user_token(self, username, token, key=None):
+    def update_user_key(self, username, new_key):
         updated = False
         tmp = NamedTemporaryFile("w", delete=False, newline="")
         with open(self.file_path, "r", newline="") as src, tmp:
@@ -101,18 +97,16 @@ class UserCSV:
                 "email",
                 "role",
                 "key",
-                "token",
             ]
-            for col in ["key", "token"]:
-                if col not in fieldnames:
-                    fieldnames.append(col)
+            if "key" not in fieldnames:
+                fieldnames.append("key")
+
             writer = csv.DictWriter(tmp, fieldnames=fieldnames)
             writer.writeheader()
+
             for row in reader:
                 if row.get("username") == username:
-                    row["token"] = token
-                    if key is not None:
-                        row["key"] = key
+                    row["key"] = new_key
                     updated = True
                 for col in fieldnames:
                     row.setdefault(col, "")
