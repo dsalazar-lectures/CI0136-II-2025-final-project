@@ -119,7 +119,8 @@ class UserApplicationService:
             return (
                 None,
                 {
-                    "error": "The new password does not meet the security requirements (minimum 8 characters, numbers, uppercase, symbols)."
+                    "error": "The new password does not meet the security requirements "
+                    '(minimum 8 characters and include at least one number, one uppercase letter, and one special character (e.g. !@#$%^&*(),.?":{}|<>).'
                 },
                 400,
             )
@@ -160,26 +161,10 @@ class UserApplicationService:
         else:
             return None, {"error": "Expired session"}, 401
 
-    def regenerate_key(self, headers):
-        auth = headers.get("Authorization", "")
-        parts = auth.split()
-        if len(parts) != 2 or parts[0].lower() != "bearer":
-            return None, {"error": "Missing or invalid Authorization header"}, 401
-        token = parts[1].strip()
-        if not token:
-            return None, {"error": "Missing token"}, 401
-
-        try:
-            payload = jwt.decode(token, options={"verify_signature": False})
-            username = payload.get("username")
-            if not username:
-                return None, {"error": "Invalid token payload"}, 401
-        except jwt.InvalidTokenError:
-            return None, {"error": "Invalid token"}, 401
-
-        user, resp, status = self.verify_valid_session(headers, username)
+    def regenerate_key(self, username: str):
+        user = self.user_repository.get_user_by_username(username)
         if not user:
-            return None, resp, status
+            return None, {"error": "User not found"}, 404
 
         new_key = self.token_service.generate_key()
         ok = self.user_repository.update_user_key(username, new_key)

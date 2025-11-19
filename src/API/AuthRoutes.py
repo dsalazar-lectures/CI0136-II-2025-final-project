@@ -34,8 +34,9 @@ google_bp = make_google_blueprint(
     redirect_to="google_login_callback",
     scope=[
         "scopes",
-    ]
+    ],
 )
+
 
 @auth_bp.route("/register", methods=["POST"])
 def register():
@@ -63,9 +64,11 @@ def login():
 
     return response_with_header
 
+
 @auth_bp.route("/login-google", methods=["POST"])
 def login_google():
     return redirect(url_for("google.login"))
+
 
 # User will be redirected here after login
 @auth_bp.route("/login-google/callback", methods=["POST"])
@@ -73,28 +76,26 @@ def login_google_callback():
 
     if not google.authorized:
         return jsonify({"error:" "User not authenticated"}), 401
-    
+
     resp = google.get("https://www.googleapis.com/oauth2/v3/userinfo")
 
     if not resp.ok:
         return jsonify({"error:" "Couldn't get information from Google"}), 401
-    
+
     user_info = resp.json()
 
     if "email" not in user_info:
         return jsonify({"error": "Couldn't get information from Google"}), 401
-    
+
     # TODO(@Paulette): make login method only with email
 
     return jsonify({"add proper login response here"}), 200
-    
 
 
 @auth_bp.route("/change-password", methods=["POST"])
-# TODO(@Paulette): add jwt_required decorator
 def change_password():
     if "Authorization" not in request.headers or not request.headers["Authorization"]:
-        return jsonify({"error": "Missing signature"}), 401
+        return jsonify({"error": "Missing token"}), 401
 
     # Request username, old_password, and new_password
     data = request.get_json()
@@ -120,7 +121,7 @@ def regenerate_key():
     auth = request.headers.get("Authorization", "")
     parts = auth.split()
     if len(parts) != 2 or parts[0].lower() != "bearer":
-        return jsonify({"error": "Missing or invalid Authorization header"}), 401
+        return jsonify({"error": "Missing token"}), 401
     token = parts[1].strip()
 
     try:
@@ -137,12 +138,8 @@ def regenerate_key():
     if not user:
         return jsonify(resp), status
 
-    new_key = token_service.generate_key()
-    ok = user_repository.update_user_key(username, new_key)
-    if not ok:
-        return jsonify({"error": "Failed to rotate key"}), 500
-
-    return jsonify({"message": "Key regenerated successfully"}), 200
+    _, resp, status = user_app_service.regenerate_key(user.username)
+    return jsonify(resp), status
 
 
 @auth_bp.route("/delete-account", methods=["DELETE"])
@@ -150,7 +147,7 @@ def delete_account():
     auth = request.headers.get("Authorization", "")
     parts = auth.split()
     if len(parts) != 2 or parts[0].lower() != "bearer":
-        return jsonify({"error": "Missing or invalid Authorization header"}), 401
+        return jsonify({"error": "Missing token"}), 401
     token = parts[1].strip()
 
     try:
