@@ -10,29 +10,16 @@ class MenuRepository(IMenuRepository):
     def get_menu_by_id(self, menu_id: int) -> Menu:
         db_menu = self.menu_csv.get_menu_by_id(menu_id)
         if db_menu:
-            return Menu(
-                menu_id=int(db_menu["menu_id"]),
-                breakfast_recipe_id=int(db_menu["breakfast_recipe_id"]),
-                lunch_recipe_id=int(db_menu["lunch_recipe_id"]),
-                dinner_recipe_id=int(db_menu["dinner_recipe_id"]),
-                dessert_recipe_id=int(db_menu["dessert_recipe_id"]),
-            )
+            return db_menu
         return None
 
     def create_menu(self, menu: Menu):
         if self.menu_exists(menu.menu_id):
             return None, "Menu already exists", 400
 
-        created_menu_data = self.menu_csv.create_menu(menu)
-        if created_menu_data:
-            menu_entity = Menu(
-                menu_id=int(created_menu_data["menu_id"]),
-                breakfast_recipe_id=int(created_menu_data["breakfast_recipe_id"]),
-                lunch_recipe_id=int(created_menu_data["lunch_recipe_id"]),
-                dinner_recipe_id=int(created_menu_data["dinner_recipe_id"]),
-                dessert_recipe_id=int(created_menu_data["dessert_recipe_id"]),
-            )
-            return menu_entity, "Menu created successfully", 201
+        created_menu = self.menu_csv.create_menu(menu)
+        if created_menu:
+            return created_menu, "Menu created successfully", 201
         return None, "Failed to create menu", 400
 
     def update_menu(self, menu: Menu):

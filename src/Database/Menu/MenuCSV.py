@@ -1,6 +1,7 @@
 import csv
 import os
 from src.Model.Menu.Menu import Menu
+from src.Model.Menu.MenuDay import MenuDay
 
 
 class MenuCSV:
@@ -13,8 +14,16 @@ class MenuCSV:
         if not os.path.exists(self.file_path):
             with open(self.file_path, "w", newline="") as file:
                 writer = csv.writer(file)
+                # Format: menu_id, day, breakfast, lunch, dinner, dessert
                 writer.writerow(
-                    ["menu_id", "breakfast_recipe_id", "lunch_recipe_id", "dinner_recipe_id", "dessert_recipe_id"]
+                    [
+                        "menu_id",
+                        "day",
+                        "breakfast_recipe_id",
+                        "lunch_recipe_id",
+                        "dinner_recipe_id",
+                        "dessert_recipe_id",
+                    ]
                 )
 
     def menu_exists(self, menu_id: int) -> bool:
@@ -37,36 +46,51 @@ class MenuCSV:
                 if ids:
                     next_id = max(ids) + 1
 
-        new_menu = {
-            "menu_id": str(next_id),
-            "breakfast_recipe_id": str(menu.breakfast),
-            "lunch_recipe_id": str(menu.lunch),
-            "dinner_recipe_id": str(menu.dinner),
-            "dessert_recipe_id": str(menu.dessert),
-        }
-
-        # Appends new menu to CSV file
+        # Write each day as a separate row
         with open(self.file_path, "a", newline="") as file:
             writer = csv.DictWriter(
                 file,
                 fieldnames=[
                     "menu_id",
+                    "day",
                     "breakfast_recipe_id",
                     "lunch_recipe_id",
                     "dinner_recipe_id",
                     "dessert_recipe_id",
                 ],
             )
-            writer.writerow(new_menu)
+            for day, menu_day in menu.daily_menus.items():
+                writer.writerow(
+                    {
+                        "menu_id": str(next_id),
+                        "day": str(day),
+                        "breakfast_recipe_id": str(menu_day.breakfast),
+                        "lunch_recipe_id": str(menu_day.lunch),
+                        "dinner_recipe_id": str(menu_day.dinner),
+                        "dessert_recipe_id": str(menu_day.dessert),
+                    }
+                )
 
-        return new_menu
+        # Return the Menu object
+        return Menu(menu_id=next_id, daily_menus=menu.daily_menus)
 
-    def get_menu_by_id(self, menu_id: int) -> dict:
+    def get_menu_by_id(self, menu_id: int) -> Menu:
         if not os.path.exists(self.file_path):
             return None
+
+        daily_menus = {}
         with open(self.file_path, "r", newline="") as file:
             reader = csv.DictReader(file)
             for csv_row in reader:
                 if csv_row["menu_id"] == str(menu_id):
-                    return csv_row
+                    day = int(csv_row["day"])
+                    daily_menus[day] = MenuDay(
+                        breakfast_recipe_id=int(csv_row["breakfast_recipe_id"]),
+                        lunch_recipe_id=int(csv_row["lunch_recipe_id"]),
+                        dinner_recipe_id=int(csv_row["dinner_recipe_id"]),
+                        dessert_recipe_id=int(csv_row["dessert_recipe_id"]),
+                    )
+
+        if daily_menus:
+            return Menu(menu_id=menu_id, daily_menus=daily_menus)
         return None
