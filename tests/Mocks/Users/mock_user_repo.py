@@ -23,7 +23,7 @@ class MockUserRepository(IUserRepository):
             password=user_dto.password,
             email=user_dto.email,
             role=user_dto.role,
-            key="mock_key",
+            key=user_dto.key,
         )
 
         mock_user = MockUser(
@@ -32,7 +32,7 @@ class MockUserRepository(IUserRepository):
             password=user_dto.password,
             email=user_dto.email,
             role=user_dto.role,
-            key="mock_key",
+            key=user_dto.key,
         )
         self._users.append(mock_user)
         self._next_id += 1

@@ -6,7 +6,6 @@ from src.Application.Interfaces.IUserRepository import IUserRepository
 from src.Application.Interfaces.IEncryptionService import IEncryptionService
 from src.Application.Interfaces.IValidationService import IValidationService
 from src.Application.Interfaces.ITokenService import ITokenService
-import jwt
 
 
 class UserApplicationService:
