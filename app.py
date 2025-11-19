@@ -29,7 +29,7 @@ def create_app():
     app.register_blueprint(auth_bp, url_prefix="/auth")
     app.register_blueprint(profiles_bp, url_prefix="/api")
     app.register_blueprint(dashboard_bp, url_prefix="/api")
-    
+
     # Create logger singleton instance
     CustomLogger(handlers=build_handlers())
 
