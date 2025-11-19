@@ -41,12 +41,14 @@ class MenuRepository(IMenuRepository):
         # Update logic to be implemented
         return None, "Update functionality not implemented", 501
 
-    # TODO(): Implement delete and list methods
-    # def delete_menu(self, menu_id: int):
-    #     pass
+    # TODO(JM): Implement CSV functions
+    def delete_menu(self, menu_id: int):
+        if not self.menu_exists(menu_id):
+            return None, "Menu does not exist", 404
+        return self.menu_csv.delete_menu(menu_id)
 
-    # def list_menus(self) -> list:
-    #     pass
+    def list_menus(self) -> list:
+        return self.menu_csv.list_menus()
 
     def menu_exists(self, menu_id: int) -> bool:
         return self.menu_csv.menu_exists(menu_id)
