@@ -1,4 +1,5 @@
 from src.Model.Menu.Menu import Menu
+from src.Model.Menu.MenuDay import MenuDay
 from src.Database.Menu.MenuCSV import MenuCSV
 from src.Application.Menu.IMenuRepository import IMenuRepository
 
@@ -10,25 +11,49 @@ class MenuRepository(IMenuRepository):
     def get_menu_by_id(self, menu_id: int) -> Menu:
         db_menu = self.menu_csv.get_menu_by_id(menu_id)
         if db_menu:
-            return db_menu
+            # Convert dictionary daily_menus to MenuDay objects
+            daily_menus = {
+                day: MenuDay(
+                    breakfast_recipe_id=menu_day_data["breakfast_recipe_id"],
+                    lunch_recipe_id=menu_day_data["lunch_recipe_id"],
+                    dinner_recipe_id=menu_day_data["dinner_recipe_id"],
+                    dessert_recipe_id=menu_day_data["dessert_recipe_id"],
+                )
+                for day, menu_day_data in db_menu["daily_menus"].items()
+            }
+            return Menu(
+                menu_id=int(db_menu["menu_id"]),
+                daily_menus=daily_menus,
+            )
         return None
 
-    def create_menu(self, menu: Menu):
-        if self.menu_exists(menu.menu_id):
-            return None, "Menu already exists", 400
-
-        created_menu = self.menu_csv.create_menu(menu)
+    def create_menu(self, menu_data):
+        created_menu = self.menu_csv.create_menu(menu_data)
         if created_menu:
-            return created_menu, "Menu created successfully", 201
+            # Convert dictionary daily_menus to MenuDay objects
+            daily_menus = {
+                day: MenuDay(
+                    breakfast_recipe_id=menu_day.breakfast,
+                    lunch_recipe_id=menu_day.lunch,
+                    dinner_recipe_id=menu_day.dinner,
+                    dessert_recipe_id=menu_day.dessert,
+                )
+                for day, menu_day in created_menu["daily_menus"].items()
+            }
+            menu = Menu(
+                menu_id=int(created_menu["menu_id"]),
+                daily_menus=daily_menus,
+            )
+            return menu, "Menu created successfully", 201
         return None, "Failed to create menu", 400
 
-    def update_menu(self, menu: Menu):
-        if not self.menu_exists(menu.menu_id):
-            return None, "Menu does not exist", 404
-        # Update logic to be implemented
-        return None, "Update functionality not implemented", 501
-
     # TODO(JM): Implement CSV functions
+    def update_menu(self, menu: Menu):
+        updated_menu = self.menu_csv.update_menu(menu)
+        if updated_menu:
+            return updated_menu, "Menu updated successfully", 200
+        return None, "Failed to update menu", 400
+
     def delete_menu(self, menu_id: int):
         if not self.menu_exists(menu_id):
             return None, "Menu does not exist", 404

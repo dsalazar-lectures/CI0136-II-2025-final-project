@@ -1,7 +1,5 @@
 import csv
 import os
-from src.Model.Menu.Menu import Menu
-from src.Model.Menu.MenuDay import MenuDay
 
 
 class MenuCSV:
@@ -34,7 +32,7 @@ class MenuCSV:
                     return True
         return False
 
-    def create_menu(self, menu: Menu):
+    def create_menu(self, menu_data):
         next_id = 1
         if os.path.exists(self.file_path):
             with open(self.file_path, "r", newline="") as file:
@@ -45,6 +43,11 @@ class MenuCSV:
                 ]
                 if ids:
                     next_id = max(ids) + 1
+
+        new_menu = {
+            "menu_id": str(next_id),
+            "daily_menus": menu_data.daily_menus,
+        }
 
         # Write each day as a separate row
         with open(self.file_path, "a", newline="") as file:
@@ -59,7 +62,7 @@ class MenuCSV:
                     "dessert_recipe_id",
                 ],
             )
-            for day, menu_day in menu.daily_menus.items():
+            for day, menu_day in new_menu["daily_menus"].items():
                 writer.writerow(
                     {
                         "menu_id": str(next_id),
@@ -72,9 +75,9 @@ class MenuCSV:
                 )
 
         # Return the Menu object
-        return Menu(menu_id=next_id, daily_menus=menu.daily_menus)
+        return new_menu
 
-    def get_menu_by_id(self, menu_id: int) -> Menu:
+    def get_menu_by_id(self, menu_id: int):
         if not os.path.exists(self.file_path):
             return None
 
@@ -84,13 +87,13 @@ class MenuCSV:
             for csv_row in reader:
                 if csv_row["menu_id"] == str(menu_id):
                     day = int(csv_row["day"])
-                    daily_menus[day] = MenuDay(
-                        breakfast_recipe_id=int(csv_row["breakfast_recipe_id"]),
-                        lunch_recipe_id=int(csv_row["lunch_recipe_id"]),
-                        dinner_recipe_id=int(csv_row["dinner_recipe_id"]),
-                        dessert_recipe_id=int(csv_row["dessert_recipe_id"]),
-                    )
+                    daily_menus[day] = {
+                        "breakfast_recipe_id": int(csv_row["breakfast_recipe_id"]),
+                        "lunch_recipe_id": int(csv_row["lunch_recipe_id"]),
+                        "dinner_recipe_id": int(csv_row["dinner_recipe_id"]),
+                        "dessert_recipe_id": int(csv_row["dessert_recipe_id"]),
+                    }
 
         if daily_menus:
-            return Menu(menu_id=menu_id, daily_menus=daily_menus)
+            return {"menu_id": menu_id, "daily_menus": daily_menus}
         return None
