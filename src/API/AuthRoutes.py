@@ -1,11 +1,16 @@
 from flask import Blueprint, request, jsonify
 from src.Application.User.Services.UserApplicationService import UserApplicationService
 from src.Infrastructure.User.UserRepository import UserRepository
+from src.Infrastructure.User.PasswordResetTokenRepository import PasswordResetTokenRepository
+from src.Application.User.Services.PasswordResetTokenService import PasswordResetTokenService
+from src.Application.User.Services.EncryptionService import EncryptionService
 
 auth_bp = Blueprint('auth', __name__)
 user_repository = UserRepository()
-user_app_service = UserApplicationService(user_repository)
-
+token_repository = PasswordResetTokenRepository()
+password_reset_service = PasswordResetTokenService(token_repository)
+user_app_service = UserApplicationService(user_repository, token_repository)
+encryption_service = EncryptionService()
 
 @auth_bp.route('/register', methods=['POST'])
 def register():
@@ -59,4 +64,18 @@ def change_email():
     # Call the application service to handle the email change logic
     _, response, status_code = user_app_service.change_email(username, data)
 
+    return jsonify(response), status_code
+
+@auth_bp.route('/forgot-password', methods=['POST'])
+def forgot_password():
+    # Delegate all logic to UserApplicationService
+    data = request.get_json()
+    user, response, status_code = user_app_service.request_password_reset(data)
+    return jsonify(response), status_code
+
+@auth_bp.route('/reset-password', methods=['POST'])
+def reset_password():
+    # Delegate all logic to UserApplicationService
+    data = request.get_json()
+    user, response, status_code = user_app_service.reset_password(data)
     return jsonify(response), status_code
