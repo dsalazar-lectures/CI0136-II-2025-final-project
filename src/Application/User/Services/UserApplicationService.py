@@ -4,7 +4,7 @@ from Application.Interfaces.IPasswordResetTokenRepository import IPasswordResetT
 from src.Application.User.Services.ValidationService import ValidationService
 from src.Application.User.Services.EncryptionService import EncryptionService
 from src.Application.User.Services.TokenService import TokenService
-from src.Application.User.Services.PasswordResetTokenService import PasswordResetTokenService
+from Application.Unwanted.PasswordResetTokenService import PasswordResetTokenService
 
 class UserApplicationService:
     def __init__(self, user_repository: IUserRepository, token_repository: IPasswordResetTokenRepository = None):

@@ -1,8 +1,8 @@
 from flask import Blueprint, request, jsonify
 from src.Application.User.Services.UserApplicationService import UserApplicationService
 from src.Infrastructure.User.UserRepository import UserRepository
-from src.Infrastructure.User.PasswordResetTokenRepository import PasswordResetTokenRepository
-from src.Application.User.Services.PasswordResetTokenService import PasswordResetTokenService
+from Infrastructure.User.PasswordResetTokenRepository import PasswordResetTokenRepository
+from Application.User.Services.PasswordResetTokenService import PasswordResetTokenService
 from src.Application.User.Services.EncryptionService import EncryptionService
 
 auth_bp = Blueprint('auth', __name__)
