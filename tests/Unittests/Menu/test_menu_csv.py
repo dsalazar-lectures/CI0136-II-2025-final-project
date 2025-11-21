@@ -224,6 +224,156 @@ class TestMenuCSV(unittest.TestCase):
         if os.path.exists(nonexistent_path):
             os.unlink(nonexistent_path)
 
+    def test_delete_menu_success(self):
+        # Arrange
+        menu1 = Menu(menu_id=1, daily_menus={1: MenuDay(101, 102, 103, 104)})
+        menu2 = Menu(
+            menu_id=2,
+            daily_menus={
+                1: MenuDay(201, 202, 203, 204),
+                2: MenuDay(211, 212, 213, 214),
+            },
+        )
+        self.menu_csv.create_menu(menu1)
+        self.menu_csv.create_menu(menu2)
+
+        # Act
+        result = self.menu_csv.delete_menu(1)
+
+        # Assert
+        self.assertTrue(result)
+        self.assertFalse(self.menu_csv.menu_exists(1))
+        self.assertTrue(self.menu_csv.menu_exists(2))
+
+    def test_delete_menu_not_found(self):
+        # Arrange
+        menu = Menu(menu_id=1, daily_menus={1: MenuDay(101, 102, 103, 104)})
+        self.menu_csv.create_menu(menu)
+
+        # Act
+        result = self.menu_csv.delete_menu(999)
+
+        # Assert
+        self.assertFalse(result)
+        self.assertTrue(self.menu_csv.menu_exists(1))
+
+    def test_delete_menu_multi_day(self):
+        # Arrange - Create a multi-day menu
+        menu = Menu(
+            menu_id=1,
+            daily_menus={
+                1: MenuDay(101, 102, 103, 104),
+                2: MenuDay(201, 202, 203, 204),
+                3: MenuDay(301, 302, 303, 304),
+            },
+        )
+        self.menu_csv.create_menu(menu)
+
+        # Verify file has 3 data rows + header
+        with open(self.temp_file.name, "r") as f:
+            lines = f.readlines()
+            self.assertEqual(len(lines), 4)
+
+        # Act
+        result = self.menu_csv.delete_menu(1)
+
+        # Assert
+        self.assertTrue(result)
+        self.assertFalse(self.menu_csv.menu_exists(1))
+
+        # Verify all rows were deleted
+        with open(self.temp_file.name, "r") as f:
+            lines = f.readlines()
+            self.assertEqual(len(lines), 1)  # Only header remains
+
+    def test_list_menus_empty(self):
+        # Act
+        result = self.menu_csv.list_menus()
+
+        # Assert
+        self.assertEqual(result, [])
+
+    def test_list_menus_single_menu(self):
+        # Arrange
+        menu = Menu(
+            menu_id=1,
+            daily_menus={
+                1: MenuDay(101, 102, 103, 104),
+                2: MenuDay(201, 202, 203, 204),
+            },
+        )
+        self.menu_csv.create_menu(menu)
+
+        # Act
+        result = self.menu_csv.list_menus()
+
+        # Assert
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0]["menu_id"], 1)
+        self.assertEqual(len(result[0]["daily_menus"]), 2)
+        self.assertEqual(result[0]["daily_menus"][1]["breakfast_recipe_id"], 101)
+        self.assertEqual(result[0]["daily_menus"][2]["breakfast_recipe_id"], 201)
+
+    def test_list_menus_multiple_menus(self):
+        # Arrange
+        menu1 = Menu(menu_id=1, daily_menus={1: MenuDay(101, 102, 103, 104)})
+        menu2 = Menu(
+            menu_id=2,
+            daily_menus={
+                1: MenuDay(201, 202, 203, 204),
+                2: MenuDay(211, 212, 213, 214),
+            },
+        )
+        menu3 = Menu(
+            menu_id=3,
+            daily_menus={
+                1: MenuDay(301, 302, 303, 304),
+                2: MenuDay(311, 312, 313, 314),
+                3: MenuDay(321, 322, 323, 324),
+            },
+        )
+        self.menu_csv.create_menu(menu1)
+        self.menu_csv.create_menu(menu2)
+        self.menu_csv.create_menu(menu3)
+
+        # Act
+        result = self.menu_csv.list_menus()
+
+        # Assert
+        self.assertEqual(len(result), 3)
+
+        # Check menu IDs
+        menu_ids = [m["menu_id"] for m in result]
+        self.assertIn(1, menu_ids)
+        self.assertIn(2, menu_ids)
+        self.assertIn(3, menu_ids)
+
+        # Check day counts
+        menu_by_id = {m["menu_id"]: m for m in result}
+        self.assertEqual(len(menu_by_id[1]["daily_menus"]), 1)
+        self.assertEqual(len(menu_by_id[2]["daily_menus"]), 2)
+        self.assertEqual(len(menu_by_id[3]["daily_menus"]), 3)
+
+    def test_delete_then_list(self):
+        # Arrange
+        menu1 = Menu(menu_id=1, daily_menus={1: MenuDay(101, 102, 103, 104)})
+        menu2 = Menu(menu_id=2, daily_menus={1: MenuDay(201, 202, 203, 204)})
+        menu3 = Menu(menu_id=3, daily_menus={1: MenuDay(301, 302, 303, 304)})
+        self.menu_csv.create_menu(menu1)
+        self.menu_csv.create_menu(menu2)
+        self.menu_csv.create_menu(menu3)
+
+        # Act - Delete middle menu
+        self.menu_csv.delete_menu(2)
+        result = self.menu_csv.list_menus()
+
+        # Assert
+        self.assertEqual(len(result), 2)
+        menu_ids = [m["menu_id"] for m in result]
+        self.assertIn(1, menu_ids)
+        self.assertNotIn(2, menu_ids)
+        self.assertIn(3, menu_ids)
+
 
 if __name__ == "__main__":
     unittest.main()

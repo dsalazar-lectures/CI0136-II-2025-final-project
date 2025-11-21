@@ -87,15 +87,6 @@ class TestMenuRepository(unittest.TestCase):
         self.assertTrue(self.repository.menu_exists(1))
         self.assertFalse(self.repository.menu_exists(999))
 
-    def test_delete_menu_not_exists(self):
-        # Act
-        result, message, status = self.repository.delete_menu(999)
-
-        # Assert
-        self.assertIsNone(result)
-        self.assertEqual(message, "Menu does not exist")
-        self.assertEqual(status, 404)
-
     def test_create_multiple_menus(self):
         # Arrange
         menu1 = Menu(menu_id=1, daily_menus={1: MenuDay(101, 102, 103, 104)})
@@ -130,6 +121,139 @@ class TestMenuRepository(unittest.TestCase):
         # Verify retrieval
         retrieved = self.repository.get_menu_by_id(1)
         self.assertEqual(len(retrieved.daily_menus), 7)
+
+    def test_delete_menu_not_exists(self):
+        # Act
+        result, message, status = self.repository.delete_menu(999)
+
+        # Assert
+        self.assertIsNone(result)
+        self.assertEqual(message, "Menu does not exist")
+        self.assertEqual(status, 404)
+
+    def test_delete_menu_success(self):
+        # Arrange
+        menu = Menu(
+            menu_id=1,
+            daily_menus={
+                1: MenuDay(101, 102, 103, 104),
+                2: MenuDay(201, 202, 203, 204),
+            },
+        )
+        self.repository.create_menu(menu)
+
+        # Act
+        result, message, status = self.repository.delete_menu(1)
+
+        # Assert
+        self.assertTrue(result)
+        self.assertEqual(message, "Menu deleted successfully")
+        self.assertEqual(status, 200)
+        self.assertFalse(self.repository.menu_exists(1))
+        self.assertIsNone(self.repository.get_menu_by_id(1))
+
+    def test_delete_menu_removes_all_days(self):
+        # Arrange - Create a multi-day menu
+        menu = Menu(
+            menu_id=1,
+            daily_menus={
+                1: MenuDay(101, 102, 103, 104),
+                2: MenuDay(201, 202, 203, 204),
+                3: MenuDay(301, 302, 303, 304),
+            },
+        )
+        self.repository.create_menu(menu)
+
+        # Act
+        result, message, status = self.repository.delete_menu(1)
+
+        # Assert
+        self.assertTrue(result)
+        self.assertEqual(status, 200)
+        # Verify all days were removed
+        retrieved = self.repository.get_menu_by_id(1)
+        self.assertIsNone(retrieved)
+
+    def test_list_menus_empty(self):
+        # Act
+        result = self.repository.list_menus()
+
+        # Assert
+        self.assertEqual(result, [])
+
+    def test_list_menus_single_menu(self):
+        # Arrange
+        menu = Menu(
+            menu_id=1,
+            daily_menus={
+                1: MenuDay(101, 102, 103, 104),
+                2: MenuDay(201, 202, 203, 204),
+            },
+        )
+        self.repository.create_menu(menu)
+
+        # Act
+        result = self.repository.list_menus()
+
+        # Assert
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0]["menu_id"], 1)
+        self.assertEqual(len(result[0]["daily_menus"]), 2)
+
+    def test_list_menus_multiple(self):
+        # Arrange
+        menu1 = Menu(menu_id=1, daily_menus={1: MenuDay(101, 102, 103, 104)})
+        menu2 = Menu(
+            menu_id=2,
+            daily_menus={
+                1: MenuDay(201, 202, 203, 204),
+                2: MenuDay(211, 212, 213, 214),
+            },
+        )
+        menu3 = Menu(
+            menu_id=3,
+            daily_menus={
+                1: MenuDay(301, 302, 303, 304),
+                2: MenuDay(311, 312, 313, 314),
+                3: MenuDay(321, 322, 323, 324),
+            },
+        )
+        self.repository.create_menu(menu1)
+        self.repository.create_menu(menu2)
+        self.repository.create_menu(menu3)
+
+        # Act
+        result = self.repository.list_menus()
+
+        # Assert
+        self.assertEqual(len(result), 3)
+        menu_ids = [m["menu_id"] for m in result]
+        self.assertEqual(sorted(menu_ids), [1, 2, 3])
+
+    def test_delete_from_multiple_menus(self):
+        # Arrange
+        menu1 = Menu(menu_id=1, daily_menus={1: MenuDay(101, 102, 103, 104)})
+        menu2 = Menu(menu_id=2, daily_menus={1: MenuDay(201, 202, 203, 204)})
+        menu3 = Menu(menu_id=3, daily_menus={1: MenuDay(301, 302, 303, 304)})
+        self.repository.create_menu(menu1)
+        self.repository.create_menu(menu2)
+        self.repository.create_menu(menu3)
+
+        # Act - Delete menu 2
+        self.repository.delete_menu(2)
+
+        # Assert
+        self.assertTrue(self.repository.menu_exists(1))
+        self.assertFalse(self.repository.menu_exists(2))
+        self.assertTrue(self.repository.menu_exists(3))
+
+        # Verify list_menus reflects deletion
+        result = self.repository.list_menus()
+        self.assertEqual(len(result), 2)
+        menu_ids = [m["menu_id"] for m in result]
+        self.assertIn(1, menu_ids)
+        self.assertNotIn(2, menu_ids)
+        self.assertIn(3, menu_ids)
 
 
 if __name__ == "__main__":

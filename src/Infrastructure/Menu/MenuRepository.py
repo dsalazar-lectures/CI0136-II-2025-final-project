@@ -45,11 +45,11 @@ class MenuRepository(IMenuRepository):
         )
         return menu, "Menu created successfully", 201
 
-    # TODO(JM): Implement CSV functions
-    def delete_menu(self, menu_id: int) -> bool:
+    def delete_menu(self, menu_id: int):
         if not self.menu_exists(menu_id):
             return None, "Menu does not exist", 404
-        return self.menu_csv.delete_menu(menu_id)
+        self.menu_csv.delete_menu(menu_id)
+        return True, "Menu deleted successfully", 200
 
     def list_menus(self) -> list:
         return self.menu_csv.list_menus()
