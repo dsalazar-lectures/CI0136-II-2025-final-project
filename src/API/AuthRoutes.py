@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify, make_response, redirect, url_for
 from flask_dance.contrib.google import make_google_blueprint, google
 import jwt
+import os
 from src.Application.User.Services.UserApplicationService import UserApplicationService
 from src.Application.User.Services.EncryptionService import EncryptionService
 from src.Application.User.Services.ValidationService import ValidationService
@@ -29,11 +30,13 @@ user_app_service = UserApplicationService(
 
 # Configuración para Google OAuth
 google_bp = make_google_blueprint(
-    client_id="ID",
-    client_secret="secret",
-    redirect_to="google_login_callback",
+    client_id=os.getenv("GOOGLE_ID"),
+    client_secret=os.getenv("GOOGLE_SECRET"),
+    redirect_to="google.login_google_callback",
     scope=[
-        "scopes",
+        "openid",
+        "https://www.googleapis.com/auth/userinfo.profile",
+        "https://www.googleapis.com/auth/userinfo.email",
     ],
 )
 
@@ -65,13 +68,13 @@ def login():
     return response_with_header
 
 
-@auth_bp.route("/login-google", methods=["POST"])
+@google_bp.route("/login-google", methods=["GET", "POST"])
 def login_google():
     return redirect(url_for("google.login"))
 
 
 # User will be redirected here after login
-@auth_bp.route("/login-google/callback", methods=["POST"])
+@google_bp.route("/login-google/callback", methods=["GET", "POST"])
 def login_google_callback():
 
     if not google.authorized:
@@ -89,7 +92,7 @@ def login_google_callback():
 
     # TODO(@Paulette): make login method only with email
 
-    return jsonify({"add proper login response here"}), 200
+    return jsonify({"message": "Succesful Login"}), 200
 
 
 @auth_bp.route("/change-password", methods=["POST"])

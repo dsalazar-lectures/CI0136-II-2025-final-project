@@ -1,4 +1,5 @@
 from flask import Flask
+from dotenv import load_dotenv
 import sys
 import os
 
@@ -20,12 +21,16 @@ def create_app():
 
     app.json.ensure_ascii = False
 
+    # Secret key for sessions with Google
+    load_dotenv()
+    app.secret_key = os.getenv("SECRET_KEY", "dev-dafult-key")
+
     # Register blueprints
     app.register_blueprint(ingredients_bp)
     app.register_blueprint(recipes_bp, url_prefix="/api")
     app.register_blueprint(menu_bp, url_prefix="/api")
     app.register_blueprint(auth_bp, url_prefix="/auth")
-    app.register_blueprint(google_bp, url_prefix="/auth/google")
+    app.register_blueprint(google_bp, url_prefix="/auth")
     app.register_blueprint(profiles_bp, url_prefix="/api")
     app.register_blueprint(dashboard_bp, url_prefix="/api")
 
