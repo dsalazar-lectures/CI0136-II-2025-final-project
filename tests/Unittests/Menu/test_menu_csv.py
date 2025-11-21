@@ -220,6 +220,18 @@ class TestMenuCSV(unittest.TestCase):
                 ],
             )
 
+        # Use the menu_csv_no_file instance to verify it works correctly
+        menu = Menu(menu_id=1, daily_menus={1: MenuDay(101, 102, 103, 104)})
+        created_menu = menu_csv_no_file.create_menu(menu)
+
+        self.assertIsNotNone(created_menu)
+        self.assertEqual(int(created_menu["menu_id"]), 1)
+
+        # Verify we can retrieve the created menu
+        retrieved = menu_csv_no_file.get_menu_by_id(1)
+        self.assertIsNotNone(retrieved)
+        self.assertEqual(retrieved["menu_id"], 1)
+
         # Cleanup
         if os.path.exists(nonexistent_path):
             os.unlink(nonexistent_path)
