@@ -29,23 +29,21 @@ class MenuRepository(IMenuRepository):
 
     def create_menu(self, menu_data):
         created_menu = self.menu_csv.create_menu(menu_data)
-        if created_menu:
-            # Convert dictionary daily_menus to MenuDay objects
-            daily_menus = {
-                day: MenuDay(
-                    breakfast_recipe_id=menu_day.breakfast,
-                    lunch_recipe_id=menu_day.lunch,
-                    dinner_recipe_id=menu_day.dinner,
-                    dessert_recipe_id=menu_day.dessert,
-                )
-                for day, menu_day in created_menu["daily_menus"].items()
-            }
-            menu = Menu(
-                menu_id=int(created_menu["menu_id"]),
-                daily_menus=daily_menus,
+        # Convert dictionary daily_menus to MenuDay objects
+        daily_menus = {
+            day: MenuDay(
+                breakfast_recipe_id=menu_day.breakfast,
+                lunch_recipe_id=menu_day.lunch,
+                dinner_recipe_id=menu_day.dinner,
+                dessert_recipe_id=menu_day.dessert,
             )
-            return menu, "Menu created successfully", 201
-        return None, "Failed to create menu", 400
+            for day, menu_day in created_menu["daily_menus"].items()
+        }
+        menu = Menu(
+            menu_id=int(created_menu["menu_id"]),
+            daily_menus=daily_menus,
+        )
+        return menu, "Menu created successfully", 201
 
     # TODO(JM): Implement CSV functions
     def update_menu(self, menu: Menu):

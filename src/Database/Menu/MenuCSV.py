@@ -78,9 +78,6 @@ class MenuCSV:
         return new_menu
 
     def get_menu_by_id(self, menu_id: int):
-        if not os.path.exists(self.file_path):
-            return None
-
         daily_menus = {}
         with open(self.file_path, "r", newline="") as file:
             reader = csv.DictReader(file)
