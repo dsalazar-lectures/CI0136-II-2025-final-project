@@ -12,10 +12,6 @@ class IMenuRepository(ABC):
         pass
 
     @abstractmethod
-    def update_menu(self, menu: Menu):
-        pass
-
-    @abstractmethod
     def delete_menu(self, menu_id: int):
         pass
 
