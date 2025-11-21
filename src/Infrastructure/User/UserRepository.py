@@ -1,3 +1,4 @@
+import csv
 from src.Application.Interfaces.IUserRepository import IUserRepository
 from src.Model.User.User import User
 from src.Application.DTOs.UserDTO import UserDTO
@@ -50,3 +51,38 @@ class UserRepository(IUserRepository):
         if updated:
             return True, "Email updated successfully", 200
         return False, "Failed to update email", 400
+    
+    def get_user_by_email(self, email):
+        with open(self.user_csv.file_path, 'r', newline='') as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                if row['email'] == email:
+                    return UserDTO(
+                        id=int(row['id']),
+                        username=row['username'],
+                        password=row['password'],
+                        email=row['email'],
+                        role=row['role']
+                    )
+        return None
+
+    def update_password_by_id(self, user_id: str, hashed_password: str):
+        updated = False
+        rows = []
+        
+        with open(self.user_csv.file_path, 'r', newline='') as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                if row['id'] == user_id:
+                    row['password'] = hashed_password
+                    updated = True
+                rows.append(row)
+        
+        if updated:
+            with open(self.user_csv.file_path, 'w', newline='') as file:
+                writer = csv.DictWriter(file, fieldnames=['id', 'username', 'password', 'email', 'role'])
+                writer.writeheader()
+                writer.writerows(rows)
+            return True, "Password updated successfully", 200
+        
+        return False, "User not found", 404
