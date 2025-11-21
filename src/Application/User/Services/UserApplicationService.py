@@ -1,15 +1,21 @@
 from src.Application.DTOs.UserDTO import UserDTO
 from src.Application.Interfaces.IUserRepository import IUserRepository
+from Application.Interfaces.IPasswordResetTokenRepository import IPasswordResetTokenRepository
 from src.Application.User.Services.ValidationService import ValidationService
 from src.Application.User.Services.EncryptionService import EncryptionService
 from src.Application.User.Services.TokenService import TokenService
+from src.Application.User.Services.PasswordResetTokenService import PasswordResetTokenService
 
 class UserApplicationService:
-    def __init__(self, user_repository: IUserRepository):
+    def __init__(self, user_repository: IUserRepository, token_repository: IPasswordResetTokenRepository = None):
         self.validation_service = ValidationService()
         self.user_repository = user_repository
         self.encryption_service = EncryptionService()
         self.token_service = TokenService()
+        if token_repository:
+            self.password_reset_service = PasswordResetTokenService(token_repository)
+        else:
+            self.password_reset_service = None
 
     def create_user_dto(self, data):
 
@@ -148,3 +154,66 @@ class UserApplicationService:
             return None, {'error': message}, status
 
         return user, {'message': "Email updated successfully"}, 200
+    
+    def request_password_reset(self, data):
+        # Requests a password reset link for the given email
+        if not self.password_reset_service:
+            return None, {'error': "Password reset service not available"}, 500
+
+        required_fields = ['email']
+        is_valid, error_response, status_code = self.validation_service.validate_request_data(
+            data, required_fields)
+        if not is_valid:
+            return None, error_response, status_code
+
+        user = self.user_repository.get_user_by_email(data['email'])
+        if not user:
+            return None, {'message': "If the email exists, a password reset link has been sent"}, 200
+
+        reset_token = self.password_reset_service.generate_reset_token(str(user.id))
+        reset_link = f"http://localhost:5000/reset-password?token={reset_token}"
+
+        try:
+            from src.Services.EmailService import send_email
+            send_email(
+                sender="noreply@yourapp.com",
+                recipient=user.email,
+                subject="Password Reset Request",
+                contents=f"Reset link: {reset_link}"
+            )
+        except Exception as e:
+            return None, {'error': "Failed to send reset email"}, 500
+
+        return None, {'message': "If the email exists, a password reset link has been sent"}, 200
+
+    def reset_password(self, data):
+        # Resets the user's password using the provided token and new password
+        if not self.password_reset_service:
+            return None, {'error': "Password reset service not available"}, 500
+
+        required_fields = ['token', 'new_password']
+        is_valid, error_response, status_code = self.validation_service.validate_request_data(
+            data, required_fields)
+        if not is_valid:
+            return None, error_response, status_code
+
+        token = data['token']
+        new_password = data['new_password']
+
+        is_valid_token, user_id_or_error = self.password_reset_service.verify_reset_token(token)
+        if not is_valid_token:
+            return None, {'error': user_id_or_error}, 400
+
+        is_valid, valid_msg = self.validation_service.validate_password_format(new_password)
+        if not is_valid:
+            return None, {'error': valid_msg}, 400
+
+        hashed_new_password = self.encryption_service.hash_password(new_password)
+        success, message, status = self.user_repository.update_password_by_id(
+            user_id_or_error, hashed_new_password)
+        
+        if not success:
+            return None, {'error': message}, status
+
+        self.password_reset_service.invalidate_token(token)
+        return None, {'message': "Password reset successfully"}, 200
