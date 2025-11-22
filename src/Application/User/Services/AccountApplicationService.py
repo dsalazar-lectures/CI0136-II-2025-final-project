@@ -58,15 +58,23 @@ class AccountApplicationService:
         if not user_to_delete:
             return None, {"error": "User not found"}, 404
 
+        # Store profile before deletion
+        profile_to_delete = self.profile_service.get_profile(user_to_delete.id)
+        if not profile_to_delete:
+            return None, {"error": "User profile not found"}, 404
         # Delete user profile
         profile_deleted = self.profile_service.delete_profile(user_to_delete.id)
         if not profile_deleted:
             return None, {"error": "Failed to delete user profile"}, 500
-
-        # Delete user account
-        user_deleted = self.user_repository.delete_user(user_to_delete.id)
-        if not user_deleted:
-            return None, {"error": "Failed to delete user account"}, 500
+        if profile_deleted:
+            # Delete user account
+            user_deleted = self.user_repository.delete_user(user_to_delete.id)
+            if not user_deleted:
+                # Rollback profile deletion if user deletion fails
+                self.profile_service.restore_profile(
+                    user_to_delete.id, profile_to_delete.favorite_foods
+                )
+                return None, {"error": "Failed to delete user account"}, 500
 
         return (
             user_to_delete,
