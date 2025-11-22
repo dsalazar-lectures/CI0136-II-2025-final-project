@@ -30,8 +30,8 @@ user_app_service = UserApplicationService(
 
 # Configuración para Google OAuth
 google_bp = make_google_blueprint(
-    client_id=os.getenv("GOOGLE_ID"),
-    client_secret=os.getenv("GOOGLE_SECRET"),
+    client_id=os.getenv("GOOGLE_CLIENT_ID"),
+    client_secret=os.getenv("GOOGLE_CLIENT_SECRET"),
     redirect_to="google.login_google_callback",
     scope=[
         "openid",
@@ -89,6 +89,8 @@ def login_google_callback():
 
     if "email" not in user_info:
         return jsonify({"error": "Couldn't get information from Google"}), 401
+    
+    print(user_info["email"])
 
     user, response, status_code = user_app_service.login_with_google(user_info["email"])
 
