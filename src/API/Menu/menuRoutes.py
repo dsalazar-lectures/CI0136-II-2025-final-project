@@ -1,18 +1,19 @@
 from flask import Blueprint, jsonify, request
+from collections import OrderedDict
+import threading
+
 from src.Application.Recipes import recipe_service
 from src.Application.Menu import menu_service
 from src.Application.Menu import MenuUseCase
-
-import threading
-
-_slot_counters = {"breakfast": 0, "lunch": 0, "dinner": 0, "dessert": 0}
-_slot_lock = threading.Lock()
-
 from src.Application.Menu.CustomizedMenuService import CustomizedMenuService
 from src.Application.Profiles.Services.ProfileApplicationService import (
     ProfileApplicationService,
 )
 from src.Infrastructure.Profiles.ProfileRepository import ProfileRepository
+
+_slot_counters = {"breakfast": 0, "lunch": 0, "dinner": 0, "dessert": 0}
+_slot_lock = threading.Lock()
+
 
 # Factory function to create blueprints with configurable profiles.csv path
 def create_menu_blueprints(profiles_csv_path="profiles.csv"):
@@ -25,19 +26,15 @@ def create_menu_blueprints(profiles_csv_path="profiles.csv"):
     @menu_bp.route("/menu", methods=["GET"])
     def get_menu():
 
-        from collections import OrderedDict
-
         slot_category_preferences = {
             "breakfast": ["desayuno", "breakfast"],
             "lunch": ["almuerzo", "lunch"],
             "dinner": ["cena", "dinner"],
             "dessert": ["postre", "dessert"],
         }
-
         ordered = OrderedDict()
 
         for slot, prefs in slot_category_preferences.items():
-            found = None
             chosen_recipe = None
             chosen_list_len = 0
             for cat in prefs:
@@ -77,7 +74,9 @@ def create_menu_blueprints(profiles_csv_path="profiles.csv"):
         if not recipes:
             return (
                 jsonify(
-                    {"message": f"No se encontraron recetas en la categoría '{category}'"}
+                    {
+                        "message": f"No se encontraron recetas en la categoría '{category}'"
+                    }
                 ),
                 404,
             )
