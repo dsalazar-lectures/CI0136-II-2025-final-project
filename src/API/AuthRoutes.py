@@ -90,9 +90,14 @@ def login_google_callback():
     if "email" not in user_info:
         return jsonify({"error": "Couldn't get information from Google"}), 401
 
-    # TODO(@Paulette): make login method only with email
+    user, response, status_code = user_app_service.login_with_google(user_info["email"])
 
-    return jsonify({"message": "Succesful Login"}), 200
+    if not user:
+        return jsonify(response), status_code
+
+    response_with_token = make_response(jsonify(response), status_code)
+
+    return response_with_token
 
 
 @auth_bp.route("/change-password", methods=["POST"])

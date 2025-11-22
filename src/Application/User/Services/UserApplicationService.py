@@ -95,6 +95,16 @@ class UserApplicationService:
 
         return user, {"message": "Login successful"}, token, 200
 
+    def login_with_google(self, email):
+
+        user = self.user_repository.get_user_by_email(email)
+        if not user:
+            return None, {"error": "Invalid email"}, 401
+
+        token = self.token_service.generate_token(user)
+
+        return user, {"message": "Login successful", "token": token}, 200
+
     def change_password(self, user, data):
         required_fields = ["old_password", "new_password"]
         is_valid, error_response, status_code = (
