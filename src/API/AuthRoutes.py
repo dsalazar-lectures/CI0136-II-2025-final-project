@@ -89,7 +89,7 @@ def login_google_callback():
 
     if "email" not in user_info:
         return jsonify({"error": "Couldn't get information from Google"}), 401
-    
+
     print(user_info["email"])
 
     user, response, status_code = user_app_service.login_with_google(user_info["email"])
