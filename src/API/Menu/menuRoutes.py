@@ -3,6 +3,11 @@ from src.Application.Recipes import recipe_service
 from src.Application.Menu import menu_service
 from src.Application.Menu import MenuUseCase
 
+import threading
+
+_slot_counters = {"breakfast": 0, "lunch": 0, "dinner": 0, "dessert": 0}
+_slot_lock = threading.Lock()
+
 from src.Application.Menu.CustomizedMenuService import CustomizedMenuService
 from src.Application.Profiles.Services.ProfileApplicationService import (
     ProfileApplicationService,
@@ -19,9 +24,38 @@ def create_menu_blueprints(profiles_csv_path="profiles.csv"):
 
     @menu_bp.route("/menu", methods=["GET"])
     def get_menu():
-        category = request.args.get("category")
-        recipe = recipe_service.get_random_recipe_by_category(category)
-        return jsonify([recipe.to_dict() if recipe else {}])
+
+        from collections import OrderedDict
+
+        slot_category_preferences = {
+            "breakfast": ["desayuno", "breakfast"],
+            "lunch": ["almuerzo", "lunch"],
+            "dinner": ["cena", "dinner"],
+            "dessert": ["postre", "dessert"],
+        }
+
+        ordered = OrderedDict()
+
+        for slot, prefs in slot_category_preferences.items():
+            found = None
+            chosen_recipe = None
+            chosen_list_len = 0
+            for cat in prefs:
+                recipes = recipe_service.get_recipes_by_category(cat)
+                if recipes:
+                    chosen_list_len = len(recipes)
+                    with _slot_lock:
+                        idx = _slot_counters.get(slot, 0) % chosen_list_len
+                        _slot_counters[slot] = _slot_counters.get(slot, 0) + 1
+                    chosen_recipe = recipes[idx]
+                    break
+
+            if chosen_recipe:
+                ordered[slot] = chosen_recipe.to_dict()
+            else:
+                ordered[slot] = {}
+
+        return jsonify(ordered)
 
     @menu_bp.route("/menu/<string:category>/<int:count>", methods=["GET"])
     def get_menus_number(category: str, count: int):
