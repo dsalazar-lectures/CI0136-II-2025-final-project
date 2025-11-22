@@ -44,6 +44,12 @@ class MockUserRepository(IUserRepository):
             if user.username == username:
                 return user
         return None
+    
+    def get_user_by_email(self, email):
+        for user in self._users:
+            if user.email == email:
+                return user
+        return None
 
     def get_user_by_id(self, user_id):
         for user in self._users:
