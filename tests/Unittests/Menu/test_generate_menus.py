@@ -1,14 +1,15 @@
 import unittest
 from unittest.mock import patch
 from flask import Flask
-from src.API.Menu.menuRoutes import menu_bp
+from src.API.Menu.menuRoutes import create_menu_blueprints
 from tests.Mocks.Recipes.mock_recipe_repo import MockRecipe
 
 
 class GenerateMenusTestCase(unittest.TestCase):
     def setUp(self):
+        menu_bp, _ = create_menu_blueprints("test_profiles.csv")
         app = Flask(__name__)
-        app.register_blueprint(menu_bp)
+        app.register_blueprint(menu_bp, url_prefix="/api")
         self.client = app.test_client()
 
     @patch("src.Application.Recipes.recipe_service.get_recipes_by_category")
@@ -19,7 +20,7 @@ class GenerateMenusTestCase(unittest.TestCase):
         ]
         mock_get_recipes.return_value = recipes
 
-        response = self.client.get("/menu/category1/2")
+        response = self.client.get("/api/menu/category1/2")
         self.assertEqual(response.status_code, 200)
         data = response.get_json()
         self.assertIsInstance(data, list)
@@ -38,7 +39,7 @@ class GenerateMenusTestCase(unittest.TestCase):
         mock_get_recipes.return_value = recipes
 
         # Request 3 menus but only 2 recipes exist -> expect repetition (r1, r2, r1)
-        response = self.client.get("/menu/categoryA/3")
+        response = self.client.get("/api/menu/categoryA/3")
         self.assertEqual(response.status_code, 200)
         data = response.get_json()
         self.assertEqual(len(data), 3)

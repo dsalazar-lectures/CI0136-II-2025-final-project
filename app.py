@@ -8,7 +8,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "src"))
 # Import blueprints
 from src.API.Ingredients.IngredientsRoutes import ingredients_bp
 from src.API.Recipes.recipesRoutes import recipes_bp
-from src.API.Menu.menuRoutes import menu_bp
+from src.API.Menu.menuRoutes import create_menu_blueprints
 from src.API.AuthRoutes import auth_bp
 from src.API.Profiles.ProfileRoutes import profiles_bp
 
@@ -20,10 +20,13 @@ def create_app():
 
     app.json.ensure_ascii = False
 
+    menu_bp, menu_recipes_bp = create_menu_blueprints()
+
     # Register blueprints
     app.register_blueprint(ingredients_bp)
     app.register_blueprint(recipes_bp, url_prefix="/api")
     app.register_blueprint(menu_bp, url_prefix="/api")
+    app.register_blueprint(menu_recipes_bp, url_prefix="/api")
     app.register_blueprint(auth_bp, url_prefix="/auth")
     app.register_blueprint(profiles_bp, url_prefix="/api")
     app.register_blueprint(dashboard_bp, url_prefix="/api")

@@ -2,12 +2,13 @@ import unittest
 from unittest.mock import patch
 from flask import Flask
 from src.Application.Menu import MenuUseCase
-from src.API.Menu.menuRoutes import menu_bp
+from src.API.Menu.menuRoutes import create_menu_blueprints
 from tests.Mocks.Recipes.mock_recipe_repo import MockRecipe
 
 
 class MenuEndpointTestCase(unittest.TestCase):
     def setUp(self):
+        menu_bp, _ = create_menu_blueprints("test_profiles.csv")
         app = Flask(__name__)
         app.register_blueprint(menu_bp, url_prefix="/api")
         self.client = app.test_client()
