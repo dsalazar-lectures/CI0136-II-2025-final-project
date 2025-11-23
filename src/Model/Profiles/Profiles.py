@@ -22,5 +22,5 @@ class Profile:
             "favorite_foods": self.favorite_foods,
             "unfavorite_foods": self.unfavorite_foods,
             "favorite_menus": self.favorite_menus,
-            "role": self.role,
+            "role": self.role.name,
         }
