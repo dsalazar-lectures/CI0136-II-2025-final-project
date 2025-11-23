@@ -68,13 +68,13 @@ def login():
     return response_with_header
 
 
-@google_bp.route("/login-google", methods=["GET", "POST"])
+@google_bp.route("/login-google", methods=["GET"])
 def login_google():
     return redirect(url_for("google.login"))
 
 
 # User will be redirected here after login
-@google_bp.route("/login-google/callback", methods=["GET", "POST"])
+@google_bp.route("/login-google/callback", methods=["GET"])
 def login_google_callback():
 
     if not google.authorized:
@@ -89,8 +89,6 @@ def login_google_callback():
 
     if "email" not in user_info:
         return jsonify({"error": "Couldn't get information from Google"}), 401
-
-    print(user_info["email"])
 
     user, response, status_code = user_app_service.login_with_google(user_info["email"])
 
