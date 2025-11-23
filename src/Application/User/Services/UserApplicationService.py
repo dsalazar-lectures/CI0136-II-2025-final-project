@@ -1,3 +1,4 @@
+import jwt
 from src.Application.DTOs.UserDTO import UserDTO
 from src.Application.Profiles.Services.ProfileApplicationService import (
     IProfileApplicationService,
@@ -6,7 +7,9 @@ from src.Application.Interfaces.IUserRepository import IUserRepository
 from src.Application.Interfaces.IEncryptionService import IEncryptionService
 from src.Application.Interfaces.IValidationService import IValidationService
 from src.Application.Interfaces.ITokenService import ITokenService
-import jwt
+from src.Shared.Logs.custom_logger import CustomLogger
+
+user_logger = CustomLogger(name="Users")
 
 
 class UserApplicationService:
@@ -42,12 +45,18 @@ class UserApplicationService:
             self.validation_service.validate_request_data(data, required_fields)
         )
         if not is_valid:
+            user_logger.log(
+                "warning", "-", "-", "REGISTER_FAILED", "-", "Missing fields"
+            )
             return None, error_response, status_code
 
         is_valid, valid_msg = self.validation_service.validate_userdata(
             data["username"], data["email"]
         )
         if not is_valid:
+            user_logger.log(
+                "warning", data["username"], "-", "REGISTER_FAILED", "-", valid_msg
+            )
             return None, {"error": valid_msg}, 400
 
         is_valid, valid_msg = self.validation_service.validate_password_format(
@@ -55,6 +64,9 @@ class UserApplicationService:
         )
 
         if not is_valid:
+            user_logger.log(
+                "warning", data["username"], "-", "REGISTER_FAILED", "-", valid_msg
+            )
             return None, {"error": valid_msg}, 400
 
         exists = self.user_repository.user_exists(data["username"], data["email"])
@@ -72,7 +84,19 @@ class UserApplicationService:
         user, message, status = self.user_repository.create_user(user_dto)
 
         if not user:
+            user_logger.log(
+                "error", data["username"], "-", "REGISTER_DB_FAIL", "-", message
+            )
             return None, {"error": message}, status
+
+        user_logger.log(
+            "info",
+            user.username,
+            user.role,
+            "REGISTER_SUCCESS",
+            user.id,
+            "User registered successfully",
+        )
 
         self.profile_service.create_profile(user.id)
         return user, {"message": message, "user": user_dto.to_dict()}, status
@@ -83,16 +107,32 @@ class UserApplicationService:
             self.validation_service.validate_request_data(data, required_fields)
         )
         if not is_valid:
+            user_logger.log("warning", "-", "-", "LOGIN_FAILED", "-", "Missing fields")
             return None, error_response, None, status_code
 
         user = self.user_repository.get_user_by_username(data["username"])
         if not user:
+            user_logger.log(
+                "warning", data["username"], "-", "LOGIN_FAILED", "-", "User not found"
+            )
             return None, {"error": "Invalid username or password"}, None, 401
 
         if not self.encryption_service.verify_password(data["password"], user.password):
+            user_logger.log(
+                "warning",
+                user.username,
+                user.role,
+                "LOGIN_FAILED",
+                user.id,
+                "Incorrect password",
+            )
             return None, {"error": "Invalid username or password"}, None, 401
 
         token = self.token_service.generate_token(user)
+
+        user_logger.log(
+            "info", user.username, user.role, "LOGIN_SUCCESS", user.id, "User logged in"
+        )
 
         return user, {"message": "Login successful"}, token, 200
 
@@ -102,6 +142,14 @@ class UserApplicationService:
             self.validation_service.validate_request_data(data, required_fields)
         )
         if not is_valid:
+            user_logger.log(
+                "warning",
+                user.username,
+                user.role,
+                "PWD_CHANGE_FAILED",
+                user.id,
+                "Missing fields",
+            )
             return None, error_response, status_code
 
         old_password = data["old_password"]
@@ -109,6 +157,14 @@ class UserApplicationService:
 
         # Verify old password
         if not self.encryption_service.verify_password(old_password, user.password):
+            user_logger.log(
+                "warning",
+                user.username,
+                user.role,
+                "PWD_CHANGE_FAILED",
+                user.id,
+                "Old password incorrect",
+            )
             return None, {"error": "Old password is incorrect"}, 401
 
         # Validate new password format
@@ -142,7 +198,24 @@ class UserApplicationService:
             user.username, hashed_new_password
         )
         if not success:
+            user_logger.log(
+                "error",
+                user.username,
+                user.role,
+                "PWD_CHANGE_DB_FAIL",
+                user.id,
+                message,
+            )
             return None, {"error": message}, status
+
+        user_logger.log(
+            "info",
+            user.username,
+            user.role,
+            "PWD_CHANGE_SUCCESS",
+            user.id,
+            "Password updated",
+        )
 
         return user, {"message": "Password updated successfully"}, 200
 
