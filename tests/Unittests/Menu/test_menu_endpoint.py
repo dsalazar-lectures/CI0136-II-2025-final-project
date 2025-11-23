@@ -24,7 +24,9 @@ class MenuEndpointTestCase(unittest.TestCase):
         for meal in expected_keys:
             self.assertEqual(data[meal], {})
 
-    @patch("src.Infrastructure.Recipes.CSVRecipeRepository.CSVRecipeRepository.find_by_categories")
+    @patch(
+        "src.Infrastructure.Recipes.CSVRecipeRepository.CSVRecipeRepository.find_by_categories"
+    )
     def test_get_menu_returns_recipes(self, find_by_categories_mock):
         recipes = [
             MockRecipe(1, "breakfast_recipe", ["breakfast"]),
