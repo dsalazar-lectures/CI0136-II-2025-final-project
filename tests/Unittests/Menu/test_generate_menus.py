@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import patch
 from flask import Flask
 from src.API.Menu.menuRoutes import create_menu_blueprints
-from tests.Mocks.Recipes.mock_recipe_repo import MockRecipe
+from tests.Mocks.Recipes.mock_recipe import MockRecipe
 
 
 class GenerateMenusTestCase(unittest.TestCase):

@@ -1,5 +1,5 @@
 import unittest
-from tests.Mocks.Recipes.mock_recipe_repo import MockRecipe
+from tests.Mocks.Recipes.mock_recipe import MockRecipe
 from src.Application.Menu import menu_service
 
 

@@ -1,8 +1,8 @@
 import unittest
 from unittest.mock import patch
 from src.Application.Recipes import recipe_service
-from tests.Mocks.Recipes.mock_recipe import MockRecipeRepo
-from tests.Mocks.Recipes.mock_recipe_repo import MockRecipe
+from tests.Mocks.Recipes.mock_recipe import MockRecipe
+from tests.Mocks.Recipes.mock_recipe_repo import MockRecipeRepo
 
 
 class RecipeServiceTestCase(unittest.TestCase):
