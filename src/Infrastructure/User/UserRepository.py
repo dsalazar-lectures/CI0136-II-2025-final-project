@@ -62,3 +62,6 @@ class UserRepository(IUserRepository):
 
     def update_user_key(self, username, new_key) -> bool:
         return self.user_csv.update_user_key(username, new_key)
+
+    def delete_user(self, user_id: int) -> bool:
+        return self.user_csv.delete_user(user_id)
