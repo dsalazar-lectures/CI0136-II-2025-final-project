@@ -1,9 +1,11 @@
-from Application.Interfaces.IPasswordResetTokenRepository import IPasswordResetTokenRepository
+from Application.Interfaces.IPasswordResetTokenRepository import (
+    IPasswordResetTokenRepository,
+)
 from src.Database.User.PasswordResetTokenCSV import PasswordResetTokenCSV
 import datetime
 
-class PasswordResetTokenRepository(IPasswordResetTokenRepository):
 
+class PasswordResetTokenRepository(IPasswordResetTokenRepository):
     def __init__(self, csv_file_path="password_reset_tokens.csv"):
         self.token_csv = PasswordResetTokenCSV(csv_file_path)
 

@@ -24,7 +24,6 @@ class UserCSV:
         return False
 
     def create_user(self, user_dto):
-
         next_id = 1
         if os.path.exists(self.file_path):
             with open(self.file_path, "r", newline="") as file:
@@ -172,17 +171,20 @@ class UserCSV:
         updated = False
         rows = []
 
-        with open(self.file_path, 'r', newline='') as file:
+        with open(self.file_path, "r", newline="") as file:
             reader = csv.DictReader(file)
             for row in reader:
-                if row['username'] == username:
-                    row['email'] = new_email
+                if row["username"] == username:
+                    row["email"] = new_email
                     updated = True
                 rows.append(row)
 
         if updated:
-            with open(self.file_path, 'w', newline='') as file:
-                writer = csv.DictWriter(file, fieldnames=['id', 'username', 'password', 'email', 'role', 'key'])
+            with open(self.file_path, "w", newline="") as file:
+                writer = csv.DictWriter(
+                    file,
+                    fieldnames=["id", "username", "password", "email", "role", "key"],
+                )
                 writer.writeheader()
                 writer.writerows(rows)
             return True, "Email updated successfully", 200

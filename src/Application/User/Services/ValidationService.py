@@ -3,7 +3,6 @@ from src.Application.Interfaces.IValidationService import IValidationService
 
 
 class ValidationService(IValidationService):
-
     @staticmethod
     def validate_request_data(data, required_fields):
         # Validate request data
@@ -54,7 +53,6 @@ class ValidationService(IValidationService):
 
     @staticmethod
     def validate_email_format(email: str):
-        
         # Validates that the email has a correct format using a regex pattern.
         pattern = r"^[\w\.-]+@[\w\.-]+\.\w+$"
         if re.match(pattern, email):

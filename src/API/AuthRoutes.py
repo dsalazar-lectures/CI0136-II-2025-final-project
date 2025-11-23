@@ -13,8 +13,12 @@ from src.Application.User.Services.AccountApplicationService import (
     AccountApplicationService,
 )
 # New imports for password reset
-from Infrastructure.User.PasswordResetTokenRepository import PasswordResetTokenRepository
-from Application.User.Services.PasswordResetTokenService import PasswordResetTokenService
+from Infrastructure.User.PasswordResetTokenRepository import (
+    PasswordResetTokenRepository,
+)
+from Application.User.Services.PasswordResetTokenService import (
+    PasswordResetTokenService,
+)
 
 auth_bp = Blueprint("auth", __name__)
 
@@ -40,8 +44,8 @@ user_app_service = UserApplicationService(
     encryption_service=encryption_service,
     token_service=token_service,
     profile_service=profile_service,
-    #new ref for password reset service
-    password_reset_service=password_reset_service
+    # new ref for password reset service
+    password_reset_service=password_reset_service,
 )
 
 
@@ -86,9 +90,7 @@ def change_password():
         return jsonify({"error": "User not authenticated"}), 401
 
     header = request.headers
-    user, response, status_code = user_app_service.verify_valid_session(
-        header, username
-    )
+    user, response, status_code = user_app_service.verify_valid_session(header, username)
 
     if not user:
         return jsonify(response), status_code
@@ -101,18 +103,18 @@ def change_password():
 def change_email():
     # Allows an authenticated user to change their email.
     # Requires: username, old_email, new_email, password
-    
+
     if "Authorization" not in request.headers or not request.headers["Authorization"]:
         return jsonify({"error": "Missing signature"}), 401
 
     # Get JSON data from the request
     data = request.get_json()
     if not data:
-        return jsonify({'error': 'Invalid JSON'}), 400
+        return jsonify({"error": "Invalid JSON"}), 400
 
-    username = data.get('username')
+    username = data.get("username")
     if not username:
-        return jsonify({'error': 'User not authenticated'}), 401
+        return jsonify({"error": "User not authenticated"}), 401
 
     # Verificar sesión válida
     header = request.headers
@@ -127,7 +129,7 @@ def change_email():
     return jsonify(response), status_code
 
 
-@auth_bp.route('/forgot-password', methods=['POST'])
+@auth_bp.route("/forgot-password", methods=["POST"])
 def forgot_password():
     # Delegate all logic to UserApplicationService
     data = request.get_json()
@@ -135,7 +137,7 @@ def forgot_password():
     return jsonify(response), status_code
 
 
-@auth_bp.route('/reset-password', methods=['POST'])
+@auth_bp.route("/reset-password", methods=["POST"])
 def reset_password():
     # Delegate all logic to UserApplicationService
     data = request.get_json()
@@ -159,9 +161,7 @@ def regenerate_key():
     except jwt.InvalidTokenError:
         return jsonify({"error": "Invalid token"}), 401
 
-    user, resp, status = user_app_service.verify_valid_session(
-        request.headers, username
-    )
+    user, resp, status = user_app_service.verify_valid_session(request.headers, username)
     if not user:
         return jsonify(resp), status
 

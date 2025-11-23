@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 from typing import Optional
 import datetime
 
+
 class IPasswordResetTokenRepository(ABC):
     @abstractmethod
     # Persist a token for user_id that expires at expires_at.
@@ -20,7 +21,7 @@ class IPasswordResetTokenRepository(ABC):
     def invalidate_token(self, token: str):
         pass
 
-    #Invalidate all tokens for a specific user.
+    # Invalidate all tokens for a specific user.
     @abstractmethod
     def invalidate_all_user_tokens(self, user_id: str):
         pass
