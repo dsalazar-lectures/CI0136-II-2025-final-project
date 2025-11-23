@@ -67,3 +67,13 @@ jobs:
         run: |
           # check formatting for tracked python files; fail CI if not formatted
           black --check $(git ls-files '*.py')
+
+  detect-secrets:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Run detect-secrets
+        uses: secret-scanner/action@0.0.2
