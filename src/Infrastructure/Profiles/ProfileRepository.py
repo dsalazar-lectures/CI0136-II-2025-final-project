@@ -107,3 +107,37 @@ class ProfileRepository(IProfileRepository):
     def is_menu_in_favorites(self, user_id: int, menu_id: str) -> bool:
         """Check if a menu is in user's favorites"""
         return menu_id in self.get_favorite_menus(user_id)
+
+    def delete_profile(self, user_id: int) -> bool:
+        """Delete a user's profile.
+        Returns True if successful. False on failure."""
+        return self.profile_database.delete_profile(user_id)
+
+    def restore_profile(self, user_id: int, favorites: list) -> Optional[Profile]:
+        profile_data = {
+            "user_id": user_id,
+            "favorite_foods": favorites,
+            "unfavorite_foods": [],
+            "favorite_menus": [],
+        }
+        restored_profile_data = self.profile_database.create_profile(profile_data)
+        if restored_profile_data:
+            return Profile(
+                user_id=int(restored_profile_data["user_id"]),
+                favorite_foods=(
+                    restored_profile_data["favorite_foods"].split(";")
+                    if restored_profile_data["favorite_foods"]
+                    else []
+                ),
+                unfavorite_foods=(
+                    restored_profile_data["unfavorite_foods"].split(";")
+                    if restored_profile_data["unfavorite_foods"]
+                    else []
+                ),
+                favorite_menus=(
+                    restored_profile_data["favorite_menus"].split(";")
+                    if restored_profile_data["favorite_menus"]
+                    else []
+                ),
+            )
+        return None

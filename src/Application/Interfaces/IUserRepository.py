@@ -25,3 +25,7 @@ class IUserRepository(ABC):
     @abstractmethod
     def update_user_key(self, username, new_key) -> bool:
         pass
+
+    @abstractmethod
+    def delete_user(self, user_id: int) -> bool:
+        pass

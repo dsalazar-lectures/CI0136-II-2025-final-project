@@ -10,3 +10,7 @@ class IProfileApplicationService(ABC):
     @abstractmethod
     def get_profile(self, user_id: int):
         pass
+
+    @abstractmethod
+    def delete_profile(self, user_id: int) -> bool:
+        pass
