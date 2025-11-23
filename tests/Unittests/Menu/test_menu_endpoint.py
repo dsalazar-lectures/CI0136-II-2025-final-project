@@ -3,7 +3,7 @@ from unittest.mock import patch
 from flask import Flask
 from src.Application.Menu import MenuUseCase
 from src.API.Menu.menuRoutes import create_menu_blueprints
-from tests.Mocks.Recipes.mock_recipe_repo import MockRecipe
+from tests.Mocks.Recipes.mock_recipe import MockRecipe
 
 
 class MenuEndpointTestCase(unittest.TestCase):
@@ -13,44 +13,42 @@ class MenuEndpointTestCase(unittest.TestCase):
         app.register_blueprint(menu_bp, url_prefix="/api")
         self.client = app.test_client()
 
-    @patch("src.Application.Recipes.recipe_service.get_recipes_by_category")
-    def test_get_menu_returns_empty_list_when_recipes_repo_empty(
-        self, mock_get_recipes
-    ):
-        mock_get_recipes.return_value = []
-        response = self.client.get("/api/menu?category=unknown")
-        self.assertEqual(response.status_code, 200)
-        data = response.get_json()
-        self.assertEqual(data, [{}])
-
-    @patch("src.Application.Recipes.recipe_service.get_random_recipe_by_category")
-    def test_get_menu_returns_one_random_recipe(self, mock_get_random_recipe):
-        recipe = MockRecipe(1, "recipe1", ["category1", "category2"])
-        mock_get_random_recipe.return_value = recipe
-        response = self.client.get("/api/menu?category=category1")
-        self.assertEqual(response.status_code, 200)
-        data = response.get_json()
-        self.assertIsInstance(data, list)
-        self.assertEqual(len(data), 1)
-        self.assertEqual(data[0]["name"], "recipe1")
-
-    @patch("src.Application.Recipes.recipe_service.get_random_recipe_by_category")
-    def test_get_menu_empty_category(self, mock_get_random_recipe):
+    @patch("src.Application.Recipes.recipe_service.get_random_recipe_by_categories")
+    def test_get_menu_returns_empty_when_no_recipes(self, mock_get_random_recipe):
         mock_get_random_recipe.return_value = None
-        response = self.client.get("/api/menu?category=unknown")
+        response = self.client.get("/api/menu")
         self.assertEqual(response.status_code, 200)
         data = response.get_json()
-        self.assertEqual(data, [{}])
+        expected_keys = sorted(["breakfast", "lunch", "dinner", "dessert"])
+        self.assertEqual(list(data.keys()), expected_keys)
+        for meal in expected_keys:
+            self.assertEqual(data[meal], {})
 
-    @patch("src.Application.Recipes.recipe_service.get_random_recipe_by_category")
-    def test_get_menu_category_filter(self, mock_get_random_recipe):
-        recipe = MockRecipe(2, "recipe2", ["category2"])
-        mock_get_random_recipe.return_value = recipe
-        response = self.client.get("/api/menu?category=category2")
+    @patch("src.Infrastructure.Recipes.CSVRecipeRepository.CSVRecipeRepository.find_by_categories")
+    def test_get_menu_returns_recipes(self, find_by_categories_mock):
+        recipes = [
+            MockRecipe(1, "breakfast_recipe", ["breakfast"]),
+            MockRecipe(1, "lunch_recipe", ["lunch"]),
+            MockRecipe(1, "dinner_recipe", ["dinner"]),
+            MockRecipe(1, "dessert_recipe", ["dessert"]),
+        ]
+
+        def side_effect(categories):
+            for recipe in recipes:
+                if any(cat in recipe.categories for cat in categories):
+                    return [recipe]
+            return []
+
+        find_by_categories_mock.side_effect = side_effect
+        response = self.client.get("/api/menu")
         self.assertEqual(response.status_code, 200)
         data = response.get_json()
-        self.assertEqual(len(data), 1)
-        self.assertEqual(data[0]["name"], "recipe2")
+        expected_keys = sorted(["breakfast", "lunch", "dinner", "dessert"])
+        self.assertEqual(list(data.keys()), expected_keys)
+        for meal in expected_keys:
+            self.assertIsInstance(data[meal], dict)
+            self.assertIn("name", data[meal])
+            self.assertEqual(data[meal]["name"], f"{meal}_recipe")
 
     def test_get_menu_emailPdf_invalid_address(self):
         response = MenuUseCase.emailPdf(1, "test.gmail.com")
