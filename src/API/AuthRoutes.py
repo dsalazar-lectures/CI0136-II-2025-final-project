@@ -12,6 +12,9 @@ from src.Application.Profiles.Services.ProfileApplicationService import (
 from src.Application.User.Services.AccountApplicationService import (
     AccountApplicationService,
 )
+# New imports for password reset
+from Infrastructure.User.PasswordResetTokenRepository import PasswordResetTokenRepository
+from Application.User.Services.PasswordResetTokenService import PasswordResetTokenService
 
 auth_bp = Blueprint("auth", __name__)
 
@@ -20,6 +23,10 @@ validation_service = ValidationService()
 encryption_service = EncryptionService()
 token_service = TokenService()
 profile_service = ProfileApplicationService(profile_repository=ProfileRepository())
+
+# New setup for password reset service
+token_repository = PasswordResetTokenRepository()
+password_reset_service = PasswordResetTokenService(token_repository)
 
 account_app_service = AccountApplicationService(
     user_repository=user_repository,
@@ -33,6 +40,8 @@ user_app_service = UserApplicationService(
     encryption_service=encryption_service,
     token_service=token_service,
     profile_service=profile_service,
+    #new ref for password reset service
+    password_reset_service=password_reset_service
 )
 
 
@@ -85,6 +94,52 @@ def change_password():
         return jsonify(response), status_code
 
     _, response, status_code = user_app_service.change_password(user, data)
+    return jsonify(response), status_code
+
+
+@auth_bp.route("/change-email", methods=["POST"])
+def change_email():
+    # Allows an authenticated user to change their email.
+    # Requires: username, old_email, new_email, password
+    
+    if "Authorization" not in request.headers or not request.headers["Authorization"]:
+        return jsonify({"error": "Missing signature"}), 401
+
+    # Get JSON data from the request
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': 'Invalid JSON'}), 400
+
+    username = data.get('username')
+    if not username:
+        return jsonify({'error': 'User not authenticated'}), 401
+
+    # Verificar sesión válida
+    header = request.headers
+    user, response, status_code = user_app_service.verify_valid_session(header, username)
+
+    if not user:
+        return jsonify(response), status_code
+
+    # Call the application service to handle the email change logic
+    _, response, status_code = user_app_service.change_email(user, data)
+
+    return jsonify(response), status_code
+
+
+@auth_bp.route('/forgot-password', methods=['POST'])
+def forgot_password():
+    # Delegate all logic to UserApplicationService
+    data = request.get_json()
+    user, response, status_code = user_app_service.request_password_reset(data)
+    return jsonify(response), status_code
+
+
+@auth_bp.route('/reset-password', methods=['POST'])
+def reset_password():
+    # Delegate all logic to UserApplicationService
+    data = request.get_json()
+    user, response, status_code = user_app_service.reset_password(data)
     return jsonify(response), status_code
 
 
