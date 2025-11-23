@@ -77,3 +77,5 @@ jobs:
           fetch-depth: 0
       - name: Run detect-secrets
         uses: secret-scanner/action@0.0.2
+        with:
+          detect_secrets_version: 1.5.0
