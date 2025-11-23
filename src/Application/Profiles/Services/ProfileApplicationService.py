@@ -22,3 +22,12 @@ class ProfileApplicationService(IProfileApplicationService):
             f.replace("-", " ").strip().lower() for f in favorites if isinstance(f, str)
         ]
         return self.profile_repository.update_favorite_foods(user_id, favorites_norm)
+
+    def delete_profile(self, user_id):
+        return self.profile_repository.delete_profile(user_id)
+
+    def restore_profile(self, user_id: int, favorites: List[str]) -> Optional[Profile]:
+        favorites_norm = [
+            f.replace("-", " ").strip().lower() for f in favorites if isinstance(f, str)
+        ]
+        return self.profile_repository.restore_profile(user_id, favorites_norm)
