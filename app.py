@@ -42,7 +42,7 @@ def create_app():
             "endpoints": [
                 "POST /auth/register",
                 "POST /auth/login",
-                "GET /login-google",
+                "GET /auth/login-google",
                 "POST /auth/regenerate-key",
                 "POST /auth/change-password",
                 "GET /api/ingredients - Get all ingredients",

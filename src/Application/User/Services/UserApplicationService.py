@@ -103,7 +103,11 @@ class UserApplicationService:
 
         token = self.token_service.generate_token(user)
 
-        return user, {"message": "Login successful", "token": token}, 200
+        return (
+            user,
+            {"message": "Login successful", "user": user.username, "token": token},
+            200,
+        )
 
     def change_password(self, user, data):
         required_fields = ["old_password", "new_password"]
