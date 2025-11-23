@@ -1,6 +1,5 @@
 from flask import Blueprint, jsonify, request
 from collections import OrderedDict
-import threading
 
 from src.Application.Recipes import recipe_service
 from src.Application.Menu import menu_service
@@ -10,9 +9,6 @@ from src.Application.Profiles.Services.ProfileApplicationService import (
     ProfileApplicationService,
 )
 from src.Infrastructure.Profiles.ProfileRepository import ProfileRepository
-
-_slot_counters = {"breakfast": 0, "lunch": 0, "dinner": 0, "dessert": 0}
-_slot_lock = threading.Lock()
 
 
 # Factory function to create blueprints with configurable profiles.csv path
@@ -25,34 +21,20 @@ def create_menu_blueprints(profiles_csv_path="profiles.csv"):
 
     @menu_bp.route("/menu", methods=["GET"])
     def get_menu():
-
-        slot_category_preferences = {
+        meal_categories = {
             "breakfast": ["desayuno", "breakfast"],
             "lunch": ["almuerzo", "lunch"],
             "dinner": ["cena", "dinner"],
             "dessert": ["postre", "dessert"],
         }
-        ordered = OrderedDict()
 
-        for slot, prefs in slot_category_preferences.items():
-            chosen_recipe = None
-            chosen_list_len = 0
-            for cat in prefs:
-                recipes = recipe_service.get_recipes_by_category(cat)
-                if recipes:
-                    chosen_list_len = len(recipes)
-                    with _slot_lock:
-                        idx = _slot_counters.get(slot, 0) % chosen_list_len
-                        _slot_counters[slot] = _slot_counters.get(slot, 0) + 1
-                    chosen_recipe = recipes[idx]
-                    break
+        menu = OrderedDict()
 
-            if chosen_recipe:
-                ordered[slot] = chosen_recipe.to_dict()
-            else:
-                ordered[slot] = {}
+        for meal, categories in meal_categories.items():
+            recipe = recipe_service.get_random_recipe_by_categories(categories)
+            menu[meal] = recipe.to_dict() if recipe else {}
 
-        return jsonify(ordered)
+        return jsonify(menu)
 
     @menu_bp.route("/menu/<string:category>/<int:count>", methods=["GET"])
     def get_menus_number(category: str, count: int):
