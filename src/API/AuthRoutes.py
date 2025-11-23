@@ -11,6 +11,9 @@ from src.Infrastructure.Profiles.ProfileRepository import ProfileRepository
 from src.Application.Profiles.Services.ProfileApplicationService import (
     ProfileApplicationService,
 )
+from src.Application.User.Services.AccountApplicationService import (
+    AccountApplicationService,
+)
 
 auth_bp = Blueprint("auth", __name__)
 
@@ -19,6 +22,12 @@ validation_service = ValidationService()
 encryption_service = EncryptionService()
 token_service = TokenService()
 profile_service = ProfileApplicationService(profile_repository=ProfileRepository())
+
+account_app_service = AccountApplicationService(
+    user_repository=user_repository,
+    profile_service=profile_service,
+    token_service=token_service,
+)
 
 user_app_service = UserApplicationService(
     user_repository=user_repository,
@@ -152,34 +161,16 @@ def regenerate_key():
 
 @auth_bp.route("/delete-account", methods=["DELETE"])
 def delete_account():
-    auth = request.headers.get("Authorization", "")
-    parts = auth.split()
-    if len(parts) != 2 or parts[0].lower() != "bearer":
-        return jsonify({"error": "Missing token"}), 401
-    token = parts[1].strip()
+    # Get username to delete from request body
+    json_data = request.get_json()
+    username_to_delete = json_data.get("username") if json_data else None
 
-    try:
-        payload = jwt.decode(token, options={"verify_signature": False})
-        username = payload.get("username")
-        if not username:
-            return jsonify({"error": "Invalid token payload"}), 401
-    except jwt.InvalidTokenError:
-        return jsonify({"error": "Invalid token"}), 401
+    if not username_to_delete:
+        return jsonify({"error": "Username to delete is required"}), 400
 
-    user, resp, status = user_app_service.verify_valid_session(
-        request.headers, username
+    # Call the service to delete the user account
+    user, response, status_code = account_app_service.delete_user_account(
+        request.headers, username_to_delete
     )
-    if not user:
-        return jsonify(resp), status
 
-    # Delete user profile
-    profile_deleted = profile_service.delete_profile(user.id)
-    if not profile_deleted:
-        return jsonify({"error": "Failed to delete user profile"}), 500
-
-    # Delete user account
-    user_deleted = user_repository.delete_user(user.id)
-    if not user_deleted:
-        return jsonify({"error": "Failed to delete user account"}), 500
-
-    return jsonify({"message": "User account and profile deleted successfully"}), 200
+    return jsonify(response), status_code

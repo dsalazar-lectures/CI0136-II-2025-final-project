@@ -45,3 +45,9 @@ class IProfileRepository(ABC):
         """Delete a user's profile.
         Returns True if successful. False on failure."""
         pass
+
+    @abstractmethod
+    def restore_profile(self, user_id: int, favorites: list) -> Optional[Profile]:
+        """Restore a user's profile with given favorite foods.
+        Returns the restored Profile if successful, None on failure."""
+        pass
