@@ -2,7 +2,7 @@ import unittest
 import sys
 from pathlib import Path
 
-sys.path.append(str(Path(__file__).resolve().parents[3] / "src"))
+sys.path.append(str(Path(__file__).resolve().parents[3]))
 
 from src.Services.Metrics.Dashboard import LogsDashboard
 from tests.Mocks.Dashboard.Mock_Dasboard import MocksLogsDashboard

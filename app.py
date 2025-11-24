@@ -13,6 +13,8 @@ from src.API.AuthRoutes import auth_bp
 from src.API.Profiles.ProfileRoutes import profiles_bp
 
 from src.API.Metrics.DashboardRoute import dashboard_bp
+from src.Shared.Logs.custom_logger import CustomLogger
+from src.Shared.Logs.build_handlers import build_handlers
 
 
 def create_app():
@@ -31,6 +33,9 @@ def create_app():
     app.register_blueprint(profiles_bp, url_prefix="/api")
     app.register_blueprint(dashboard_bp, url_prefix="/api")
 
+    # Create logger singleton instance
+    CustomLogger(handlers=build_handlers())
+
     # Health check endpoint
     @app.route("/")
     def health_check():
@@ -41,6 +46,7 @@ def create_app():
                 "POST /auth/login",
                 "POST /auth/regenerate-key",
                 "POST /auth/change-password",
+                "DELETE /auth/delete-account - Deletes user account",
                 "GET /api/ingredients - Get all ingredients",
                 "GET /api/ingredients/<id> - Get ingredient by ID",
                 "GET /api/recipes - Get all recipes",

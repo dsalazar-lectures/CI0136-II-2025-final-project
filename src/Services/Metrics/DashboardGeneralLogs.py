@@ -4,7 +4,7 @@ from typing import Iterable, List
 import pandas as pd
 import streamlit as st
 
-from Services.Metrics.GeneralLogs import GeneralLogs
+from src.Services.Metrics.GeneralLogs import GeneralLogs
 
 
 # ------------------------------------------------------------------------------------
