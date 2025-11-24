@@ -23,7 +23,7 @@ class MockUserRepository(IUserRepository):
             password=user_dto.password,
             email=user_dto.email,
             role=user_dto.role,
-            key="mock_key",
+            key=user_dto.key,
         )
 
         mock_user = MockUser(
@@ -32,7 +32,7 @@ class MockUserRepository(IUserRepository):
             password=user_dto.password,
             email=user_dto.email,
             role=user_dto.role,
-            key="mock_key",
+            key=user_dto.key,
         )
         self._users.append(mock_user)
         self._next_id += 1
@@ -42,6 +42,12 @@ class MockUserRepository(IUserRepository):
     def get_user_by_username(self, username):
         for user in self._users:
             if user.username == username:
+                return user
+        return None
+
+    def get_user_by_email(self, email):
+        for user in self._users:
+            if user.email == email:
                 return user
         return None
 
