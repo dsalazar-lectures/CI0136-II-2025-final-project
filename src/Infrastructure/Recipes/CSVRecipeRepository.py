@@ -13,11 +13,11 @@ class CSVRecipeRepository(IRecipeRepository):
         load_api_recipes()
         all_recipes = system_recipes + api_recipes
         return all_recipes
-    
+
     def get_api_recipes():
         load_api_recipes()
         return api_recipes
-    
+
     def get_system_recipes():
         load_recipes()
         return system_recipes
@@ -26,9 +26,7 @@ class CSVRecipeRepository(IRecipeRepository):
         load_recipes()
         load_api_recipes()
         all_recipes = system_recipes + api_recipes
-        return next(
-            (recipe for recipe in all_recipes if recipe.id == recipe_id), None
-        )
+        return next((recipe for recipe in all_recipes if recipe.id == recipe_id), None)
 
     def find_by_ingredient(self, ingredient):
         load_recipes()
