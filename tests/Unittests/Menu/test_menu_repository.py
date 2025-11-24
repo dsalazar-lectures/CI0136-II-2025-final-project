@@ -15,7 +15,9 @@ class TestMenuRepository(unittest.TestCase):
 
         # Paths for normal and custom menus CSV inside the temp dir
         self.menus_csv_path = os.path.join(self.temp_dir.name, "menus.csv")
-        self.custom_menus_csv_path = os.path.join(self.temp_dir.name, "custom_menus.csv")
+        self.custom_menus_csv_path = os.path.join(
+            self.temp_dir.name, "custom_menus.csv"
+        )
 
         # Initialize normal menus CSV with headers
         headers = [

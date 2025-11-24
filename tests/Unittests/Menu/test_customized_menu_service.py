@@ -1,6 +1,6 @@
 import unittest
 import inspect
-from typing import List, Optional
+from typing import List
 from src.Application.Menu.ICustomizedMenuService import ICustomizedMenuService
 from src.Application.Menu.CustomizedMenuService import CustomizedMenuService
 
@@ -139,7 +139,14 @@ class TestCustomizedMenuServiceBehavior(unittest.TestCase):
         result = sut.recommend_by_favorites("tomate;queso", limit=10)
         # should return recipes that include tomate or queso
         self.assertTrue(len(result) > 0)
-        self.assertTrue(all(any("tomate" in i.lower() or "queso" in i.lower() for i in r.ingredients) for r in result))
+        self.assertTrue(
+            all(
+                any(
+                    "tomate" in i.lower() or "queso" in i.lower() for i in r.ingredients
+                )
+                for r in result
+            )
+        )
 
     def test_negative_limit_returns_empty(self):
         """Negative limits are treated as 0 and should return empty list"""
@@ -180,6 +187,7 @@ class TestCustomizedMenuServiceBehavior(unittest.TestCase):
         sut = build_sut([], require_all=False)
         result = sut.recommend_by_favorites(["tomate"], "almuerzo", limit=10)
         self.assertEqual(result, [])
+
 
 if __name__ == "__main__":
     unittest.main()

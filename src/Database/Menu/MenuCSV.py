@@ -233,16 +233,22 @@ class MenuCSV:
                     "menu_id": str(next_menu_id),
                     "day": str(day),  # Always the same day for this customized menu
                     "breakfast_recipe_id": (
-                        str(breakfast_ids[row_index]) if row_index < len(breakfast_ids) else "0"
+                        str(breakfast_ids[row_index])
+                        if row_index < len(breakfast_ids)
+                        else "0"
                     ),
                     "lunch_recipe_id": (
                         str(lunch_ids[row_index]) if row_index < len(lunch_ids) else "0"
                     ),
                     "dinner_recipe_id": (
-                        str(dinner_ids[row_index]) if row_index < len(dinner_ids) else "0"
+                        str(dinner_ids[row_index])
+                        if row_index < len(dinner_ids)
+                        else "0"
                     ),
                     "dessert_recipe_id": (
-                        str(dessert_ids[row_index]) if row_index < len(dessert_ids) else "0"
+                        str(dessert_ids[row_index])
+                        if row_index < len(dessert_ids)
+                        else "0"
                     ),
                 }
                 writer.writerow(row)

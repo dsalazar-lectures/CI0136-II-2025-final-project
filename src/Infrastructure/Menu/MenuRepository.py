@@ -5,8 +5,11 @@ from src.Application.Menu.IMenuRepository import IMenuRepository
 
 
 class MenuRepository(IMenuRepository):
-    def __init__(self, csv_file_path="src/Database/Menu/menus.csv", 
-                 custom_csv_file_path="src/Database/Menu/custom_menus.csv"):
+    def __init__(
+        self,
+        csv_file_path="src/Database/Menu/menus.csv",
+        custom_csv_file_path="src/Database/Menu/custom_menus.csv",
+    ):
         self.menu_csv = MenuCSV(csv_file_path)
         # CSV for customized menus
         self.custom_menu_csv = MenuCSV(custom_csv_file_path)
@@ -95,4 +98,6 @@ class MenuRepository(IMenuRepository):
         return normal + custom
 
     def menu_exists(self, menu_id: int) -> bool:
-        return self.menu_csv.menu_exists(menu_id) or self.custom_menu_csv.menu_exists(menu_id)
+        return self.menu_csv.menu_exists(menu_id) or self.custom_menu_csv.menu_exists(
+            menu_id
+        )

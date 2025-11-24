@@ -76,9 +76,7 @@ class MenuEndpointTestCase(unittest.TestCase):
         ]
         mock_customized_service.recommend_by_favorites.return_value = fake_recipes
 
-        response = self.client.get(
-            "/api/menu/customized?user_id=1&category=almuerzo"
-        )
+        response = self.client.get("/api/menu/customized?user_id=1&category=almuerzo")
 
         self.assertEqual(response.status_code, 200)
         data = response.get_json()
@@ -108,9 +106,7 @@ class MenuEndpointTestCase(unittest.TestCase):
             201,
         )
 
-        response = self.client.post(
-            "/api/menu/customized?user_id=1&category=almuerzo"
-        )
+        response = self.client.post("/api/menu/customized?user_id=1&category=almuerzo")
 
         self.assertEqual(response.status_code, 201)
         data = response.get_json()
@@ -132,6 +128,7 @@ class MenuEndpointTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 404)
         data = response.get_json()
         self.assertEqual(data, {"error": "Perfil no encontrado"})
+
 
 if __name__ == "__main__":
     unittest.main()

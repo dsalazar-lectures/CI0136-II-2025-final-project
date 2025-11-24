@@ -388,6 +388,7 @@ class TestMenuCSV(unittest.TestCase):
 
     def test_save_customized_uses_same_menu_id_and_day(self):
         """save_customized should use the same menu_id and day for all rows."""
+
         # Arrange: define minimal recipe objects with id and categories
         class DummyRecipe:
             def __init__(self, recipe_id, categories):
@@ -419,6 +420,7 @@ class TestMenuCSV(unittest.TestCase):
 
     def test_save_customized_sorts_recipe_ids_per_meal(self):
         """save_customized should sort recipe IDs ascending within each meal."""
+
         # Arrange: all recipes are breakfast type, but with unsorted IDs
         class DummyRecipe:
             def __init__(self, recipe_id, categories):
@@ -448,6 +450,7 @@ class TestMenuCSV(unittest.TestCase):
         self.assertEqual(len(breakfast_ids), 3)
         # IDs must be sorted ascending
         self.assertEqual(breakfast_ids, sorted(breakfast_ids))
+
 
 if __name__ == "__main__":
     unittest.main()
