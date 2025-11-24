@@ -216,18 +216,19 @@ class UserApplicationService:
 
         try:
             from src.Services.EmailService import sendEmail
+
             sendEmail(
                 user.email,
                 "Password Reset Request",
                 f"Reset link: {reset_link}",
-        )
+            )
         except Exception:
             return None, {"error": "Failed to send reset email"}, 500
         return (
             None,
             {"message": "If the email exists, a password reset link has been sent"},
             200,
-            )
+        )
 
     # new method for resetting password
     def reset_password(self, data):
