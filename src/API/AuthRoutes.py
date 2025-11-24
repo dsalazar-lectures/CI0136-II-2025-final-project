@@ -9,6 +9,9 @@ from src.Infrastructure.Profiles.ProfileRepository import ProfileRepository
 from src.Application.Profiles.Services.ProfileApplicationService import (
     ProfileApplicationService,
 )
+from src.Application.User.Services.AccountApplicationService import (
+    AccountApplicationService,
+)
 
 auth_bp = Blueprint("auth", __name__)
 
@@ -17,6 +20,12 @@ validation_service = ValidationService()
 encryption_service = EncryptionService()
 token_service = TokenService()
 profile_service = ProfileApplicationService(profile_repository=ProfileRepository())
+
+account_app_service = AccountApplicationService(
+    user_repository=user_repository,
+    profile_service=profile_service,
+    token_service=token_service,
+)
 
 user_app_service = UserApplicationService(
     user_repository=user_repository,
@@ -107,3 +116,20 @@ def regenerate_key():
         return jsonify({"error": "Failed to rotate key"}), 500
 
     return jsonify({"message": "Key regenerated successfully"}), 200
+
+
+@auth_bp.route("/delete-account", methods=["DELETE"])
+def delete_account():
+    # Get username to delete from request body
+    json_data = request.get_json()
+    username_to_delete = json_data.get("username") if json_data else None
+
+    if not username_to_delete:
+        return jsonify({"error": "Username to delete is required"}), 400
+
+    # Call the service to delete the user account
+    user, response, status_code = account_app_service.delete_user_account(
+        request.headers, username_to_delete
+    )
+
+    return jsonify(response), status_code

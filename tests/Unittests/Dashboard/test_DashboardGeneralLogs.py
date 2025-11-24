@@ -5,7 +5,7 @@ import sys
 import tempfile
 from pathlib import Path
 
-sys.path.append(str(Path(__file__).resolve().parents[3] / "src"))
+sys.path.append(str(Path(__file__).resolve().parents[3]))
 sys.path.append(str(Path(__file__).resolve().parents[2] / "Mocks"))
 from src.Services.Metrics.DashboardGeneralLogs import GeneralData_Window
 from tests.Mocks.Dashboard.Mock_DashboardGeneralLogs import MocksDashboardGeneralLogs
