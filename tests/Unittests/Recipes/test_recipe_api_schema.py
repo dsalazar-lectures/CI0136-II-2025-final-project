@@ -9,7 +9,9 @@ import sys
 import os
 
 # Add src to path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../")))
+sys.path.insert(
+    0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../"))
+)
 
 from src.Database.Recipes import APIRecipesSchema
 
@@ -57,6 +59,7 @@ class TestGetApiData(unittest.TestCase):
     def test_get_api_data_request_exception(self, mock_get):
         """Test API call with request exception"""
         import requests
+
         mock_get.side_effect = requests.exceptions.RequestException("Connection error")
 
         result = APIRecipesSchema.get_api_data()
@@ -67,8 +70,11 @@ class TestGetApiData(unittest.TestCase):
     def test_get_api_data_http_error(self, mock_get):
         """Test API call with HTTP error"""
         import requests
+
         mock_response = MagicMock()
-        mock_response.raise_for_status.side_effect = requests.exceptions.HTTPError("404 Not Found")
+        mock_response.raise_for_status.side_effect = requests.exceptions.HTTPError(
+            "404 Not Found"
+        )
         mock_get.return_value = mock_response
 
         result = APIRecipesSchema.get_api_data()
@@ -303,7 +309,7 @@ class TestIntegration(unittest.TestCase):
         # Verify the flow
         mock_get_api.assert_called_once()
         mock_write.assert_called_once()
-        
+
         # Verify parsed recipe structure
         parsed = parsed_recipes[0]
         self.assertEqual(parsed["id"], "52772")
