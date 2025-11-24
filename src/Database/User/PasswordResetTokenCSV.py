@@ -9,7 +9,8 @@ class PasswordResetTokenCSV:
         self._ensure_file_exists()
 
     def _ensure_file_exists(self):
-        if not os.path.exists(self.file_path):
+        # Archivo no existe o está vacío → escribir header
+        if not os.path.exists(self.file_path) or os.path.getsize(self.file_path) == 0:
             with open(self.file_path, "w", newline="") as file:
                 writer = csv.writer(file)
                 writer.writerow(["token", "user_id", "expires_at", "used"])
@@ -29,19 +30,24 @@ class PasswordResetTokenCSV:
             )
 
     def get_valid_token(self, token: str):
+        now = datetime.datetime.now()
+
         with open(self.file_path, "r", newline="") as file:
             reader = csv.DictReader(file)
             for row in reader:
                 if row["token"] == token and row["used"] == "False":
                     expires_at = datetime.datetime.fromisoformat(row["expires_at"])
-                    return type(
-                        "TokenData",
-                        (),
-                        {
-                            "user_id": row["user_id"],
-                            "expires_at": expires_at,
-                        },
-                    )
+
+                    if expires_at > now:
+                        return type(
+                            "TokenData",
+                            (),
+                            {
+                                "user_id": row["user_id"],
+                                "expires_at": expires_at,
+                            },
+                        )
+
         return None
 
     def invalidate_token(self, token: str):
