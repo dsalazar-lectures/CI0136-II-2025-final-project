@@ -2,7 +2,9 @@ import unittest
 from pathlib import Path
 import sys
 
-sys.path.append(str(Path(__file__).resolve().parents[3] / "src"))
+# for parent in Path(__file__).resolve().parents:
+#     print(parent)
+sys.path.append(str(Path(__file__).resolve().parents[3]))
 sys.path.append(str(Path(__file__).resolve().parents[2] / "Mocks"))
 
 from src.Services.Metrics.GeneralLogs import GeneralLogs
