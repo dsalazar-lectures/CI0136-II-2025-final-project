@@ -113,12 +113,15 @@ class ProfileRepository(IProfileRepository):
         Returns True if successful. False on failure."""
         return self.profile_database.delete_profile(user_id)
 
-    def restore_profile(self, user_id: int, favorites: list) -> Optional[Profile]:
+    def restore_profile(
+        self, user_id: int, favorites: list, role=Role.USER
+    ) -> Optional[Profile]:
         profile_data = {
             "user_id": user_id,
-            "favorite_foods": favorites,
+            "favorite_foods": [],
             "unfavorite_foods": [],
             "favorite_menus": [],
+            "role": role.name,
         }
         restored_profile_data = self.profile_database.create_profile(profile_data)
         if restored_profile_data:
@@ -139,5 +142,6 @@ class ProfileRepository(IProfileRepository):
                     if restored_profile_data["favorite_menus"]
                     else []
                 ),
+                role=Role[restored_profile_data["role"]],
             )
         return None
