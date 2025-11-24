@@ -1,6 +1,7 @@
 import unittest
 from unittest.mock import patch
 from flask import Flask
+from types import SimpleNamespace
 from src.Application.Menu import MenuUseCase
 from src.API.Menu.menuRoutes import menu_bp
 from tests.Mocks.Recipes.mock_recipe_repo import MockRecipe
@@ -55,6 +56,82 @@ class MenuEndpointTestCase(unittest.TestCase):
         response = MenuUseCase.emailPdf(1, "test.gmail.com")
         self.assertEqual(response, 400)
 
+    def test_customized_menu_get_requires_user_id(self):
+        response = self.client.get("/api/menu/customized")
+        self.assertEqual(response.status_code, 400)
+        data = response.get_json()
+        self.assertEqual(data, {"error": "user_id requerido"})
+
+    @patch("src.API.Menu.menuRoutes.customized_service")
+    @patch("src.API.Menu.menuRoutes.profile_service")
+    def test_customized_menu_get_returns_recipes(
+        self, mock_profile_service, mock_customized_service
+    ):
+        fake_profile = SimpleNamespace(favorite_foods=["tomate", "queso"])
+        mock_profile_service.get_profile.return_value = fake_profile
+
+        fake_recipes = [
+            MockRecipe(1, "Custom Recipe 1", ["almuerzo"]),
+            MockRecipe(2, "Custom Recipe 2", ["almuerzo"]),
+        ]
+        mock_customized_service.recommend_by_favorites.return_value = fake_recipes
+
+        response = self.client.get(
+            "/api/menu/customized?user_id=1&category=almuerzo"
+        )
+
+        self.assertEqual(response.status_code, 200)
+        data = response.get_json()
+        self.assertIn("recipes", data)
+        self.assertIsInstance(data["recipes"], list)
+        self.assertEqual(len(data["recipes"]), 2)
+        self.assertEqual(data["recipes"][0]["name"], "Custom Recipe 1")
+        self.assertNotIn("menu_id", data)
+
+    @patch("src.API.Menu.menuRoutes.MenuRepository")
+    @patch("src.API.Menu.menuRoutes.customized_service")
+    @patch("src.API.Menu.menuRoutes.profile_service")
+    def test_customized_menu_post_creates_customized_menu(
+        self, mock_profile_service, mock_customized_service, mock_menu_repo_cls
+    ):
+        fake_profile = SimpleNamespace(favorite_foods=["tomate"])
+        mock_profile_service.get_profile.return_value = fake_profile
+
+        fake_recipes = [MockRecipe(1, "Custom Recipe 1", ["almuerzo"])]
+        mock_customized_service.recommend_by_favorites.return_value = fake_recipes
+
+        mock_repo_instance = mock_menu_repo_cls.return_value
+        fake_menu_obj = SimpleNamespace(menu_id=123)
+        mock_repo_instance.create_customized_menu.return_value = (
+            fake_menu_obj,
+            "Customized menu created",
+            201,
+        )
+
+        response = self.client.post(
+            "/api/menu/customized?user_id=1&category=almuerzo"
+        )
+
+        self.assertEqual(response.status_code, 201)
+        data = response.get_json()
+        self.assertIn("recipes", data)
+        self.assertEqual(len(data["recipes"]), 1)
+        self.assertEqual(data["menu_id"], 123)
+        self.assertEqual(data["message"], "Customized menu created")
+
+        mock_repo_instance.create_customized_menu.assert_called_once()
+
+    @patch("src.API.Menu.menuRoutes.profile_service")
+    def test_customized_menu_post_profile_not_found(self, mock_profile_service):
+        mock_profile_service.get_profile.return_value = None
+
+        response = self.client.post(
+            "/api/menu/customized?user_id=999&category=almuerzo"
+        )
+
+        self.assertEqual(response.status_code, 404)
+        data = response.get_json()
+        self.assertEqual(data, {"error": "Perfil no encontrado"})
 
 if __name__ == "__main__":
     unittest.main()
