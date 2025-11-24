@@ -23,7 +23,7 @@ class testUserApplicationService(unittest.TestCase):
             encryption_service=self.encryption_service,
             token_service=self.token_service,
             profile_service=self.profile_service,
-            password_reset_service= self.password_reset_service,
+            password_reset_service=self.password_reset_service,
         )
 
     def test_register_user_success(self):

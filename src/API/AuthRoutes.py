@@ -12,6 +12,7 @@ from src.Application.Profiles.Services.ProfileApplicationService import (
 from src.Application.User.Services.AccountApplicationService import (
     AccountApplicationService,
 )
+
 # New imports for password reset
 from Infrastructure.User.PasswordResetTokenRepository import (
     PasswordResetTokenRepository,
@@ -90,7 +91,9 @@ def change_password():
         return jsonify({"error": "User not authenticated"}), 401
 
     header = request.headers
-    user, response, status_code = user_app_service.verify_valid_session(header, username)
+    user, response, status_code = user_app_service.verify_valid_session(
+        header, username
+    )
 
     if not user:
         return jsonify(response), status_code
@@ -118,7 +121,9 @@ def change_email():
 
     # Verificar sesión válida
     header = request.headers
-    user, response, status_code = user_app_service.verify_valid_session(header, username)
+    user, response, status_code = user_app_service.verify_valid_session(
+        header, username
+    )
 
     if not user:
         return jsonify(response), status_code
@@ -161,7 +166,9 @@ def regenerate_key():
     except jwt.InvalidTokenError:
         return jsonify({"error": "Invalid token"}), 401
 
-    user, resp, status = user_app_service.verify_valid_session(request.headers, username)
+    user, resp, status = user_app_service.verify_valid_session(
+        request.headers, username
+    )
     if not user:
         return jsonify(resp), status
 
