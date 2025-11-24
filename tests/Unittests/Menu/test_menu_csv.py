@@ -386,6 +386,68 @@ class TestMenuCSV(unittest.TestCase):
         self.assertNotIn(2, menu_ids)
         self.assertIn(3, menu_ids)
 
+    def test_save_customized_uses_same_menu_id_and_day(self):
+        """save_customized should use the same menu_id and day for all rows."""
+        # Arrange: define minimal recipe objects with id and categories
+        class DummyRecipe:
+            def __init__(self, recipe_id, categories):
+                self.id = recipe_id
+                self.categories = categories
+
+        recipes = [
+            DummyRecipe(5, ["desayuno"]),
+            DummyRecipe(10, ["almuerzo"]),
+        ]
+
+        # Act
+        menu_id = self.menu_csv.save_customized(recipes, day=3)
+
+        # Assert: read back all rows from CSV
+        with open(self.temp_file.name, "r", newline="") as f:
+            rows = list(csv.DictReader(f))
+
+        # There should be at least one data row
+        self.assertGreaterEqual(len(rows), 1)
+
+        # All rows must share the same menu_id as returned by save_customized
+        menu_ids_in_file = {int(row["menu_id"]) for row in rows}
+        self.assertEqual(menu_ids_in_file, {menu_id})
+
+        # All rows must use the same day that was passed (day=3)
+        days_in_file = {row["day"] for row in rows}
+        self.assertEqual(days_in_file, {"3"})
+
+    def test_save_customized_sorts_recipe_ids_per_meal(self):
+        """save_customized should sort recipe IDs ascending within each meal."""
+        # Arrange: all recipes are breakfast type, but with unsorted IDs
+        class DummyRecipe:
+            def __init__(self, recipe_id, categories):
+                self.id = recipe_id
+                self.categories = categories
+
+        recipes = [
+            DummyRecipe(10, ["desayuno"]),
+            DummyRecipe(3, ["desayuno"]),
+            DummyRecipe(7, ["desayuno"]),
+        ]
+
+        # Act
+        _menu_id = self.menu_csv.save_customized(recipes, day=1)
+
+        # Assert: read back all rows and collect breakfast IDs
+        with open(self.temp_file.name, "r", newline="") as f:
+            rows = list(csv.DictReader(f))
+
+        breakfast_ids = [
+            int(row["breakfast_recipe_id"])
+            for row in rows
+            if row["breakfast_recipe_id"] != "0"
+        ]
+
+        # All three recipes must be present
+        self.assertEqual(len(breakfast_ids), 3)
+        # IDs must be sorted ascending
+        self.assertEqual(breakfast_ids, sorted(breakfast_ids))
 
 if __name__ == "__main__":
     unittest.main()
