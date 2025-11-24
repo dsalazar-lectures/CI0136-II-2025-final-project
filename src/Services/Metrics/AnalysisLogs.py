@@ -1,6 +1,10 @@
 from typing import Callable, Dict, List
 import pandas as pd
 import streamlit as st
+from src.Application.Recipes.IRecipeRepository import IRecipeRepository
+from src.Infrastructure.Recipes.CSVRecipeRepository import CSVRecipeRepository
+from datetime import datetime, timedelta
+
 
 # --------------------------------------------------------------------------------
 
@@ -15,12 +19,36 @@ ERROR_LEVELS = {"ERROR"}  # Only errors only (no warnings)
 
 # --------------------------------------------------------------------------------
 class AnalysisLogs:
-    @staticmethod
-    def top_users_least_active():
-
-        pass
 
     @staticmethod
+    def top_most_search_recipes(
+        df_list,
+        start_date=(datetime.today() - timedelta(days=7)),
+        end_date=datetime.today(),
+        recipe_repo: IRecipeRepository | None = None,
+    ):
+        recipe_repo = recipe_repo or CSVRecipeRepository()
+        if df_list is None or len(df_list) == 0:
+            st.text(MSG_NO_DATA_OR_FUNC)
+        else:
+            df = None
+            for item in df_list:
+                if item["name"] == "Search recipes":
+                    df = item["data"]
+                    break
+
+            if df is None or df.empty:
+                st.text("No 'Search recipes' data found.")
+            else:
+                counts = df["Id_Producto"].value_counts().head(10)
+                recipes_counts = {}
+                for recipe_id in df["Id_Producto"].unique():
+                    recipe = recipe_repo.get_by_id(recipe_id)
+                    if recipe:
+                        recipes_counts[recipe.to_dict()["name"]] = counts[recipe_id]
+
+                st.bar_chart(recipes_counts)
+
     def _concat_and_filter(df_list, start_date, end_date) -> pd.DataFrame:
         frames: List[pd.DataFrame] = []
         for item in df_list:
@@ -81,7 +109,8 @@ class AnalysisLogs:
         st.dataframe(counts.rename_axis("category").reset_index(name="errors"))
 
     analysis_registry: Dict[str, Callable[..., None]] = {
-        "Error Categories (Top 5)": top_error_categories
+        "Error Categories (Top 5)": top_error_categories,
+        "Most Searched Recipes": top_most_search_recipes,
     }
 
     @staticmethod
