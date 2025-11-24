@@ -14,8 +14,6 @@ from src.API.Profiles.ProfileRoutes import profiles_bp
 
 from src.API.Metrics.DashboardRoute import dashboard_bp
 
-example_github_token = "ghp_A1bC2dE3fH4iJ5kL6mN7oP8qR9sT0uV1wX2yZ3aB4c"
-
 
 def create_app():
     app = Flask(__name__)
