@@ -93,8 +93,47 @@ def delete_recipe(recipe_id, username):
 
 def update_recipe(recipe_id, updates, username):
     if not validate_data(updates):
+        logger.log(
+            level="error",
+            user=username,
+            role="-",
+            action="Update recipe",
+            id_object=recipe_id,
+            description=f"Validation failed for update data in recipe {recipe_id}"
+        )
         return -1
-    return recipe_repository.update_if_owned(recipe_id, username, updates)
+    recipe = recipe_repository.update_if_owned(recipe_id, username, updates)
+
+    if recipe is None:
+        logger.log(
+            level="error",
+            user=username,
+            role="-",
+            action="Update recipe",
+            id_object=recipe_id,
+            description=f"Recipe {recipe_id} not found"
+        )
+        return -1
+    elif recipe is False:
+        logger.log(
+            level="warning",
+            user=username,
+            role="-",
+            action="Update recipe",
+            id_object=recipe_id,
+            description=f"User {username} does not own recipe {recipe_id}"
+        )
+        return 0
+    else:
+        logger.log(
+            level="info",
+            user=username,
+            role="-",
+            action="Update recipe",
+            id_object=recipe_id,
+            description=f"Recipe {recipe_id} updated successfully by {username})"
+        )
+        return recipe
 
 
 def filter_recipes(filter_criteria):
