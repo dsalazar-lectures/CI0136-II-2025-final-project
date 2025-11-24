@@ -6,9 +6,6 @@ from src.Application.Interfaces.IUserRepository import IUserRepository
 from src.Application.Interfaces.IEncryptionService import IEncryptionService
 from src.Application.Interfaces.IValidationService import IValidationService
 from src.Application.Interfaces.ITokenService import ITokenService
-from src.Application.Interfaces.IPasswordResetTokenRepository import (
-    IPasswordResetTokenRepository,
-)
 from src.Application.User.Services.PasswordResetTokenService import (
     PasswordResetTokenService,
 )
@@ -226,7 +223,7 @@ class UserApplicationService:
                 subject="Password Reset Request",
                 contents=f"Reset link: {reset_link}",
             )
-        except Exception as e:
+        except Exception:
             return None, {"error": "Failed to send reset email"}, 500
 
         return (

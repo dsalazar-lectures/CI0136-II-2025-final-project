@@ -1,7 +1,4 @@
 from abc import ABC, abstractmethod
-from src.Application.DTOs.UserDTO import UserDTO
-from src.Model.User.User import User
-
 
 class IUserRepository(ABC):
     @abstractmethod
