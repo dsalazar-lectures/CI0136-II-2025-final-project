@@ -4,7 +4,7 @@ Tests the combined functionality of system recipes and API recipes
 """
 
 import unittest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 import sys
 import os
 
