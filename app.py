@@ -21,7 +21,7 @@ def create_app():
     app.json.ensure_ascii = False
 
     # Register blueprints
-    app.register_blueprint(ingredients_bp)
+    app.register_blueprint(ingredients_bp, url_prefix="/api")
     app.register_blueprint(recipes_bp, url_prefix="/api")
     app.register_blueprint(menu_bp, url_prefix="/api")
     app.register_blueprint(auth_bp, url_prefix="/auth")

@@ -109,23 +109,25 @@ def search_ingredients_body():
         }), 400
 
     criterion = search_criteria[0]
-    if criterion == 'names':
+    if criterion == "names":
         names = _parse_names(data)
         if isinstance(names, tuple):
             return names
+        if len(names) == 1:
+            return _handle_single_name(names[0], simple)
         return _handle_multiple_names(names, simple)
     
     elif criterion == 'ids':
         ids = _parse_ids(data)
         if isinstance(ids, tuple):
             return ids
-        return jsonify(_handle_multiple_ids(ids, simple))
+        return _handle_multiple_ids(ids, simple)
     
     else:  # categories
         categories = _parse_categories(data)
         if isinstance(categories, tuple):
             return categories
-        return jsonify({"results": _handle_categories(categories, simple)})
+        return _handle_categories(categories, simple)
 
 def _get_request_data():
     """Retrieves and validates the JSON body."""
@@ -135,6 +137,7 @@ def _get_request_data():
     return data
 
 def _get_simple_flag(data):
+    """Query param ?simple=true overrides body.simple"""
     simple_q = request.args.get('simple')
     if simple_q is not None:
         return simple_q.lower() == 'true'
@@ -170,15 +173,13 @@ def _handle_multiple_names(names, simple):
     """Searches for multiple ingredients and returns results + missing items."""
     results = []
     not_found = []
-
     for name in names:
         ingredient = ingredient_service.get_ingredient_by_name(name)
         if ingredient:
             results.append({'id': ingredient.id, 'name': ingredient.name} if simple else ingredient.to_json())
         else:
             not_found.append(name)
-
-    return jsonify({"results": results, "not_found": not_found})
+    return jsonify({"results": results, "not_found": not_found}), 200
 
 def _parse_ids(data):
     raw = data.get('ids')
@@ -214,25 +215,26 @@ def _parse_categories(data):
 def _handle_multiple_ids(ids, simple):
     results = []
     not_found = []
-
-    for id in ids:
-        ingredient = ingredient_service.get_ingredient_by_id(id)
+    for iid in ids:
+        ingredient = ingredient_service.get_ingredient_by_id(iid)
         if ingredient:
-            results.append(
-                {'id': ingredient.id, 'name': ingredient.name} if simple else ingredient.to_json()
-            )
+            results.append({'id': ingredient.id, 'name': ingredient.name} if simple else ingredient.to_json())
         else:
-            not_found.append(id)
-
-    return {"results": results, "not_found": not_found}
+            not_found.append(iid)
+    return jsonify({"results": results, "not_found": not_found}), 200
 
 def _handle_categories(categories, simple):
     results = []
     for category in categories:
         ingredients = ingredient_service.get_ingredients_by_category(category)
         for ingredient in ingredients:
-            results.append(
-                {'id': ingredient.id, 'name': ingredient.name} if simple else ingredient.to_json()
-            )
-    return results
-    return jsonify(ingredient.to_json())
+            results.append({'id': ingredient.id, 'name': ingredient.name} if simple else ingredient.to_json())
+    # remove duplicates by id
+    unique = []
+    seen = set()
+    for r in results:
+        iid = r["id"]
+        if iid not in seen:
+            seen.add(iid)
+            unique.append(r)
+    return jsonify({"results": unique}), 200
