@@ -129,3 +129,122 @@ class MenuCSV:
             menu_list.append({"menu_id": menu_id, "daily_menus": daily_menus})
 
         return menu_list
+
+    def save_customized(self, recipes: list, day: int = 1) -> int:
+        """
+        Save a customized menu based on user preferences.
+        """
+        # Determine next menu_id based on existing rows in the CSV
+        next_menu_id = 1
+        if os.path.exists(self.file_path):
+            with open(self.file_path, "r", newline="") as file:
+                reader = csv.DictReader(file)
+                existing_ids = [
+                    int(row["menu_id"]) for row in reader if row["menu_id"].isdigit()
+                ]
+                if existing_ids:
+                    next_menu_id = max(existing_ids) + 1
+
+        # Mapping of meal types to category keywords
+        meal_category_map = {
+            "breakfast": ["desayuno", "desayunos", "breakfast"],
+            "lunch": ["almuerzo", "almuerzos", "comida", "lunch"],
+            "dinner": ["cena", "cenas", "dinner"],
+            "dessert": ["postre", "postres", "dessert"],
+        }
+
+        def detect_meal_for_recipe(recipe):
+            """
+            Try to determine the meal type (breakfast/lunch/dinner/dessert)
+            for a given recipe based on its categories.
+            """
+            categories_lower = []
+            try:
+                categories_lower = [c.lower() for c in recipe.categories]
+            except Exception:
+                # If the recipe has no categories attribute or it's malformed,
+                # we simply leave the list empty and fall back later.
+                pass
+
+            for meal_type, keywords in meal_category_map.items():
+                for keyword in keywords:
+                    if any(keyword in category for category in categories_lower):
+                        return meal_type
+            return None
+
+        # Collect recipe IDs per meal type
+        meal_recipe_ids = {
+            "breakfast": [],
+            "lunch": [],
+            "dinner": [],
+            "dessert": [],
+        }
+
+        # First pass: assign recipes based on detected meal from categories
+        for recipe in recipes:
+            meal_type = detect_meal_for_recipe(recipe)
+            if meal_type:
+                meal_recipe_ids[meal_type].append(str(recipe.id))
+
+        # Second pass: unassigned recipes are distributed by position
+        unassigned_recipes = [r for r in recipes if detect_meal_for_recipe(r) is None]
+        meal_cycle_order = ["breakfast", "lunch", "dinner", "dessert"]
+        for index, recipe in enumerate(unassigned_recipes):
+            meal_type = meal_cycle_order[index % 4]
+            meal_recipe_ids[meal_type].append(str(recipe.id))
+
+        def parse_and_sort_ids(raw_ids):
+            """
+            Convert a list of string IDs to integers, ignore invalid values,
+            and return them sorted ascending.
+            """
+            if not raw_ids:
+                return []
+            numeric_ids = []
+            for value in raw_ids:
+                try:
+                    numeric_ids.append(int(value))
+                except ValueError:
+                    # Ignore non-numeric values silently
+                    continue
+            return sorted(numeric_ids)
+
+        # Parse and sort recipe IDs for each meal
+        breakfast_ids = parse_and_sort_ids(meal_recipe_ids["breakfast"])
+        lunch_ids = parse_and_sort_ids(meal_recipe_ids["lunch"])
+        dinner_ids = parse_and_sort_ids(meal_recipe_ids["dinner"])
+        dessert_ids = parse_and_sort_ids(meal_recipe_ids["dessert"])
+
+        # Number of rows needed: enough to cover the longest meal list
+        total_rows = max(
+            len(breakfast_ids),
+            len(lunch_ids),
+            len(dinner_ids),
+            len(dessert_ids),
+            1,  # ensure at least one row is written
+        )
+
+        # Append all rows to the CSV file using the same menu_id and day
+        with open(self.file_path, "a", newline="") as file:
+            writer = csv.DictWriter(file, fieldnames=self.headers)
+            # Header is guaranteed to exist thanks to _ensure_file_exists
+            for row_index in range(total_rows):
+                row = {
+                    "menu_id": str(next_menu_id),
+                    "day": str(day),  # Always the same day for this customized menu
+                    "breakfast_recipe_id": (
+                        str(breakfast_ids[row_index]) if row_index < len(breakfast_ids) else "0"
+                    ),
+                    "lunch_recipe_id": (
+                        str(lunch_ids[row_index]) if row_index < len(lunch_ids) else "0"
+                    ),
+                    "dinner_recipe_id": (
+                        str(dinner_ids[row_index]) if row_index < len(dinner_ids) else "0"
+                    ),
+                    "dessert_recipe_id": (
+                        str(dessert_ids[row_index]) if row_index < len(dessert_ids) else "0"
+                    ),
+                }
+                writer.writerow(row)
+
+        return next_menu_id
