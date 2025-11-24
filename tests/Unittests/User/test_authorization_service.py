@@ -21,7 +21,7 @@ class TestAuthorizationService(unittest.TestCase):
         auth_role = Role.ADMIN
 
         is_auth, response, status_code = self.auth_service.is_authorized(
-            data, headers, auth_role
+            data, headers, [auth_role]
         )
 
         self.assertFalse(is_auth)
@@ -34,7 +34,7 @@ class TestAuthorizationService(unittest.TestCase):
         auth_role = Role.ADMIN
 
         is_auth, response, status_code = self.auth_service.is_authorized(
-            data, headers, auth_role
+            data, headers, [auth_role]
         )
 
         self.assertFalse(is_auth)
@@ -53,7 +53,7 @@ class TestAuthorizationService(unittest.TestCase):
         )
 
         is_auth, response, status_code = self.auth_service.is_authorized(
-            data, headers, auth_role
+            data, headers, [auth_role]
         )
 
         self.mock_user_app_service.validation_service.validate_request_data.assert_called_once_with(
@@ -80,7 +80,7 @@ class TestAuthorizationService(unittest.TestCase):
         )
 
         is_auth, response, status_code = self.auth_service.is_authorized(
-            data, headers, auth_role
+            data, headers, [auth_role]
         )
 
         self.mock_user_app_service.verify_valid_session.assert_called_once_with(
@@ -109,7 +109,7 @@ class TestAuthorizationService(unittest.TestCase):
         self.mock_profile_service.get_profile.return_value = None
 
         is_auth, response, status_code = self.auth_service.is_authorized(
-            data, headers, auth_role
+            data, headers, [auth_role]
         )
 
         self.mock_profile_service.get_profile.assert_called_once_with(user.id)
@@ -136,7 +136,7 @@ class TestAuthorizationService(unittest.TestCase):
         self.mock_profile_service.get_profile.return_value = Profile(1, role=Role.USER)
 
         is_auth, response, status_code = self.auth_service.is_authorized(
-            data, headers, auth_role
+            data, headers, [auth_role]
         )
 
         self.assertFalse(is_auth)
@@ -162,7 +162,7 @@ class TestAuthorizationService(unittest.TestCase):
         self.mock_profile_service.get_profile.return_value = Profile(1, role=Role.ADMIN)
 
         is_auth, response, status_code = self.auth_service.is_authorized(
-            data, headers, auth_role
+            data, headers, [auth_role]
         )
 
         self.assertTrue(is_auth)

@@ -15,7 +15,7 @@ class AuthorizationService(IAuthorizationService):
         self.user_app_service = user_app_service
         self.profile_service = profile_service
 
-    def is_authorized(self, data, headers, auth_role: Role):
+    def is_authorized(self, data, headers, auth_roles: list[Role]):
         if "Authorization" not in headers or not headers["Authorization"]:
             return False, {"error": "Authorization header missing"}, 401
 
@@ -38,7 +38,7 @@ class AuthorizationService(IAuthorizationService):
         if not profile:
             return False, {"error": "Profile not found"}, 404
 
-        if profile.role != auth_role:
+        if profile.role not in auth_roles:
             return False, {"error": "Unauthorized access"}, 403
 
         return True, {}, 200
