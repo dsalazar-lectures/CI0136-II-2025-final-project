@@ -7,6 +7,31 @@ import socket
 import webbrowser
 from pathlib import Path
 import os
+from src.Application.User.Services.AuthorizationService import AuthorizationService
+from src.Application.User.Services.UserApplicationService import UserApplicationService
+from src.Application.User.Services.EncryptionService import EncryptionService
+from src.Application.User.Services.ValidationService import ValidationService
+from src.Application.User.Services.TokenService import TokenService
+from src.Infrastructure.User.UserRepository import UserRepository
+from src.Infrastructure.Profiles.ProfileRepository import ProfileRepository
+from src.Application.Profiles.Services.ProfileApplicationService import (
+    ProfileApplicationService,
+)
+from src.Model.Profiles.Roles import Role
+
+user_repository = UserRepository()
+validation_service = ValidationService()
+encryption_service = EncryptionService()
+token_service = TokenService()
+profile_service = ProfileApplicationService(profile_repository=ProfileRepository())
+user_app_service = UserApplicationService(
+    user_repository=user_repository,
+    validation_service=validation_service,
+    encryption_service=encryption_service,
+    token_service=token_service,
+    profile_service=profile_service,
+)
+auth_service = AuthorizationService(user_app_service, profile_service)
 
 dashboard_bp = Blueprint("dashboard", __name__)
 
@@ -69,6 +94,15 @@ def _start_streamlit_if_needed(port: int) -> bool:
 
 @dashboard_bp.route("/Services/metrics/open-dashboard", methods=["POST", "GET"])
 def open_dashboard():
+    is_auth, response, status_code = auth_service.is_authorized(
+        request.get_json(),
+        request.headers,
+        Role.ADMIN,
+    )
+
+    if not is_auth:
+        return jsonify(response), status_code
+
     port = int(request.args.get("port", DEFAULT_DASHBOARD_PORT))
     url = f"http://localhost:{port}"
     try:
