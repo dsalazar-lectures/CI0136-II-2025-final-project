@@ -26,7 +26,7 @@ class RecipePrioritizer:
             if isinstance(ingredient, str)
         ]
 
-        # Count matches (substring matching)
+        # Count matches
         score = 0
         for favorite in favorite_ingredients:
             if any(favorite in ingredient for ingredient in recipe_ingredients):
@@ -34,7 +34,9 @@ class RecipePrioritizer:
 
         return score
 
-    def prioritize(self, recipes: List[Recipe], favorite_foods: List[str]) -> List[Recipe]:
+    def prioritize(
+        self, recipes: List[Recipe], favorite_foods: List[str]
+    ) -> List[Recipe]:
         """
         Recipes with more favorite ingredients appear first.
         Recipes without any favorite ingredients appear last

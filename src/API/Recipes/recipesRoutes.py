@@ -115,9 +115,7 @@ def get_prioritized_recipes():
         return jsonify({"error": "Perfil de usuario no encontrado"}), 404
 
     # Get prioritized recipes based on user's favorite foods
-    prioritized_recipes = recipe_service.get_prioritized_recipes(
-        profile.favorite_foods
-    )
+    prioritized_recipes = recipe_service.get_prioritized_recipes(profile.favorite_foods)
 
     return (
         jsonify(
