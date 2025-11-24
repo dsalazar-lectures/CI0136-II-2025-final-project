@@ -26,10 +26,10 @@ def create_recipe(recipe_data, username):
         logger.log(
             level="error",
             user=username,
-            role="-", # Can be changed if necessary
+            role="-",  # Can be changed if necessary
             action="Create recipe",
             id_object="-",
-            description=f"Validation error by {username}"
+            description=f"Validation error by {username}",
         )
         return -1
     recipe = recipe_repository.add_recipe(recipe_data)
@@ -41,7 +41,7 @@ def create_recipe(recipe_data, username):
             role="-",
             action="Create recipe",
             id_object="-",
-            description=f"Failed to create recipe {username}"
+            description=f"Failed to create recipe {username}",
         )
         return -1
     else:
@@ -51,7 +51,7 @@ def create_recipe(recipe_data, username):
             role="-",
             action="Create recipe",
             id_object=recipe.id,
-            description=f"Recipe '{recipe.name}' created successfully by {username}"
+            description=f"Recipe '{recipe.name}' created successfully by {username}",
         )
         return recipe
 
@@ -66,7 +66,7 @@ def delete_recipe(recipe_id, username):
             role="-",
             action="Delete recipe",
             id_object="-",
-            description=f"Recipe {recipe_id} not found"
+            description=f"Recipe {recipe_id} not found",
         )
         return -1
     elif recipe is False:
@@ -76,7 +76,7 @@ def delete_recipe(recipe_id, username):
             role="-",
             action="Delete recipe",
             id_object=recipe_id,
-            description=f"User {username} does not own recipe {recipe_id}"
+            description=f"User {username} does not own recipe {recipe_id}",
         )
         return 0
     else:
@@ -86,7 +86,7 @@ def delete_recipe(recipe_id, username):
             role="-",
             action="Delete recipe",
             id_object=recipe_id,
-            description=f"Recipe {recipe_id} deleted successfully"
+            description=f"Recipe {recipe_id} deleted successfully",
         )
         return recipe
 
@@ -99,7 +99,7 @@ def update_recipe(recipe_id, updates, username):
             role="-",
             action="Update recipe",
             id_object=recipe_id,
-            description=f"Validation failed for update data in recipe {recipe_id}"
+            description=f"Validation failed for update data in recipe {recipe_id}",
         )
         return -1
     recipe = recipe_repository.update_if_owned(recipe_id, username, updates)
@@ -111,7 +111,7 @@ def update_recipe(recipe_id, updates, username):
             role="-",
             action="Update recipe",
             id_object=recipe_id,
-            description=f"Recipe {recipe_id} not found"
+            description=f"Recipe {recipe_id} not found",
         )
         return -1
     elif recipe is False:
@@ -121,7 +121,7 @@ def update_recipe(recipe_id, updates, username):
             role="-",
             action="Update recipe",
             id_object=recipe_id,
-            description=f"User {username} does not own recipe {recipe_id}"
+            description=f"User {username} does not own recipe {recipe_id}",
         )
         return 0
     else:
@@ -131,7 +131,7 @@ def update_recipe(recipe_id, updates, username):
             role="-",
             action="Update recipe",
             id_object=recipe_id,
-            description=f"Recipe {recipe_id} updated successfully by {username})"
+            description=f"Recipe {recipe_id} updated successfully by {username})",
         )
         return recipe
 
