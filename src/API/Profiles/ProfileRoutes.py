@@ -108,3 +108,16 @@ def remove_favorite_menu(user_id: int):
             )
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+@profiles_bp.route("/profiles/<int:user_id>/role", methods=["GET"])
+def get_user_role(user_id: int):
+    """Get role of a user"""
+    try:
+        profile = profile_service.get_profile(user_id)
+        if not profile:
+            return jsonify({"error": "Perfil no encontrado"}), 404
+        role = profile.role
+        return jsonify({"user_id": user_id, "role": role.name}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

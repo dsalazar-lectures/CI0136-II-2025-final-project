@@ -5,6 +5,7 @@ import tempfile
 import unittest.mock
 from src.Infrastructure.Profiles.ProfileRepository import ProfileRepository
 from src.Model.Profiles.Profiles import Profile
+from src.Model.Profiles.Roles import Role
 
 
 class TestProfileRepository(unittest.TestCase):
@@ -17,7 +18,7 @@ class TestProfileRepository(unittest.TestCase):
 
         # Write header to the themp CSV file
         with open(self.temp_file.name, "w", newline="") as f:
-            f.write("user_id,favorite_foods,unfavorite_foods,favorite_menus\n")
+            f.write("user_id,favorite_foods,unfavorite_foods,favorite_menus,role\n")
 
         self.profile_repo = ProfileRepository(self.temp_file.name)
 
@@ -35,6 +36,7 @@ class TestProfileRepository(unittest.TestCase):
         self.assertEqual(result.favorite_foods, [])
         self.assertEqual(result.unfavorite_foods, [])
         self.assertEqual(result.favorite_menus, [])
+        self.assertEqual(result.role, Role.USER)
 
     def test_create_profile_multiple_users(self):
         # Act
