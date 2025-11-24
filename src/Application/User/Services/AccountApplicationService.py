@@ -8,6 +8,7 @@ from src.Shared.Logs.custom_logger import CustomLogger
 
 account_logger = CustomLogger(name="Account")
 
+
 class AccountApplicationService:
     def __init__(
         self,
@@ -104,7 +105,7 @@ class AccountApplicationService:
                 "User profile to delete not found",
             )
             return None, {"error": "User profile not found"}, 404
-        
+
         # Delete user profile
         profile_deleted = self.profile_service.delete_profile(user_to_delete.id)
         if not profile_deleted:
@@ -117,7 +118,7 @@ class AccountApplicationService:
                 "Failed to delete user profile",
             )
             return None, {"error": "Failed to delete user profile"}, 500
-        
+
         if profile_deleted:
             account_logger.log(
                 "info",
@@ -127,7 +128,7 @@ class AccountApplicationService:
                 user_to_delete.id,
                 "Profile deleted successfully",
             )
-            
+
             # Delete user account
             user_deleted = self.user_repository.delete_user(user_to_delete.id)
             if not user_deleted:
@@ -139,12 +140,12 @@ class AccountApplicationService:
                     user_to_delete.id,
                     "User deletion failed, restoring profile",
                 )
-                
+
                 # Rollback profile deletion if user deletion fails
                 self.profile_service.restore_profile(
                     user_to_delete.id, profile_to_delete.favorite_foods
                 )
-                
+
                 account_logger.log(
                     "info",
                     user_to_delete.username,
@@ -154,7 +155,7 @@ class AccountApplicationService:
                     "Profile restored successfully after failed account deletion",
                 )
                 return None, {"error": "Failed to delete user account"}, 500
-            
+
         account_logger.log(
             "info",
             user_to_delete.username,
