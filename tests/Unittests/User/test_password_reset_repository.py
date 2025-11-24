@@ -1,6 +1,8 @@
 import unittest
 from unittest.mock import Mock
-from src.Infrastructure.User.PasswordResetTokenRepository import PasswordResetTokenRepository
+from src.Infrastructure.User.PasswordResetTokenRepository import (
+    PasswordResetTokenRepository,
+)
 
 
 class TestPasswordResetTokenRepository(unittest.TestCase):
