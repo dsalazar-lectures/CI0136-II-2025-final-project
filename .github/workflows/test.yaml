@@ -68,14 +68,14 @@ jobs:
           # check formatting for tracked python files; fail CI if not formatted
           black --check $(git ls-files '*.py')
 
-  detect-secrets:
+  scan:
+    name: gitleaks
     runs-on: ubuntu-latest
+    permissions: write-all
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Run detect-secrets
-        uses: secret-scanner/action@0.0.2
-        with:
-          detect-secrets-version: 1.5.0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
