@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 
+
 class IUserRepository(ABC):
     @abstractmethod
     def user_exists(self, username, email):
