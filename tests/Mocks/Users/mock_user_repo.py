@@ -64,3 +64,10 @@ class MockUserRepository(IUserRepository):
                 user.password = hashed_password
                 return True, "Password updated successfully", 200
         return False, "Failed to update password", 400
+
+    def delete_user(self, user_id: int) -> bool:
+        for user in self._users:
+            if user.id == user_id:
+                self._users.remove(user)
+                return True
+        return False
