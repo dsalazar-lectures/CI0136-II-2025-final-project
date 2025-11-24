@@ -85,12 +85,6 @@ class MockUserRepository(IUserRepository):
                 return True, "Email updated successfully", 200
         return False, "Failed to update email", 400
 
-    def get_user_by_email(self, email):
-        for user in self._users:
-            if user.email == email:
-                return user
-        return None
-
     def update_password_by_id(self, user_id: str, hashed_password: str):
         for user in self._users:
             if str(user.id) == user_id:  # Convertir a string para comparar

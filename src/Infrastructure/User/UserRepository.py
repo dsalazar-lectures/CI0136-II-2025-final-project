@@ -68,19 +68,6 @@ class UserRepository(IUserRepository):
             )
         return None
 
-    def get_user_by_email(self, email):
-        db_user = self.user_csv.get_user_by_email(email)
-        if db_user:
-            return UserDTO(
-                id=int(db_user["id"]),
-                username=db_user["username"],
-                password=db_user["password"],
-                email=db_user["email"],
-                role=db_user["role"],
-                key=db_user.get("key", ""),
-            )
-        return None
-
     def update_password(self, username, hashed_password):
         return self.user_csv.update_password(username, hashed_password)
 

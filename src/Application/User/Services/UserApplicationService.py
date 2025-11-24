@@ -9,7 +9,6 @@ from src.Application.Interfaces.ITokenService import ITokenService
 from src.Application.User.Services.PasswordResetTokenService import (
     PasswordResetTokenService,
 )
-import jwt
 from src.Shared.Logs.custom_logger import CustomLogger
 
 user_logger = CustomLogger(name="Users")
