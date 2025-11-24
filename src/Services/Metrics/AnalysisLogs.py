@@ -3,6 +3,7 @@ import pandas as pd
 import streamlit as st
 from src.Application.Recipes.IRecipeRepository import IRecipeRepository
 from src.Infrastructure.Recipes.CSVRecipeRepository import CSVRecipeRepository
+from datetime import datetime, timedelta
 
 
 # --------------------------------------------------------------------------------
@@ -20,7 +21,10 @@ ERROR_LEVELS = {"ERROR"}  # Only errors only (no warnings)
 class AnalysisLogs:
 
     @staticmethod
-    def top_most_search_recipes(df_list, recipe_repo: IRecipeRepository | None = None):
+    def top_most_search_recipes(
+        df_list,
+        recipe_repo: IRecipeRepository | None = None,
+    ):
         recipe_repo = recipe_repo or CSVRecipeRepository()
         if df_list is None or len(df_list) == 0:
             st.text(MSG_NO_DATA_OR_FUNC)
@@ -106,7 +110,7 @@ class AnalysisLogs:
         "Error Categories (Top 5)": top_error_categories,
         "Most Searched Recipes": top_most_search_recipes,
     }
-        
+
     @staticmethod
     def show_analysis_logs(df_list, func):
         if df_list and func:
