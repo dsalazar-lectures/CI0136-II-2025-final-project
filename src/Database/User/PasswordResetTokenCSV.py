@@ -1,6 +1,7 @@
 import csv
 import os
 import datetime
+from datetime import timezone
 
 
 class PasswordResetTokenCSV:
@@ -30,13 +31,16 @@ class PasswordResetTokenCSV:
             )
 
     def get_valid_token(self, token: str):
-        now = datetime.datetime.now()
+        now = datetime.datetime.now(timezone.utc)
 
         with open(self.file_path, "r", newline="") as file:
             reader = csv.DictReader(file)
             for row in reader:
                 if row["token"] == token and row["used"] == "False":
                     expires_at = datetime.datetime.fromisoformat(row["expires_at"])
+
+                    if expires_at.tzinfo is None:
+                        expires_at = expires_at.replace(tzinfo=timezone.utc)
 
                     if expires_at > now:
                         return type(

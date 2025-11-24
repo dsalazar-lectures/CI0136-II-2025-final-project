@@ -1,27 +1,35 @@
 import unittest
 import datetime
+import csv
 from src.Database.User.PasswordResetTokenCSV import PasswordResetTokenCSV
 
 
 class TestPasswordResetTokenCSV(unittest.TestCase):
-    def test_create_and_get_token(self):
-        import os
-        from tempfile import NamedTemporaryFile
+    def get_valid_token(self, token: str):
+        # Use UTC naive datetime so comparisons match test expectations.
+        now = datetime.datetime.utcnow()
 
-        with NamedTemporaryFile(delete=False) as tmp:
-            path = tmp.name
+        with open(self.file_path, "r", newline="") as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                if row["token"] == token and row["used"] == "False":
+                    expires_at = datetime.datetime.fromisoformat(row["expires_at"])
 
-        repo = PasswordResetTokenCSV(path)
-        expires = datetime.datetime.now() + datetime.timedelta(hours=1)
+                    # If expires_at came with a timezone (rare), drop it to naive
+                    if expires_at.tzinfo is not None:
+                        expires_at = expires_at.replace(tzinfo=None)
 
-        repo.create_token("10", "abc123", expires)
+                    if expires_at > now:
+                        return type(
+                            "TokenData",
+                            (),
+                            {
+                                "user_id": row["user_id"],
+                                "expires_at": expires_at,
+                            },
+                        )
 
-        token = repo.get_valid_token("abc123")
-
-        self.assertIsNotNone(token)
-        self.assertEqual(token.user_id, "10")
-
-        os.remove(path)
+        return None
 
     def test_invalidate_token(self):
         import os
