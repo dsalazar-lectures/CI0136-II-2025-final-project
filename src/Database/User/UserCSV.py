@@ -190,3 +190,33 @@ class UserCSV:
             return True, "Email updated successfully", 200
 
         return False, "User not found", 404
+
+    def get_user_by_email(self, email):
+        with open(self.file_path, "r", newline="") as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                if row["email"] == email:
+                    return row
+        return None
+
+    def update_password_by_id(self, user_id, hashed_password):
+        updated = False
+        rows = []
+
+        with open(self.file_path, "r", newline="") as file:
+            reader = csv.DictReader(file)
+            fieldnames = reader.fieldnames
+            for row in reader:
+                if row["id"] == str(user_id):
+                    row["password"] = hashed_password
+                    updated = True
+                rows.append(row)
+
+        if updated:
+            with open(self.file_path, "w", newline="") as file:
+                writer = csv.DictWriter(file, fieldnames=fieldnames)
+                writer.writeheader()
+                writer.writerows(rows)
+            return True, "Password updated successfully", 200
+
+        return False, "User not found", 404
