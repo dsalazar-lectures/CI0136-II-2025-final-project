@@ -7,18 +7,68 @@ from datetime import datetime, timedelta
 
 
 # --------------------------------------------------------------------------------
-
 MSG_NO_DATA_OR_FUNC = "No data or metrics available to display."
 MSG_EXEC_ERROR_TPL = "Error executing the metric: {}"
 DATE_COL = "timestamp"
 USER_COL = "user"
 ACTION_COL = "action"
+ACTION_VALUE_LOGIN = "Login"
 LEVEL_COL = "level"
 ERROR_LEVELS = {"ERROR"}  # Only errors only (no warnings)
 
 
 # --------------------------------------------------------------------------------
 class AnalysisLogs:
+    @staticmethod
+    def _concat_and_filter(df_list, start_date, end_date) -> pd.DataFrame:
+        frames: List[pd.DataFrame] = []
+        for item in df_list:
+            df = item.get("data")
+            if not isinstance(df, pd.DataFrame):
+                continue
+            df = df.dropna(axis=1, how="all")
+            if df.empty or df.dropna(how="all").empty:
+                continue
+            if DATE_COL in df.columns and not pd.api.types.is_datetime64_any_dtype(
+                df[DATE_COL]
+            ):
+                df = df.copy()
+                df[DATE_COL] = pd.to_datetime(df[DATE_COL], errors="coerce")
+
+            frames.append(df)
+
+        if not frames:
+            return pd.DataFrame()
+
+        all_df = pd.concat(frames, ignore_index=True)
+        if DATE_COL in all_df.columns:
+            mask = (all_df[DATE_COL] >= start_date) & (all_df[DATE_COL] <= end_date)
+            all_df = all_df.loc[mask]
+
+        return all_df
+
+    @staticmethod
+    def top_users_most_active(df_list, start_date, end_date, top_n: int = 10):
+        df = AnalysisLogs._concat_and_filter(df_list, start_date, end_date)
+
+        # Minimum validation
+        if df.empty or not {"user", "action"}.issubset(df.columns):
+            st.info("Not enough data ('user' and 'action') to compute logins.")
+            return
+
+        # Login events only (exact match)
+        df = df[df[ACTION_COL] == ACTION_VALUE_LOGIN]
+        if df.empty:
+            st.info("No login events in the selected date range.")
+            return
+
+        counts = df[USER_COL].value_counts().head(top_n)
+        st.write(
+            f"Range: **{start_date.date()} – {end_date.date()}** · "
+            f"Total logins: **{len(df)}**"
+        )
+        st.bar_chart(counts)
+        st.dataframe(counts.rename_axis("user").reset_index(name="logins"))
 
     @staticmethod
     def top_most_search_recipes(
@@ -48,32 +98,6 @@ class AnalysisLogs:
                         recipes_counts[recipe.to_dict()["name"]] = counts[recipe_id]
 
                 st.bar_chart(recipes_counts)
-
-    def _concat_and_filter(df_list, start_date, end_date) -> pd.DataFrame:
-        frames: List[pd.DataFrame] = []
-        for item in df_list:
-            df = item.get("data")
-            if not isinstance(df, pd.DataFrame):
-                continue
-            df = df.dropna(axis=1, how="all")
-            if df.empty or df.dropna(how="all").empty:
-                continue
-            if DATE_COL in df.columns and not pd.api.types.is_datetime64_any_dtype(
-                df[DATE_COL]
-            ):
-                df = df.copy()
-                df[DATE_COL] = pd.to_datetime(df[DATE_COL], errors="coerce")
-            frames.append(df)
-
-        if not frames:
-            return pd.DataFrame()
-
-        all_df = pd.concat(frames, ignore_index=True)
-
-        if DATE_COL in all_df.columns:
-            mask = (all_df[DATE_COL] >= start_date) & (all_df[DATE_COL] <= end_date)
-            all_df = all_df.loc[mask]
-        return all_df
 
     @staticmethod
     def top_error_categories(df_list, start_date, end_date, top_n: int = 5):
@@ -111,6 +135,7 @@ class AnalysisLogs:
     analysis_registry: Dict[str, Callable[..., None]] = {
         "Error Categories (Top 5)": top_error_categories,
         "Most Searched Recipes": top_most_search_recipes,
+        "Users with Most Logins": top_users_most_active,
     }
 
     @staticmethod
