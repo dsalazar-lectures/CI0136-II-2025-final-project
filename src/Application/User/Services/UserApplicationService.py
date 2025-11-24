@@ -6,10 +6,8 @@ from src.Application.Interfaces.IUserRepository import IUserRepository
 from src.Application.Interfaces.IEncryptionService import IEncryptionService
 from src.Application.Interfaces.IValidationService import IValidationService
 from src.Application.Interfaces.ITokenService import ITokenService
-from Application.Interfaces.IPasswordResetTokenRepository import (
-    IPasswordResetTokenRepository,
-)
-from Application.User.Services.PasswordResetTokenService import PasswordResetTokenService
+from src.Application.Interfaces.IPasswordResetTokenRepository import IPasswordResetTokenRepository
+from src.Application.User.Services.PasswordResetTokenService import PasswordResetTokenService
 import jwt
 
 

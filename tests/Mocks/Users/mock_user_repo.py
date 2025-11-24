@@ -71,3 +71,22 @@ class MockUserRepository(IUserRepository):
                 self._users.remove(user)
                 return True
         return False
+    def update_email(self, username: str, new_email: str):
+        for user in self._users:
+            if user.username == username:
+                user.email = new_email
+                return True, "Email updated successfully", 200
+        return False, "Failed to update email", 400
+    
+    def get_user_by_email(self, email):
+        for user in self._users:
+            if user.email == email:
+                return user
+        return None
+
+    def update_password_by_id(self, user_id: str, hashed_password: str):
+        for user in self._users:
+            if str(user.id) == user_id:  # Convertir a string para comparar
+                user.password = hashed_password
+                return True, "Password updated successfully", 200
+        return False, "User not found", 404

@@ -15,6 +15,7 @@ class testUserApplicationService(unittest.TestCase):
         self.validation_service = ValidationService()
         self.token_service = MockTokenService()
         self.profile_service = MockProfileService()
+        self.password_reset_service = None
 
         self.user_app_service = UserApplicationService(
             user_repository=self.user_repository,
@@ -22,6 +23,7 @@ class testUserApplicationService(unittest.TestCase):
             encryption_service=self.encryption_service,
             token_service=self.token_service,
             profile_service=self.profile_service,
+            password_reset_service= self.password_reset_service,
         )
 
     def test_register_user_success(self):

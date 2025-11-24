@@ -1,7 +1,7 @@
 import secrets
 import datetime
 import pytz
-from Application.Interfaces.IPasswordResetTokenRepository import (
+from src.Application.Interfaces.IPasswordResetTokenRepository import (
     IPasswordResetTokenRepository,
 )
 

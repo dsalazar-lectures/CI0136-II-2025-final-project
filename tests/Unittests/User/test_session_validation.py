@@ -8,6 +8,18 @@ from tests.Mocks.Users.mock_encryption_service import MockEncryptionService
 from tests.Mocks.Users.mock_token_service import MockTokenService
 from tests.Mocks.Profile.mock_profile_service import MockProfileService
 
+class MockPasswordResetTokenService:
+    def generate_reset_token(self, user_id):
+        return "mock_token"
+    
+    def verify_reset_token(self, token):
+        return False, "Mock error"
+    
+    def invalidate_token(self, token):
+        pass
+    
+    def invalidate_all_user_tokens(self, user_id):
+        pass
 
 class TestSessionService(unittest.TestCase):
 
@@ -17,6 +29,9 @@ class TestSessionService(unittest.TestCase):
         self.validation_service = ValidationService()
         self.token_service = MockTokenService()
         self.profile_service = MockProfileService()
+        
+        self.password_reset_service = MockPasswordResetTokenService()
+        
 
         self.user_app_service = UserApplicationService(
             user_repository=self.user_repository,
@@ -24,6 +39,7 @@ class TestSessionService(unittest.TestCase):
             encryption_service=self.encryption_service,
             token_service=self.token_service,
             profile_service=self.profile_service,
+            password_reset_service=MockPasswordResetTokenService(),
         )
 
     def test_valid_token(self):
