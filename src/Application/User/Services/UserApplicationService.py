@@ -1,4 +1,3 @@
-import jwt
 from src.Application.DTOs.UserDTO import UserDTO
 from src.Application.Profiles.Services.ProfileApplicationService import (
     IProfileApplicationService,
