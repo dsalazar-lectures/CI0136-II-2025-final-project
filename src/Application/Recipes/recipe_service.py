@@ -9,6 +9,7 @@ filter_composer = FilterComposer()
 recipe_prioritizer = RecipePrioritizer()
 logger = CustomLogger()
 
+
 def get_all_recipes():
     return recipe_repository.get_all()
 
