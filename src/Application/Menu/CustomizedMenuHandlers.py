@@ -14,6 +14,7 @@ class MenuContext:
     limit: int
     category: Optional[str] = None
     require_all: bool = False  # True (AND), False (OR)
+    excluded_ingredients: Optional[List[str]] = None
 
     def category_norm(self) -> Optional[str]:
         return (
@@ -40,6 +41,32 @@ class MenuHandler(ABC):
     def handle(self, recipes: List[Any], ctx: MenuContext) -> List[Any]:
         pass
 
+class ExcludeIngredientsHandler(MenuHandler):
+    """Filter out any recipes that contain excluded ingredients."""
+
+    def handle(self, recipes: List[Any], ctx: MenuContext) -> List[Any]:
+        excluded = [
+            _norm(ingredient)
+            for ingredient in (ctx.excluded_ingredients or [])
+            if isinstance(ingredient, str) and ingredient.strip()
+        ]
+        if not excluded:
+            return recipes
+
+        def is_safe(recipe) -> bool:
+            recipe_ingredients = [
+                _norm(ingredient)
+                for ingredient in getattr(recipe, "ingredients", [])
+                if isinstance(ingredient, str)
+            ]
+            # Recipe is safe if NONE of the excluded strings appear
+            return not any(
+                excl in ingredient
+                for excl in excluded
+                for ingredient in recipe_ingredients
+            )
+
+        return [recipe for recipe in recipes if is_safe(recipe)]
 
 class FavoritesFilterHandler(MenuHandler):
     def handle(self, recipes: List[Any], ctx: MenuContext) -> List[Any]:
