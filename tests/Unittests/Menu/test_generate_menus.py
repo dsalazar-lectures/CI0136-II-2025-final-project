@@ -1,5 +1,5 @@
 import unittest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 from flask import Flask
 from tests.Mocks.Menu.mock_menu_service import MockMenuService
 from tests.Mocks.Menu.mock_menu_repository import MockMenuRepository
