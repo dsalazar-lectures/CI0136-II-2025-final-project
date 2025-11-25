@@ -300,7 +300,7 @@ class UserApplicationService:
             )
 
         reset_token = self.password_reset_service.generate_reset_token(str(user.id))
-        reset_link = f"http://localhost:5000/reset-password?token={reset_token}"
+        reset_link = f"http://localhost:5000/auth/reset-password?token={reset_token}"
 
         try:
             from src.Services.EmailService import sendEmail
