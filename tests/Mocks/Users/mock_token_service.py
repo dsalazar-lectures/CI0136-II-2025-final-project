@@ -4,7 +4,7 @@ from src.Application.Interfaces.ITokenService import ITokenService
 class MockTokenService(ITokenService):
     def __init__(self):
         self.tokens = {}
-        self.keys = {}
+        self.counter = 0
 
     def generate_token(self, user):
         token = f"mock_token_{user.username}_{user.id}"
@@ -12,7 +12,8 @@ class MockTokenService(ITokenService):
         return token
 
     def generate_key(self) -> str:
-        return "mock_key"
+        self.counter += 1
+        return f"mock_key_{self.counter}"
 
     def verify_token(self, token):
         return self.tokens.get(token)

@@ -48,8 +48,10 @@ class Analysis_Window:
         selected_name = st.sidebar.selectbox(LABEL_ANALYSIS_METRIC, options)
         func = analysis_registry[selected_name]
 
+        start_date, end_date = Analysis_Window.combined_date_range(logs_dataframes)
+
         st.subheader(SUBHEADER_RESULTS.format(analysis=selected_name))
-        func(logs_dataframes)
+        func(logs_dataframes, start_date, end_date)
 
     @staticmethod
     def build_named_frames(
@@ -75,3 +77,12 @@ class Analysis_Window:
             return None, None
         selected = st.sidebar.selectbox(LABEL_ANALYSIS_METRIC, options)
         return selected, analysis_registry.get(selected)
+
+    @staticmethod
+    def combined_date_range(
+        items: List[Dict[str, pd.DataFrame]],
+    ) -> Tuple[pd.Timestamp, pd.Timestamp]:
+        combined = pd.concat([d[DATA_KEY] for d in items], ignore_index=True)
+        start = pd.to_datetime(combined[DATE_COL].min())
+        end = pd.to_datetime(combined[DATE_COL].max())
+        return start, end

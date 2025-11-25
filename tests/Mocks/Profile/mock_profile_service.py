@@ -11,3 +11,16 @@ class MockProfileService(IProfileApplicationService):
         profile = {"user_id": user_id, "profile_id": len(self.created_profiles) + 1}
         self.created_profiles.append(profile)
         return profile
+
+    def get_profile(self, user_id: int):
+        for profile in self.created_profiles:
+            if profile["user_id"] == user_id:
+                return profile
+        return None
+
+    def delete_profile(self, user_id: int):
+        for profile in self.created_profiles:
+            if profile["user_id"] == user_id:
+                self.created_profiles.remove(profile)
+                return True
+        return False

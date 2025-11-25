@@ -1,4 +1,5 @@
 from flask import Flask
+from dotenv import load_dotenv
 import sys
 import os
 
@@ -9,10 +10,12 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "src"))
 from src.API.Ingredients.IngredientsRoutes import ingredients_bp
 from src.API.Recipes.recipesRoutes import recipes_bp
 from src.API.Menu.menuRoutes import menu_bp
-from src.API.AuthRoutes import auth_bp
+from src.API.AuthRoutes import auth_bp, google_bp
 from src.API.Profiles.ProfileRoutes import profiles_bp
 
 from src.API.Metrics.DashboardRoute import dashboard_bp
+from src.Shared.Logs.custom_logger import CustomLogger
+from src.Shared.Logs.build_handlers import build_handlers
 
 
 def create_app():
@@ -20,13 +23,21 @@ def create_app():
 
     app.json.ensure_ascii = False
 
+    # Secret key for sessions with Google
+    load_dotenv()
+    app.secret_key = os.getenv("SECRET_KEY", "dev-dafult-key")
+
     # Register blueprints
     app.register_blueprint(ingredients_bp)
     app.register_blueprint(recipes_bp, url_prefix="/api")
     app.register_blueprint(menu_bp, url_prefix="/api")
     app.register_blueprint(auth_bp, url_prefix="/auth")
+    app.register_blueprint(google_bp, url_prefix="/auth")
     app.register_blueprint(profiles_bp, url_prefix="/api")
     app.register_blueprint(dashboard_bp, url_prefix="/api")
+
+    # Create logger singleton instance
+    CustomLogger(handlers=build_handlers())
 
     # Health check endpoint
     @app.route("/")
@@ -36,8 +47,10 @@ def create_app():
             "endpoints": [
                 "POST /auth/register",
                 "POST /auth/login",
+                "GET /auth/login-google",
                 "POST /auth/regenerate-key",
                 "POST /auth/change-password",
+                "DELETE /auth/delete-account - Deletes user account",
                 "GET /api/ingredients - Get all ingredients",
                 "GET /api/ingredients/<id> - Get ingredient by ID",
                 "GET /api/recipes - Get all recipes",

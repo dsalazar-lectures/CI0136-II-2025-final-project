@@ -68,6 +68,14 @@ class UserCSV:
                     return row
         return None
 
+    def get_user_by_email(self, email):
+        with open(self.file_path, "r", newline="") as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                if row["email"] == email:
+                    return row
+        return None
+
     def get_user_by_id(self, user_id):
         with open(self.file_path, "r", newline="") as file:
             reader = csv.DictReader(file)
@@ -145,3 +153,25 @@ class UserCSV:
             return True, "Password updated successfully", 200
 
         return False, "Failed to update password", 400
+
+    def delete_user(self, user_id: int) -> bool:
+        """Delete a user by user_id"""
+        rows = []
+        deleted = False
+
+        with open(self.file_path, "r", newline="") as file:
+            reader = csv.DictReader(file)
+            fieldnames = reader.fieldnames
+            for row in reader:
+                if row["id"] == str(user_id):
+                    deleted = True
+                    continue  # Skip adding this row to the new list
+                rows.append(row)
+
+        if deleted:
+            with open(self.file_path, "w", newline="") as file:
+                writer = csv.DictWriter(file, fieldnames=fieldnames)
+                writer.writeheader()
+                writer.writerows(rows)
+
+        return deleted
