@@ -9,6 +9,7 @@ from src.Services.EmailService import sendMenu
 
 menu_repository = MenuRepository()
 
+
 def generateRandomMenu():
     meal_categories = {
         "breakfast": ["desayuno", "breakfast"],

@@ -3,7 +3,6 @@ from unittest.mock import patch
 from flask import Flask
 from src.Application.Menu import MenuUseCase
 from src.API.Menu.menuRoutes import menu_bp
-from tests.Mocks.Recipes.mock_recipe_repo import MockRecipe
 from src.Model.Menu.Menu import Menu
 from src.Model.Menu.MenuDay import MenuDay
 
@@ -13,7 +12,6 @@ class MenuEndpointTestCase(unittest.TestCase):
         app = Flask(__name__)
         app.register_blueprint(menu_bp, url_prefix="/api")
         self.client = app.test_client()
-
 
     @patch("src.Application.Menu.MenuUseCase.generateRandomMenu")
     def test_get_menu_returns_new_menu_structure(self, mock_generate_random_menu):
@@ -48,6 +46,7 @@ class MenuEndpointTestCase(unittest.TestCase):
     def test_get_menu_emailPdf_invalid_address(self):
         response = MenuUseCase.emailPdf(1, "test.gmail.com")
         self.assertEqual(response, 400)
+
 
 if __name__ == "__main__":
     unittest.main()
