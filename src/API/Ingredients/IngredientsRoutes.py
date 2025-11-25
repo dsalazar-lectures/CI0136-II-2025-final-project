@@ -101,7 +101,7 @@ def get_ai_substitutes():
         ingredient_name = request.json["ingredient"]
     else:
         return jsonify({"error": "Ingredient name is required"}), 400
-    
+
     """Get AI-generated natural-language substitutes for an ingredient."""
     result = ingredient_ai_service.get_ai_substitutes_message(ingredient_name)
 
