@@ -95,9 +95,8 @@ def _start_streamlit_if_needed(port: int) -> bool:
 @dashboard_bp.route("/Services/metrics/open-dashboard", methods=["POST", "GET"])
 def open_dashboard():
     is_auth, response, status_code = auth_service.is_authorized(
-        request.get_json(),
         request.headers,
-        Role.ADMIN,
+        [Role.ADMIN, Role.GOD],
     )
 
     if not is_auth:
