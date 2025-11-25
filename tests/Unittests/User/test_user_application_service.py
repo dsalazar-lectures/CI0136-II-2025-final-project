@@ -240,7 +240,7 @@ class testUserApplicationService(unittest.TestCase):
         self.assertEqual(
             msg,
             {
-                "error": "The new password does not meet the security requirements (minimum 8 characters, numbers, uppercase, symbols)."
+                "error": 'The new password does not meet the security requirements (minimum 8 characters and include at least one number, one uppercase letter, and one special character (e.g. !@#$%^&*(),.?":{}|<>).'
             },
         )
 
@@ -259,19 +259,10 @@ class testUserApplicationService(unittest.TestCase):
                 }
             )
 
-            user, _, token, _ = self.user_app_service.login_user(
-                {"username": "testUser", "password": "Passw@rd123"}
-            )
-            headers = {"Authorization": f"Bearer {token}"}
-
             old_key = self.user_repository.get_user_by_username("testUser").key
+            self.assertEqual(old_key, "k1")
 
-            with patch(
-                "jwt.decode", return_value={"username": "testUser"}
-            ), patch.object(
-                self.user_app_service.token_service, "verify_token", return_value=True
-            ):
-                user2, resp, status = self.user_app_service.regenerate_key(headers)
+            user2, resp, status = self.user_app_service.regenerate_key("testUser")
 
             new_key = self.user_repository.get_user_by_username("testUser").key
             self.assertNotEqual(old_key, new_key)
@@ -282,7 +273,7 @@ class testUserApplicationService(unittest.TestCase):
         headers = {}
         user, resp, status = self.user_app_service.regenerate_key(headers)
         self.assertIsNone(user)
-        self.assertEqual(status, 401)
+        self.assertEqual(status, 404)
         self.assertIn("error", resp)
 
     def test_regenerate_key_invalid_or_expired(self):
@@ -304,7 +295,7 @@ class testUserApplicationService(unittest.TestCase):
             u, resp, status = self.user_app_service.regenerate_key(headers)
 
         self.assertIsNone(u)
-        self.assertEqual(status, 401)
+        self.assertEqual(status, 404)
         self.assertIn("error", resp)
 
 

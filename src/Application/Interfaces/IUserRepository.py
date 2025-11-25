@@ -15,6 +15,10 @@ class IUserRepository(ABC):
         pass
 
     @abstractmethod
+    def get_user_by_email(self, email):
+        pass
+
+    @abstractmethod
     def update_password(self, username: str, hashed_password: str):
         pass
 

@@ -99,6 +99,43 @@ class AnalysisLogs:
 
                 st.bar_chart(recipes_counts)
 
+    def top_least_search_recipes(
+        df_list,
+        start_date=(datetime.today() - timedelta(days=7)),
+        end_date=datetime.today(),
+        recipe_repo: IRecipeRepository | None = None,
+    ):
+        recipe_repo = recipe_repo or CSVRecipeRepository()
+        if df_list is None or len(df_list) == 0:
+            st.text(MSG_NO_DATA_OR_FUNC)
+        else:
+            df = None
+            for item in df_list:
+                if item["name"] == "Search recipes":
+                    df = item["data"]
+                    break
+
+            if df is None or df.empty:
+                st.text("No 'Search recipes' data found.")
+            else:
+                df["timestamp"] = pd.to_datetime(df["timestamp"])
+                week_ago = datetime.today() - timedelta(days=7)
+                df = df[
+                    (df["timestamp"] >= week_ago)
+                    & (df["timestamp"] <= datetime.today())
+                ]
+                counts = df["Id_Producto"].value_counts(ascending=True)
+                # st.write(f"all counts {counts}")
+                counts = counts[counts < 5]
+                # st.write(f"filtered counts {counts}")
+                recipes_counts = {}
+                for recipe_id in counts.index:
+                    recipe = recipe_repo.get_by_id(recipe_id)
+                    if recipe:
+                        recipes_counts[recipe.to_dict()["name"]] = counts[recipe_id]
+
+                st.bar_chart(recipes_counts)
+
     @staticmethod
     def top_error_categories(df_list, start_date, end_date, top_n: int = 5):
         """Top N action categories producing the most errors (level == 'ERROR')."""
@@ -136,6 +173,7 @@ class AnalysisLogs:
         "Error Categories (Top 5)": top_error_categories,
         "Most Searched Recipes": top_most_search_recipes,
         "Users with Most Logins": top_users_most_active,
+        "Least Searched Recipes": top_least_search_recipes,
     }
 
     @staticmethod

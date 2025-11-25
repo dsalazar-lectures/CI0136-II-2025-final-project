@@ -10,6 +10,14 @@ from src.Application.Profiles.Services.ProfileApplicationService import (
     ProfileApplicationService,
 )
 from src.Infrastructure.Profiles.ProfileRepository import ProfileRepository
+from src.Infrastructure.Menu.MenuRepository import MenuRepository
+
+menu_bp = Blueprint("menu", __name__)
+recipes_bp = Blueprint("menu", __name__)
+
+customized_service = CustomizedMenuService()
+profile_service = ProfileApplicationService(ProfileRepository("profiles.csv"))
+menu_repository = MenuRepository()
 
 
 # Factory function to create blueprints with configurable profiles.csv path
@@ -62,7 +70,7 @@ def create_menu_blueprints(profiles_csv_path="profiles.csv"):
         recipientEmail = request.json.get("sendto")
         return "", MenuUseCase.emailPdf(menuRecipes, recipientEmail)
 
-    @recipes_bp.route("/menu/customized", methods=["GET"])
+    @menu_bp.route("/menu/customized", methods=["GET"])
     def customized_menu():
         user_id = request.args.get("user_id", type=int)
         category = request.args.get("category")

@@ -1,4 +1,5 @@
 from flask import Flask
+from dotenv import load_dotenv
 import sys
 import os
 
@@ -9,7 +10,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "src"))
 from src.API.Ingredients.IngredientsRoutes import ingredients_bp
 from src.API.Recipes.recipesRoutes import recipes_bp
 from src.API.Menu.menuRoutes import create_menu_blueprints
-from src.API.AuthRoutes import auth_bp
+from src.API.AuthRoutes import auth_bp, google_bp
 from src.API.Profiles.ProfileRoutes import profiles_bp
 
 from src.API.Metrics.DashboardRoute import dashboard_bp
@@ -30,6 +31,7 @@ def create_app():
     app.register_blueprint(menu_bp, url_prefix="/api")
     app.register_blueprint(menu_recipes_bp, url_prefix="/api")
     app.register_blueprint(auth_bp, url_prefix="/auth")
+    app.register_blueprint(google_bp, url_prefix="/auth")
     app.register_blueprint(profiles_bp, url_prefix="/api")
     app.register_blueprint(dashboard_bp, url_prefix="/api")
 
@@ -44,6 +46,7 @@ def create_app():
             "endpoints": [
                 "POST /auth/register",
                 "POST /auth/login",
+                "GET /auth/login-google",
                 "POST /auth/regenerate-key",
                 "POST /auth/change-password",
                 "DELETE /auth/delete-account - Deletes user account",
@@ -59,7 +62,7 @@ def create_app():
                 "GET /api/profiles/<user_id>/favorite-menus - Get user's favorite menus",
                 "POST /api/profiles/<user_id>/favorite-menus - Add menu to favorites",
                 "DELETE /api/profiles/<user_id>/favorite-menus - Remove menu from favorites",
-                "GET /api/menu/<category>/<count> - Generate N menus for a category",
+                "GET /api/menu/<count> - Generate N menus",
                 "GET /api/Services/metrics/open-dashboard?port=8601",
             ],
         }
