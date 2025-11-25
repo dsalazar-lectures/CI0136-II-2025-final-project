@@ -1,5 +1,6 @@
 import os
 from typing import Optional, Tuple, List
+from dotenv import load_dotenv
 import time
 
 import requests
@@ -12,6 +13,7 @@ class DeepSeekClient:
     """
 
     def __init__(self) -> None:
+        load_dotenv(override=False)
         self._api_key = os.getenv("DEEPSEEK_API_KEY")
         self._base_url = "https://openrouter.ai/api/v1/chat/completions"
         # Allow overriding the model from environment if needed
@@ -97,11 +99,6 @@ class DeepSeekClient:
                 if response.status_code in [429, 502, 503]:
                     if attempt < max_retries - 1:
                         wait_time = 2 ** (attempt + 3)  # 8s, 16s, 32s
-                        error_msg = {
-                            429: "Rate limit",
-                            502: "Bad gateway",
-                            503: "Service unavailable",
-                        }.get(response.status_code, "Server error")
                         time.sleep(wait_time)
                         continue
                     else:

@@ -170,7 +170,7 @@ class IngredientServiceTestCase(unittest.TestCase):
             "body": {
                 "ingredient": "Whole Milk",
                 "ai_message": ["Oat Milk", "Almond Milk", "Soy Milk"],
-            }
+            },
         }
 
         response = self.client.post(
