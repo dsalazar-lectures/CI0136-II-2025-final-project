@@ -197,6 +197,8 @@ def get_random_recipe_by_categories(categories):
         return None
 
     return random.choice(recipes)
+
+
 def get_prioritized_recipes(favorite_foods):
     all_recipes = recipe_repository.get_all()
     return recipe_prioritizer.prioritize(all_recipes, favorite_foods)

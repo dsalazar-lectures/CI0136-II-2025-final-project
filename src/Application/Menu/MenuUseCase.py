@@ -9,6 +9,7 @@ from src.Services.EmailService import sendMenu
 
 menu_repository = MenuRepository()
 
+
 def generateRandomMenu():
     meal_categories = {
         "breakfast": ["desayuno", "breakfast"],
@@ -17,7 +18,9 @@ def generateRandomMenu():
         "dessert": ["postre", "dessert"],
     }
 
-    recipe = recipe_service.get_random_recipe_by_categories(meal_categories["breakfast"])
+    recipe = recipe_service.get_random_recipe_by_categories(
+        meal_categories["breakfast"]
+    )
     breakfast_recipe_id = recipe.id if recipe else 0
     recipe = recipe_service.get_random_recipe_by_categories(meal_categories["lunch"])
     lunch_recipe_id = recipe.id if recipe else 0
@@ -26,7 +29,9 @@ def generateRandomMenu():
     recipe = recipe_service.get_random_recipe_by_categories(meal_categories["dessert"])
     dessert_recipe_id = recipe.id if recipe else 0
 
-    menu_day = MenuDay(breakfast_recipe_id, lunch_recipe_id, dinner_recipe_id, dessert_recipe_id)
+    menu_day = MenuDay(
+        breakfast_recipe_id, lunch_recipe_id, dinner_recipe_id, dessert_recipe_id
+    )
 
     daily_menu = dict()
     daily_menu[1] = menu_day
