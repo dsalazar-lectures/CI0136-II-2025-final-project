@@ -10,7 +10,7 @@ def get_username_from_request():
 
     if not user_id:
         return None
-    
+
     user = user_repository.get_user_by_id(user_id)
     if not user:
         return None
@@ -22,9 +22,7 @@ def create_recipe_controller(data):
     username = get_username_from_request()
 
     if not username:
-        return 401, {
-            "error": "Invalid user_id"
-        }
+        return 401, {"error": "Invalid user_id"}
 
     recipe = recipe_service.create_recipe(data, username)
 
@@ -38,9 +36,7 @@ def delete_recipe_controller(recipe_id):
     username = get_username_from_request()
 
     if not username:
-        return 401, {
-            "error": "Invalid user_id"
-        }
+        return 401, {"error": "Invalid user_id"}
 
     result = recipe_service.delete_recipe(recipe_id, username)
 
@@ -57,9 +53,7 @@ def update_recipe_controller(recipe_id, updates):
     username = get_username_from_request()
 
     if not username:
-        return 401, {
-            "error": "Invalid user_id"
-        }
+        return 401, {"error": "Invalid user_id"}
 
     allowed_fields = {
         "name",
@@ -82,6 +76,7 @@ def update_recipe_controller(recipe_id, updates):
 
     return 200, result.to_dict()
 
+
 def rate_recipe_controller(recipe_id, data):
     username = get_username_from_request()
 
@@ -103,4 +98,3 @@ def rate_recipe_controller(recipe_id, data):
         return 400, {"error": "Invalid rating value (must be between 1 and 5)"}
 
     return 200, {"message": "Rating submitted successfully", "recipe": result.to_dict()}
-

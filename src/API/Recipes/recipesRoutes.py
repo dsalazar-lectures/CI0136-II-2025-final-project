@@ -79,11 +79,7 @@ def filter_recipes():
 
     if filtered_recipes == -1:
         return (
-            jsonify(
-                {
-                    "message": "Invalid data"
-                }
-            ),
+            jsonify({"message": "Invalid data"}),
             400,
         )
 
@@ -139,8 +135,11 @@ def get_prioritized_recipes():
         200,
     )
 
+
 @recipes_bp.route("/recipes/<int:recipe_id>/rate", methods=["POST"])
 def rate_recipe(recipe_id):
     data = request.json or {}
-    status_code, response_data = recipesController.rate_recipe_controller(recipe_id, data)
+    status_code, response_data = recipesController.rate_recipe_controller(
+        recipe_id, data
+    )
     return jsonify(response_data), status_code
