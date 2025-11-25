@@ -4,14 +4,17 @@ from src.Model.Menu.MenuDay import MenuDay
 from src.Application.Recipes import recipe_service
 
 
-def generate_menus(count: int) -> Tuple[Optional[Menu], Optional[List[str]]]:
+def generate_menus(
+    count: int,
+) -> Tuple[Optional[Menu], Optional[List[str]], Optional[List[Dict]]]:
     """
     Generates a menu with n days, each day with breakfast, lunch, dinner and dessert.
 
     Returns:
-        Tuple[Optional[Menu], Optional[List[str]]]: (menu, missing_categories)
-        - If successful: (Menu, None)
-        - If categories are missing: (None, [list of missing categories])
+        Tuple[Optional[Menu], Optional[List[str]], Optional[List[Dict]]]: 
+            (menu, missing_categories, menu_details)
+        - If successful: (Menu, None, [list of menu details with recipes])
+        - If categories are missing: (None, [list of missing categories], None)
     """
     # Dictionary of meal categories
     meal_categories = {
@@ -22,6 +25,7 @@ def generate_menus(count: int) -> Tuple[Optional[Menu], Optional[List[str]]]:
     }
 
     daily_menus = {}
+    menu_details = []
 
     # Generate each day of the menu
     for day in range(1, count + 1):
@@ -51,7 +55,7 @@ def generate_menus(count: int) -> Tuple[Optional[Menu], Optional[List[str]]]:
             missing_categories.append("postre")
 
         if missing_categories:
-            return None, missing_categories
+            return None, missing_categories, None
 
         # Create MenuDay with recipe IDs
         menu_day = MenuDay(
@@ -63,9 +67,20 @@ def generate_menus(count: int) -> Tuple[Optional[Menu], Optional[List[str]]]:
 
         daily_menus[day] = menu_day
 
+        # Add detailed menu information with full recipe data
+        menu_details.append(
+            {
+                "day": day,
+                "breakfast": breakfast_recipe.to_dict(),
+                "lunch": lunch_recipe.to_dict(),
+                "dinner": dinner_recipe.to_dict(),
+                "dessert": dessert_recipe.to_dict(),
+            }
+        )
+
     # Create Menu object (menu_id will be assigned in the repository)
     menu = Menu(
         menu_id=0, daily_menus=daily_menus  # Will be automatically assigned when saved
     )
 
-    return menu, None
+    return menu, None, menu_details

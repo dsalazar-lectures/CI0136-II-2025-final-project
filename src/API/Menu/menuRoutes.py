@@ -38,7 +38,7 @@ def get_menus_number(count: int):
         )
 
     # Generate menus
-    menu, missing_categories = menu_service.generate_menus(count)
+    menu, missing_categories, menu_details = menu_service.generate_menus(count)
 
     if missing_categories:
         return (
@@ -56,7 +56,7 @@ def get_menus_number(count: int):
     if status_code != 201:
         return jsonify({"error": message}), status_code
 
-    return jsonify(saved_menu.to_dict()), 201
+    return jsonify({"menu_id": saved_menu.menu_id, "daily_menus": menu_details}), 201
 
 
 @menu_bp.route("/menu/email", methods=["GET"])
