@@ -179,7 +179,7 @@ def change_email():
     return jsonify(response), status_code
 
 
-@auth_bp.route("/forgot-password", methods=["GET"])
+@auth_bp.route("/forgot-password", methods=["POST"])
 def forgot_password():
     # Delegate all logic to UserApplicationService
     data = request.get_json()
