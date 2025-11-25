@@ -4,6 +4,7 @@ from src.Application.Interfaces.IProfileApplicationService import (
     IProfileApplicationService,
 )
 from src.Model.Profiles.Roles import Role
+import jwt
 
 
 class AuthorizationService(IAuthorizationService):
@@ -14,20 +15,28 @@ class AuthorizationService(IAuthorizationService):
     ):
         self.user_app_service = user_app_service
         self.profile_service = profile_service
+        
+    def get_username_from_token(self, headers):
+        token = headers["Authorization"].split(" ")[1]
+        try:
+            payload = jwt.decode(token, options={"verify_signature": False})
+            username = payload.get("username")
+            if not username:
+                return None, {"error": "Invalid token payload"}, 401
+            return username, None, None
+        except jwt.InvalidTokenError:
+            return None, {"error": "Invalid token"}, 401
 
-    def is_authorized(self, data, headers, auth_roles: list[Role]):
+    def is_authorized(self, headers, auth_roles: list[Role]):
         if "Authorization" not in headers or not headers["Authorization"]:
             return False, {"error": "Authorization header missing"}, 401
 
-        is_valid, error_response, status_code = (
-            self.user_app_service.validation_service.validate_request_data(
-                data, ["username"]
-            )
-        )
-        if not is_valid:
+        username = None
+        username, error_response, status_code = self.get_username_from_token(headers)
+        
+        if not username:
             return False, error_response, status_code
 
-        username = data["username"]
         user, response, status_code = self.user_app_service.verify_valid_session(
             headers, username
         )
@@ -40,5 +49,4 @@ class AuthorizationService(IAuthorizationService):
 
         if profile.role not in auth_roles:
             return False, {"error": "Unauthorized access"}, 403
-
         return True, {}, 200

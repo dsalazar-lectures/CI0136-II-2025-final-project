@@ -12,6 +12,8 @@ from src.Application.Profiles.Services.ProfileApplicationService import (
 from src.Application.User.Services.AccountApplicationService import (
     AccountApplicationService,
 )
+from src.Application.User.Services.AuthorizationService import AuthorizationService
+from src.Model.Profiles.Roles import Role
 
 auth_bp = Blueprint("auth", __name__)
 
@@ -34,6 +36,7 @@ user_app_service = UserApplicationService(
     token_service=token_service,
     profile_service=profile_service,
 )
+auth_service = AuthorizationService(user_app_service, profile_service)
 
 
 @auth_bp.route("/register", methods=["POST"])
@@ -66,6 +69,14 @@ def login():
 @auth_bp.route("/change-password", methods=["POST"])
 # TODO(@Paulette): add jwt_required decorator
 def change_password():
+    is_auth, response, status_code = auth_service.is_authorized(
+        request.headers,
+        [Role.ADMIN, Role.GOD],
+    )
+
+    if not is_auth:
+        return jsonify(response), status_code
+    
     if "Authorization" not in request.headers or not request.headers["Authorization"]:
         return jsonify({"error": "Missing signature"}), 401
 
@@ -90,6 +101,14 @@ def change_password():
 
 @auth_bp.route("/regenerate-key", methods=["POST"])
 def regenerate_key():
+    is_auth, response, status_code = auth_service.is_authorized(
+        request.headers,
+        [Role.ADMIN, Role.GOD],
+    )
+
+    if not is_auth:
+        return jsonify(response), status_code
+    
     auth = request.headers.get("Authorization", "")
     parts = auth.split()
     if len(parts) != 2 or parts[0].lower() != "bearer":
@@ -120,6 +139,25 @@ def regenerate_key():
 
 @auth_bp.route("/delete-account", methods=["DELETE"])
 def delete_account():
+    is_auth, response, status_code = auth_service.is_authorized(
+        request.headers,
+        [Role.ADMIN, Role.GOD],
+    )
+
+    if not is_auth:
+        return jsonify(response), status_code
+    
+    actorname, _, _ = auth_service.get_username_from_token(request.headers)
+    actor = auth_service.user_app_service.user_repository.get_user_by_username(actorname)
+    roleActor = auth_service.profile_service.get_profile(actor.id).role
+    victim_name = request.get_json().get("username")
+    victim = auth_service.user_app_service.user_repository.get_user_by_username(victim_name)
+    roleVictim = auth_service.profile_service.get_profile(victim.id).role
+    
+    if roleActor == roleVictim:
+        if roleActor != Role.GOD:
+            return jsonify({"error": "An Admin user cannot delete another Admin user"}), 403
+    
     # Get username to delete from request body
     json_data = request.get_json()
     username_to_delete = json_data.get("username") if json_data else None
