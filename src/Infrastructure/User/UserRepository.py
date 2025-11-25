@@ -43,6 +43,19 @@ class UserRepository(IUserRepository):
             )
         return None
 
+    def get_user_by_email(self, email):
+        db_user = self.user_csv.get_user_by_email(email)
+        if db_user:
+            return UserDTO(
+                id=int(db_user["id"]),
+                username=db_user["username"],
+                password=db_user["password"],
+                email=db_user["email"],
+                role=db_user["role"],
+                key=db_user["key"],
+            )
+        return None
+
     def get_user_by_id(self, user_id):
         db_user = self.user_csv.get_user_by_id(user_id)
         if db_user:

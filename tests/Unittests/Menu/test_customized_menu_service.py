@@ -1,10 +1,43 @@
 import unittest
 import inspect
-from typing import List
+from typing import List, Optional
 from src.Application.Menu.ICustomizedMenuService import ICustomizedMenuService
 from src.Application.Menu.CustomizedMenuService import CustomizedMenuService
 
-from tests.Mocks.Menu.mock_customized_menu import FakeRecipe, FakeRecipeService
+
+class FakeRecipe:
+    """Mock recipe class for testing purposes"""
+
+    def __init__(
+        self,
+        title: str,
+        ingredients: List[str],
+        categories: Optional[List[str]] = None,
+        rating: int = 0,
+    ):
+        self.title = title
+        self.ingredients = ingredients
+        self.categories = categories or []
+        self.rating = rating
+
+
+class FakeRecipeService:
+    """Mock recipe service for testing"""
+
+    def __init__(self, recipes: List[FakeRecipe]):
+        self._recipes = list(recipes)
+
+    def get_all_recipes(self) -> List[FakeRecipe]:
+        return list(self._recipes)
+
+    def filter_recipes(self, criteria: dict) -> List[FakeRecipe]:
+        cats = [c.lower().strip() for c in (criteria.get("categories") or [])]
+        out = []
+        for recipe in self._recipes:
+            recipe_categories = [c.lower().strip() for c in (recipe.categories or [])]
+            if set(cats) & set(recipe_categories):
+                out.append(recipe)
+        return out
 
 
 def build_sut(

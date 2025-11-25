@@ -1,8 +1,13 @@
 from flask import Blueprint, jsonify, request
 from src.Application.Recipes import recipe_service
 from src.API.Recipes import recipesController
+from src.Application.Profiles.Services.ProfileApplicationService import (
+    ProfileApplicationService,
+)
+from src.Infrastructure.Profiles.ProfileRepository import ProfileRepository
 
 recipes_bp = Blueprint("recipes", __name__)
+profile_service = ProfileApplicationService(ProfileRepository("profiles.csv"))
 
 
 @recipes_bp.route("/recipes", methods=["GET"])
@@ -88,6 +93,37 @@ def filter_recipes():
             {
                 "count": len(filtered_recipes),
                 "recipes": [recipe.to_dict() for recipe in filtered_recipes],
+            }
+        ),
+        200,
+    )
+
+
+@recipes_bp.route("/recipes/prioritized", methods=["GET"])
+def get_prioritized_recipes():
+    """
+    Get all recipes prioritized by user's favorite ingredients.
+    """
+    user_id = request.args.get("user_id", type=int)
+
+    if not user_id:
+        return jsonify({"error": "user_id es requerido como parámetro"}), 400
+
+    # Get user profile
+    profile = profile_service.get_profile(user_id)
+    if not profile:
+        return jsonify({"error": "Perfil de usuario no encontrado"}), 404
+
+    # Get prioritized recipes based on user's favorite foods
+    prioritized_recipes = recipe_service.get_prioritized_recipes(profile.favorite_foods)
+
+    return (
+        jsonify(
+            {
+                "count": len(prioritized_recipes),
+                "user_id": user_id,
+                "favorite_ingredients": profile.favorite_foods,
+                "recipes": [recipe.to_dict() for recipe in prioritized_recipes],
             }
         ),
         200,
