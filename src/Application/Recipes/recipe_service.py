@@ -1,9 +1,13 @@
 import random
 from src.Infrastructure.Recipes.CSVRecipeRepository import CSVRecipeRepository
 from src.Application.Recipes.FilterComposer import FilterComposer
+from src.Application.Recipes.RecipePrioritizer import RecipePrioritizer
+from src.Shared.Logs.custom_logger import CustomLogger
 
 recipe_repository = CSVRecipeRepository()
 filter_composer = FilterComposer()
+recipe_prioritizer = RecipePrioritizer()
+logger = CustomLogger()
 
 
 def get_all_recipes():
@@ -21,18 +25,117 @@ def get_recipes_by_ingredient(ingredient):
 def create_recipe(recipe_data, username):
     recipe_data["author"] = username
     if not validate_create_data(recipe_data):
+        logger.log(
+            level="error",
+            user=username,
+            role="-",  # Can be changed if necessary
+            action="Create recipe",
+            id_object="-",
+            description=f"Validation error by {username}",
+        )
         return -1
-    return recipe_repository.add_recipe(recipe_data)
+    recipe = recipe_repository.add_recipe(recipe_data)
+
+    if recipe is None:
+        logger.log(
+            level="error",
+            user=username,
+            role="-",
+            action="Create recipe",
+            id_object="-",
+            description=f"Failed to create recipe {username}",
+        )
+        return -1
+    else:
+        logger.log(
+            level="info",
+            user=username,
+            role="-",
+            action="Create recipe",
+            id_object=recipe.id,
+            description=f"Recipe '{recipe.name}' created successfully by {username}",
+        )
+        return recipe
 
 
 def delete_recipe(recipe_id, username):
-    return recipe_repository.delete_if_owned(recipe_id, username)
+    recipe = recipe_repository.delete_if_owned(recipe_id, username)
+
+    if recipe is None:
+        logger.log(
+            level="error",
+            user=username,
+            role="-",
+            action="Delete recipe",
+            id_object="-",
+            description=f"Recipe {recipe_id} not found",
+        )
+        return -1
+    elif recipe is False:
+        logger.log(
+            level="warning",
+            user=username,
+            role="-",
+            action="Delete recipe",
+            id_object=recipe_id,
+            description=f"User {username} does not own recipe {recipe_id}",
+        )
+        return 0
+    else:
+        logger.log(
+            level="info",
+            user=username,
+            role="-",
+            action="Delete recipe",
+            id_object=recipe_id,
+            description=f"Recipe {recipe_id} deleted successfully",
+        )
+        return recipe
 
 
 def update_recipe(recipe_id, updates, username):
     if not validate_data(updates):
+        logger.log(
+            level="error",
+            user=username,
+            role="-",
+            action="Update recipe",
+            id_object=recipe_id,
+            description=f"Validation failed for update data in recipe {recipe_id}",
+        )
         return -1
-    return recipe_repository.update_if_owned(recipe_id, username, updates)
+    recipe = recipe_repository.update_if_owned(recipe_id, username, updates)
+
+    if recipe is None:
+        logger.log(
+            level="error",
+            user=username,
+            role="-",
+            action="Update recipe",
+            id_object=recipe_id,
+            description=f"Recipe {recipe_id} not found",
+        )
+        return -1
+    elif recipe is False:
+        logger.log(
+            level="warning",
+            user=username,
+            role="-",
+            action="Update recipe",
+            id_object=recipe_id,
+            description=f"User {username} does not own recipe {recipe_id}",
+        )
+        return 0
+    else:
+        logger.log(
+            level="info",
+            user=username,
+            role="-",
+            action="Update recipe",
+            id_object=recipe_id,
+            description=f"Recipe {recipe_id} updated successfully by {username})",
+        )
+        return recipe
 
 
 def filter_recipes(filter_criteria):
@@ -94,3 +197,8 @@ def get_random_recipe_by_category(category):
         return None
 
     return random.choice(recipes)
+
+
+def get_prioritized_recipes(favorite_foods):
+    all_recipes = recipe_repository.get_all()
+    return recipe_prioritizer.prioritize(all_recipes, favorite_foods)
