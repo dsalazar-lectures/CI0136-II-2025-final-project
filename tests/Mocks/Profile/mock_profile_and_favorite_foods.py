@@ -57,3 +57,21 @@ class MockProfileAndFavoriteFoods(IProfileRepository):
         if not profile:
             return False
         return menu_id in profile.favorite_menus
+
+    def delete_profile(self, user_id: int) -> bool:
+        if user_id in self.profiles:
+            del self.profiles[user_id]
+            return True
+        return False
+
+    def restore_profile(self, user_id: int, favorites) -> Profile:
+        if user_id in self.profiles:
+            return None
+        profile = Profile(
+            user_id=user_id,
+            favorite_foods=favorites,
+            unfavorite_foods=[],
+            favorite_menus=[],
+        )
+        self.profiles[user_id] = profile
+        return profile
