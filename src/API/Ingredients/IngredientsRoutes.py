@@ -95,11 +95,13 @@ def delete_ingredient():
     return jsonify({"message": "Ingredient deleted successfully"}), 200
 
 
-@ingredients_bp.route(
-    "/ingredients/<string:ingredient_name>/ai-substitutes",
-    methods=["GET"],
-)
-def get_ai_substitutes(ingredient_name):
+@ingredients_bp.route("/ingredients/ai-substitutes", methods=["POST"])
+def get_ai_substitutes():
+    if "ingredient" in request.json:
+        ingredient_name = request.json["ingredient"]
+    else:
+        return jsonify({"error": "Ingredient name is required"}), 400
+    
     """Get AI-generated natural-language substitutes for an ingredient."""
     result = ingredient_ai_service.get_ai_substitutes_message(ingredient_name)
 
