@@ -1,5 +1,7 @@
 from flask import Blueprint, jsonify, request
 from src.Application.Ingredients.IngredientUseCase import ingredient_service
+from src.Application.Ingredients.IngredientAIUseCase import ingredient_ai_service
+
 
 ingredients_bp = Blueprint("ingredients", __name__)
 
@@ -91,3 +93,17 @@ def delete_ingredient():
         return jsonify({"error": "Ingredient not found"}), 404
 
     return jsonify({"message": "Ingredient deleted successfully"}), 200
+
+
+@ingredients_bp.route(
+    "/ingredients/<string:ingredient_name>/ai-substitutes",
+    methods=["GET"],
+)
+def get_ai_substitutes(ingredient_name):
+    """Get AI-generated natural-language substitutes for an ingredient."""
+    result = ingredient_ai_service.get_ai_substitutes_message(ingredient_name)
+
+    status_code = result.get("status_code", 200)
+    body = result.get("body", {})
+
+    return jsonify(body), status_code
