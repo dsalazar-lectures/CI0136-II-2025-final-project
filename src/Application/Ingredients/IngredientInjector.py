@@ -12,14 +12,18 @@ from .IngredientUseCase import IngredientUseCase
 load_dotenv()
 
 API_KEY_SPOONACULAR = os.getenv("SPOONACULAR_API_KEY")
-if not API_KEY_SPOONACULAR:
-    raise RuntimeError("SPOONACULAR_API_KEY no está definida. Añádela en .env")
+# No levantar excepción en import; permitir que la app/tests funcionen sin clave.
+api_service = None
+spoonacular_adapter = None
 
-api_service = SpoonacularAPIService(api_key=API_KEY_SPOONACULAR)
+if API_KEY_SPOONACULAR:
+    api_service = SpoonacularAPIService(api_key=API_KEY_SPOONACULAR)
+    spoonacular_adapter = SpoonacularIngredientAdapter(api_service=api_service)
+else:
+    # Mensaje informativo (no obligatorio)
+    print("WARNING: SPOONACULAR_API_KEY no definida - proveedor externo deshabilitado.")
 
 ingredient_repository = IngredientRepository()
-
-spoonacular_adapter = SpoonacularIngredientAdapter(api_service=api_service)
 
 ingredient_service_instance = IngredientUseCase(
     repository=ingredient_repository, external_provider=spoonacular_adapter
