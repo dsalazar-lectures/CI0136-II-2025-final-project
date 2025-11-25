@@ -17,13 +17,17 @@ class MenuServiceTestCase(unittest.TestCase):
         mock_dinner = self._create_mock_recipe(3, "Salmón", "cena")
         mock_dessert = self._create_mock_recipe(4, "Flan", "postre")
 
-        # Configure mock to return appropriate recipe based on category
+        # Configure mock to return appropriate recipe based on category (Spanish and English)
         def get_recipe_by_category(category):
             recipes = {
                 "desayuno": mock_breakfast,
+                "breakfast": mock_breakfast,
                 "almuerzo": mock_lunch,
+                "lunch": mock_lunch,
                 "cena": mock_dinner,
+                "dinner": mock_dinner,
                 "postre": mock_dessert,
+                "dessert": mock_dessert,
             }
             return recipes.get(category)
 
@@ -84,7 +88,7 @@ class MenuServiceTestCase(unittest.TestCase):
     def test_missing_one_category(self, mock_get_recipe):
         # Mock that only breakfast is missing
         def get_recipe_by_category(category):
-            if category == "desayuno":
+            if category in ["desayuno", "breakfast"]:
                 return None
             return self._create_mock_recipe(1, "Recipe", category)
 
