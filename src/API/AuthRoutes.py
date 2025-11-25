@@ -16,6 +16,7 @@ from src.Application.User.Services.AccountApplicationService import (
 auth_bp = Blueprint("auth", __name__)
 
 user_repository = UserRepository()
+profile_repository = ProfileRepository()
 validation_service = ValidationService()
 encryption_service = EncryptionService()
 token_service = TokenService()
@@ -23,7 +24,7 @@ profile_service = ProfileApplicationService(profile_repository=ProfileRepository
 
 account_app_service = AccountApplicationService(
     user_repository=user_repository,
-    profile_service=profile_service,
+    profile_repository=profile_repository,
     token_service=token_service,
 )
 

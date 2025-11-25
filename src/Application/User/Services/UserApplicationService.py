@@ -187,6 +187,3 @@ class UserApplicationService:
             return None, {"error": "Failed to rotate key"}, 500
 
         return user, {"message": "Key regenerated successfully"}, 200
-
-    def delete_user(self, user_id):
-        return self.user_repository.delete_user(user_id)

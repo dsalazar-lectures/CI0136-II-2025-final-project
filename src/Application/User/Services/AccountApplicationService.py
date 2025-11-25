@@ -1,8 +1,6 @@
 from src.Application.Interfaces.IUserRepository import IUserRepository
 from src.Application.Interfaces.ITokenService import ITokenService
-from src.Application.Profiles.Services.ProfileApplicationService import (
-    IProfileApplicationService,
-)
+from src.Application.Profiles.IProfileRepository import IProfileRepository
 import jwt
 
 
@@ -10,11 +8,11 @@ class AccountApplicationService:
     def __init__(
         self,
         user_repository: IUserRepository,
-        profile_service: IProfileApplicationService,
+        profile_repository: IProfileRepository,
         token_service: ITokenService,
     ):
         self.user_repository = user_repository
-        self.profile_service = profile_service
+        self.profile_repository = profile_repository
         self.token_service = token_service
 
     def _verify_valid_session(self, headers, username):
@@ -59,11 +57,11 @@ class AccountApplicationService:
             return None, {"error": "User not found"}, 404
 
         # Store profile before deletion
-        profile_to_delete = self.profile_service.get_profile(user_to_delete.id)
+        profile_to_delete = self.profile_repository.get_profile(user_to_delete.id)
         if not profile_to_delete:
             return None, {"error": "User profile not found"}, 404
         # Delete user profile
-        profile_deleted = self.profile_service.delete_profile(user_to_delete.id)
+        profile_deleted = self.profile_repository.delete_profile(user_to_delete.id)
         if not profile_deleted:
             return None, {"error": "Failed to delete user profile"}, 500
         if profile_deleted:
@@ -71,7 +69,7 @@ class AccountApplicationService:
             user_deleted = self.user_repository.delete_user(user_to_delete.id)
             if not user_deleted:
                 # Rollback profile deletion if user deletion fails
-                self.profile_service.restore_profile(
+                self.profile_repository.restore_profile(
                     user_to_delete.id, profile_to_delete.favorite_foods
                 )
                 return None, {"error": "Failed to delete user account"}, 500

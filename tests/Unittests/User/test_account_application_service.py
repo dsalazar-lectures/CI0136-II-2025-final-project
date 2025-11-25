@@ -11,13 +11,13 @@ class TestAccountApplicationService(unittest.TestCase):
     def setUp(self):
         # Create mocks for dependencies
         self.mock_user_repository = Mock()
-        self.mock_profile_service = Mock()
+        self.mock_profile_repository = Mock()
         self.mock_token_service = Mock()
 
         # Initialize service with mocks
         self.account_service = AccountApplicationService(
             user_repository=self.mock_user_repository,
-            profile_service=self.mock_profile_service,
+            profile_repository=self.mock_profile_repository,
             token_service=self.mock_token_service,
         )
 
@@ -52,8 +52,8 @@ class TestAccountApplicationService(unittest.TestCase):
             self.mock_token_service.verify_token.return_value = True
 
             # Mock successful deletions
-            self.mock_profile_service.get_profile.return_value = mock_profile
-            self.mock_profile_service.delete_profile.return_value = True
+            self.mock_profile_repository.get_profile.return_value = mock_profile
+            self.mock_profile_repository.delete_profile.return_value = True
             self.mock_user_repository.delete_user.return_value = True
 
             # Act
@@ -69,11 +69,11 @@ class TestAccountApplicationService(unittest.TestCase):
             self.assertEqual(status_code, 200)
 
             # Verify method calls
-            self.mock_profile_service.get_profile.assert_called_once_with(123)
-            self.mock_profile_service.delete_profile.assert_called_once_with(123)
+            self.mock_profile_repository.get_profile.assert_called_once_with(123)
+            self.mock_profile_repository.delete_profile.assert_called_once_with(123)
             self.mock_user_repository.delete_user.assert_called_once_with(123)
             # Verify restore_profile was NOT called (success case)
-            self.mock_profile_service.restore_profile.assert_not_called()
+            self.mock_profile_repository.restore_profile.assert_not_called()
 
     def test_delete_user_account_missing_authorization_header(self):
         """Test deletion with missing Authorization header"""
@@ -221,7 +221,7 @@ class TestAccountApplicationService(unittest.TestCase):
             self.mock_token_service.verify_token.return_value = True
 
             # Mock profile not found
-            self.mock_profile_service.get_profile.return_value = None
+            self.mock_profile_repository.get_profile.return_value = None
 
             # Act
             result_user, response, status_code = (
@@ -259,8 +259,8 @@ class TestAccountApplicationService(unittest.TestCase):
             self.mock_token_service.verify_token.return_value = True
 
             # Mock profile deletion failure
-            self.mock_profile_service.get_profile.return_value = mock_profile
-            self.mock_profile_service.delete_profile.return_value = False
+            self.mock_profile_repository.get_profile.return_value = mock_profile
+            self.mock_profile_repository.delete_profile.return_value = False
 
             # Act
             result_user, response, status_code = (
@@ -275,7 +275,7 @@ class TestAccountApplicationService(unittest.TestCase):
             # Verify user deletion was NOT attempted when profile deletion fails
             self.mock_user_repository.delete_user.assert_not_called()
             # Verify restore_profile was NOT called (only for user deletion failure)
-            self.mock_profile_service.restore_profile.assert_not_called()
+            self.mock_profile_repository.restore_profile.assert_not_called()
 
     def test_delete_user_account_user_deletion_fails_with_rollback(self):
         """Test when user account deletion fails - profile should be restored"""
@@ -303,8 +303,8 @@ class TestAccountApplicationService(unittest.TestCase):
             self.mock_token_service.verify_token.return_value = True
 
             # Mock profile deletion success but user deletion failure
-            self.mock_profile_service.get_profile.return_value = mock_profile
-            self.mock_profile_service.delete_profile.return_value = True
+            self.mock_profile_repository.get_profile.return_value = mock_profile
+            self.mock_profile_repository.delete_profile.return_value = True
             self.mock_user_repository.delete_user.return_value = False
 
             # Act
@@ -318,7 +318,7 @@ class TestAccountApplicationService(unittest.TestCase):
             self.assertEqual(status_code, 500)
 
             # Verify rollback was attempted
-            self.mock_profile_service.restore_profile.assert_called_once_with(
+            self.mock_profile_repository.restore_profile.assert_called_once_with(
                 123, mock_profile.favorite_foods
             )
 
