@@ -48,7 +48,7 @@ def create_app():
                 "GET /api/ingredients/<id> - Get ingredient by ID",
                 "GET /api/recipes - Get all recipes",
                 "GET /api/recipes/<id> - Get recipe by ID",
-                "GET /api/menu?category=<category> - Get all menu items",
+                "GET /api/menu - Get a daily menu",
                 "GET /api/menu/email - Email selected recipies to specific address",
                 "GET /api/menu/customized?user_id=<id>&category=<cat-optional> - GET all recipes based in favorite ingredients",
                 "GET /api/profiles/<user_id> - GET profile by user ID",

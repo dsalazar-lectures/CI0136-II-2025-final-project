@@ -10,7 +10,6 @@ from src.Application.Profiles.Services.ProfileApplicationService import (
 from src.Infrastructure.Profiles.ProfileRepository import ProfileRepository
 
 menu_bp = Blueprint("menu", __name__)
-recipes_bp = Blueprint("menu", __name__)
 
 customized_service = CustomizedMenuService()
 profile_service = ProfileApplicationService(ProfileRepository("profiles.csv"))
@@ -18,9 +17,9 @@ profile_service = ProfileApplicationService(ProfileRepository("profiles.csv"))
 
 @menu_bp.route("/menu", methods=["GET"])
 def get_menu():
-    category = request.args.get("category")
-    recipe = recipe_service.get_random_recipe_by_category(category)
-    return jsonify([recipe.to_dict() if recipe else {}])
+    menu = MenuUseCase.generateRandomMenu()
+
+    return jsonify(menu.to_dict())
 
 
 @menu_bp.route("/menu/<string:category>/<int:count>", methods=["GET"])

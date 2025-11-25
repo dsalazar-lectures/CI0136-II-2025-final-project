@@ -149,3 +149,22 @@ class CSVRecipeRepository(IRecipeRepository):
                 for recipe_category in (recipe.categories)
             )
         ]
+
+    def find_by_categories(self, categories):
+        load_recipes()
+
+        if categories is None:
+            return []
+
+        if isinstance(categories, str):
+            categories = [c.strip() for c in categories.split(",") if c.strip()]
+
+        search_terms = [str(c).lower() for c in categories]
+
+        result = []
+        for recipe in system_recipes:
+            recipe_categories = [str(rc).lower() for rc in recipe.categories]
+            if any(term in recipe_categories for term in search_terms):
+                result.append(recipe)
+
+        return result
