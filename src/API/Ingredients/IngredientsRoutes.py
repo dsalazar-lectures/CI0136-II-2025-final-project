@@ -7,13 +7,15 @@ ingredients_bp = Blueprint("ingredients", __name__)
 @ingredients_bp.route("/ingredients", methods=["GET"])
 def get_all_ingredients():
     # Check if simplified format is requested
-    simple = request.args.get('simple', 'false').lower() == 'true'
+    simple = request.args.get("simple", "false").lower() == "true"
     ingredients = ingredient_service.get_all_ingredients()
     if simple:
-        return jsonify([{
-            'id': ingredient.id,
-            'name': ingredient.name
-        } for ingredient in ingredients])
+        return jsonify(
+            [
+                {"id": ingredient.id, "name": ingredient.name}
+                for ingredient in ingredients
+            ]
+        )
     return jsonify([ingredient.to_json() for ingredient in ingredients])
 
 
@@ -24,6 +26,7 @@ def get_ingredient_by_id(ingredient_id):
     if not ingredient:
         return jsonify({"error": "Ingrediente no encontrado"}), 404
     return jsonify(ingredient.to_json())
+
 
 @ingredients_bp.route("/ingredients/create", methods=["POST"])
 def create_new_ingredient():
@@ -88,6 +91,7 @@ def delete_ingredient():
 
     return jsonify({"message": "Ingredient deleted successfully"}), 200
 
+
 @ingredients_bp.route("/ingredients/search", methods=["POST"])
 def search_ingredients_body():
     """Search for ingredients by name OR ID OR category"""
@@ -96,17 +100,23 @@ def search_ingredients_body():
         return data
 
     simple = _get_simple_flag(data)
-    
+
     # Verify that only one search criterion is provided
-    search_criteria = [key for key in ['names', 'ids', 'categories'] if key in data]
+    search_criteria = [key for key in ["names", "ids", "categories"] if key in data]
     if len(search_criteria) == 0:
-        return jsonify({
-            "error": "Se requiere un criterio de búsqueda (names, ids, o categories)"
-        }), 400
+        return (
+            jsonify(
+                {
+                    "error": "Se requiere un criterio de búsqueda (names, ids, o categories)"
+                }
+            ),
+            400,
+        )
     if len(search_criteria) > 1:
-        return jsonify({
-            "error": "Solo se permite un criterio de búsqueda a la vez"
-        }), 400
+        return (
+            jsonify({"error": "Solo se permite un criterio de búsqueda a la vez"}),
+            400,
+        )
 
     criterion = search_criteria[0]
     if criterion == "names":
@@ -116,18 +126,19 @@ def search_ingredients_body():
         if len(names) == 1:
             return _handle_single_name(names[0], simple)
         return _handle_multiple_names(names, simple)
-    
-    elif criterion == 'ids':
+
+    elif criterion == "ids":
         ids = _parse_ids(data)
         if isinstance(ids, tuple):
             return ids
         return _handle_multiple_ids(ids, simple)
-    
+
     else:  # categories
         categories = _parse_categories(data)
         if isinstance(categories, tuple):
             return categories
         return _handle_categories(categories, simple)
+
 
 def _get_request_data():
     """Retrieves and validates the JSON body."""
@@ -136,20 +147,22 @@ def _get_request_data():
         return jsonify({"error": "Cuerpo JSON requerido"}), 400
     return data
 
+
 def _get_simple_flag(data):
     """Query param ?simple=true overrides body.simple"""
-    simple_q = request.args.get('simple')
+    simple_q = request.args.get("simple")
     if simple_q is not None:
-        return simple_q.lower() == 'true'
-    return bool(data.get('simple')) if 'simple' in data else False
+        return simple_q.lower() == "true"
+    return bool(data.get("simple")) if "simple" in data else False
+
 
 def _parse_names(data):
-    raw = data.get('names')
+    raw = data.get("names")
     if raw is None:
         return jsonify({"error": "Campo 'names' requerido en el body"}), 400
 
     if isinstance(raw, str):
-        items = [n.strip() for n in raw.split(',')]
+        items = [n.strip() for n in raw.split(",")]
     elif isinstance(raw, list):
         items = [str(n).strip() for n in raw]
     else:
@@ -161,13 +174,17 @@ def _parse_names(data):
 
     return names
 
+
 def _handle_single_name(name, simple):
     ingredient = ingredient_service.get_ingredient_by_name(name)
     if ingredient is None:
         return jsonify({"error": "Ingrediente no encontrado"}), 404
     return jsonify(
-        {'id': ingredient.id, 'name': ingredient.name} if simple else ingredient.to_json()
+        {"id": ingredient.id, "name": ingredient.name}
+        if simple
+        else ingredient.to_json()
     )
+
 
 def _handle_multiple_names(names, simple):
     """Searches for multiple ingredients and returns results + missing items."""
@@ -176,19 +193,24 @@ def _handle_multiple_names(names, simple):
     for name in names:
         ingredient = ingredient_service.get_ingredient_by_name(name)
         if ingredient:
-            results.append({'id': ingredient.id, 'name': ingredient.name} if simple else ingredient.to_json())
+            results.append(
+                {"id": ingredient.id, "name": ingredient.name}
+                if simple
+                else ingredient.to_json()
+            )
         else:
             not_found.append(name)
     return jsonify({"results": results, "not_found": not_found}), 200
 
+
 def _parse_ids(data):
-    raw = data.get('ids')
+    raw = data.get("ids")
     if not raw:
         return []
 
     try:
         if isinstance(raw, str):
-            items = [int(id.strip()) for id in raw.split(',')]
+            items = [int(id.strip()) for id in raw.split(",")]
         elif isinstance(raw, list):
             items = [int(id) for id in raw]
         else:
@@ -197,14 +219,15 @@ def _parse_ids(data):
         return [id for id in items if id > 0]
     except ValueError:
         return jsonify({"error": "Los IDs deben ser números enteros"}), 400
-    
+
+
 def _parse_categories(data):
-    raw = data.get('categories')
+    raw = data.get("categories")
     if not raw:
         return []
 
     if isinstance(raw, str):
-        items = [cat.strip() for cat in raw.split(',')]
+        items = [cat.strip() for cat in raw.split(",")]
     elif isinstance(raw, list):
         items = [str(cat).strip() for cat in raw]
     else:
@@ -212,23 +235,33 @@ def _parse_categories(data):
 
     return [cat for cat in items if cat]
 
+
 def _handle_multiple_ids(ids, simple):
     results = []
     not_found = []
     for iid in ids:
         ingredient = ingredient_service.get_ingredient_by_id(iid)
         if ingredient:
-            results.append({'id': ingredient.id, 'name': ingredient.name} if simple else ingredient.to_json())
+            results.append(
+                {"id": ingredient.id, "name": ingredient.name}
+                if simple
+                else ingredient.to_json()
+            )
         else:
             not_found.append(iid)
     return jsonify({"results": results, "not_found": not_found}), 200
+
 
 def _handle_categories(categories, simple):
     results = []
     for category in categories:
         ingredients = ingredient_service.get_ingredients_by_category(category)
         for ingredient in ingredients:
-            results.append({'id': ingredient.id, 'name': ingredient.name} if simple else ingredient.to_json())
+            results.append(
+                {"id": ingredient.id, "name": ingredient.name}
+                if simple
+                else ingredient.to_json()
+            )
     # remove duplicates by id
     unique = []
     seen = set()

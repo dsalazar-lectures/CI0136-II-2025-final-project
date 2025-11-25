@@ -175,7 +175,9 @@ class IngredientServiceTestCase(unittest.TestCase):
 
         mock_service.get_ingredient_by_name.side_effect = get_by_name_side
 
-        resp = self.client.post("/ingredients/search", json={"names": ["tomate", "cebolla"]})
+        resp = self.client.post(
+            "/ingredients/search", json={"names": ["tomate", "cebolla"]}
+        )
         self.assertEqual(resp.status_code, 200)
         data = resp.get_json()
         self.assertIn("results", data)
@@ -235,7 +237,9 @@ class IngredientServiceTestCase(unittest.TestCase):
         self.assertIn(11, ids)
 
     def test_search_combined_criteria_returns_400(self):
-        resp = self.client.post("/ingredients/search", json={"names": ["a"], "ids": [1]})
+        resp = self.client.post(
+            "/ingredients/search", json={"names": ["a"], "ids": [1]}
+        )
         self.assertEqual(resp.status_code, 400)
         data = resp.get_json()
         self.assertIn("error", data)
@@ -246,6 +250,7 @@ class IngredientServiceTestCase(unittest.TestCase):
         self.assertEqual(resp.status_code, 400)
         data = resp.get_json()
         self.assertIn("error", data)
+
 
 if __name__ == "__main__":
     unittest.main()
