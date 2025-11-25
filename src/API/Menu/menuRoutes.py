@@ -66,7 +66,7 @@ def emailMenu():
     return "", MenuUseCase.emailPdf(menuRecipes, recipientEmail)
 
 
-@menu_bp.route("/menu/customized", methods=["GET"])
+@menu_bp.route("/menu/customized", methods=["GET", "POST"])
 def customized_menu():
     user_id = request.args.get("user_id", type=int)
     category = request.args.get("category")
