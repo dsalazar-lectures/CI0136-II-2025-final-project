@@ -7,8 +7,6 @@ from src.Application.Menu.CustomizedMenuService import CustomizedMenuService
 from src.Application.Profiles.Services.ProfileApplicationService import (
     ProfileApplicationService,
 )
-
-from src.Infrastructure.Menu.MenuRepository import MenuRepository
 from src.Infrastructure.Profiles.ProfileRepository import ProfileRepository
 from src.Infrastructure.Menu.MenuRepository import MenuRepository
 
@@ -68,11 +66,10 @@ def emailMenu():
     return "", MenuUseCase.emailPdf(menuRecipes, recipientEmail)
 
 
-@menu_bp.route("/menu/customized", methods=["GET", "POST"])
+@menu_bp.route("/menu/customized", methods=["GET"])
 def customized_menu():
     user_id = request.args.get("user_id", type=int)
     category = request.args.get("category")
-
     if not user_id:
         return jsonify({"error": "user_id requerido"}), 400
 
@@ -83,26 +80,4 @@ def customized_menu():
     recipes = customized_service.recommend_by_favorites(
         profile.favorite_foods, category
     )
-    recipes_data = [r.to_dict() for r in recipes]
-
-    # View recipes
-    if request.method == "GET":
-        return (
-            jsonify(
-                {
-                    "recipes": recipes_data,
-                }
-            ),
-            200,
-        )
-
-    # Save recipe menus
-    menu_repo = MenuRepository()
-    menu_obj, msg, status = menu_repo.create_customized_menu(recipes)
-
-    menu_id = menu_obj.menu_id if menu_obj else None
-
-    return (
-        jsonify({"recipes": recipes_data, "menu_id": menu_id, "message": msg}),
-        status,
-    )
+    return jsonify([r.to_dict() for r in recipes]), 200
