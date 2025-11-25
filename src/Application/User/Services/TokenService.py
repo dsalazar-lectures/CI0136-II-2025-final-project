@@ -31,5 +31,7 @@ class TokenService(ITokenService):
             return True
         except jwt.ExpiredSignatureError:
             return False
+        except (jwt.InvalidSignatureError, jwt.DecodeError, jwt.InvalidTokenError):
+            return False
 
         return False
