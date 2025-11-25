@@ -14,6 +14,7 @@ menu_bp = Blueprint("menu", __name__)
 
 customized_service = CustomizedMenuService()
 profile_service = ProfileApplicationService(ProfileRepository("profiles.csv"))
+# instantiate repository lazily to avoid import-time side-effects in tests
 menu_repository = MenuRepository()
 
 
@@ -49,8 +50,9 @@ def get_menus_number(count: int):
             404,
         )
 
-    # Save menu to repository
-    saved_menu, message, status_code = menu_repository.create_menu(menu)
+    # Save menu to repository (instantiate repo if not available)
+    repo = menu_repository or MenuRepository()
+    saved_menu, message, status_code = repo.create_menu(menu)
 
     if status_code != 201:
         return jsonify({"error": message}), status_code
