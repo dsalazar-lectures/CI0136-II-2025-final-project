@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch
 from src.Application.Menu import menu_service
-from tests.Mocks.Recipes.mock_recipe_repo import MockRecipe
+from tests.Mocks.Recipes.mock_recipe import MockRecipe
 
 
 class MenuServiceTestCase(unittest.TestCase):
