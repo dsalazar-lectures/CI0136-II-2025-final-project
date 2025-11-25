@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request
 from collections import OrderedDict
 
+from src.Infrastructure.Menu.MenuRepository import MenuRepository
 from src.Application.Recipes import recipe_service
 from src.Application.Menu import menu_service
 from src.Application.Menu import MenuUseCase
@@ -21,20 +22,9 @@ def create_menu_blueprints(profiles_csv_path="profiles.csv"):
 
     @menu_bp.route("/menu", methods=["GET"])
     def get_menu():
-        meal_categories = {
-            "breakfast": ["desayuno", "breakfast"],
-            "lunch": ["almuerzo", "lunch"],
-            "dinner": ["cena", "dinner"],
-            "dessert": ["postre", "dessert"],
-        }
+        menu = MenuUseCase.generateRandomMenu()
 
-        menu = OrderedDict()
-
-        for meal, categories in meal_categories.items():
-            recipe = recipe_service.get_random_recipe_by_categories(categories)
-            menu[meal] = recipe.to_dict() if recipe else {}
-
-        return jsonify(menu)
+        return jsonify(menu.to_dict())
 
     @menu_bp.route("/menu/<string:category>/<int:count>", methods=["GET"])
     def get_menus_number(category: str, count: int):
