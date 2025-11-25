@@ -139,6 +139,8 @@ def update_recipe(recipe_id, updates, username):
 
 
 def filter_recipes(filter_criteria):
+    if not validate_data(filter_criteria):
+        return -1
     all_recipes = recipe_repository.get_all()
     return filter_composer.apply_filters(all_recipes, filter_criteria)
 

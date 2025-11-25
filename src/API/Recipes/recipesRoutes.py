@@ -77,6 +77,16 @@ def filter_recipes():
 
     filtered_recipes = recipe_service.filter_recipes(filter_criteria)
 
+    if filtered_recipes == -1:
+        return (
+            jsonify(
+                {
+                    "message": "Invalid data"
+                }
+            ),
+            400,
+        )
+
     if not filtered_recipes:
         return (
             jsonify(
