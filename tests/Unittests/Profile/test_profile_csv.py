@@ -3,6 +3,7 @@ import csv
 import os
 import tempfile
 from src.Database.Profiles.ProfileCSV import ProfileCSV
+from src.Model.Profiles.Roles import Role
 
 
 class TestProfileCSV(unittest.TestCase):
@@ -16,7 +17,13 @@ class TestProfileCSV(unittest.TestCase):
         with open(self.temp_file.name, "w", newline="") as file:
             writer = csv.writer(file)
             writer.writerow(
-                ["user_id", "favorite_foods", "unfavorite_foods", "favorite_menus"]
+                [
+                    "user_id",
+                    "favorite_foods",
+                    "unfavorite_foods",
+                    "favorite_menus",
+                    "role",
+                ]
             )
 
         self.profile_csv = ProfileCSV(self.temp_file.name)
@@ -32,6 +39,7 @@ class TestProfileCSV(unittest.TestCase):
             "favorite_foods": [],
             "unfavorite_foods": [],
             "favorite_menus": [],
+            "role": Role.USER.name,
         }
 
         # Act
@@ -41,13 +49,14 @@ class TestProfileCSV(unittest.TestCase):
         self.assertEqual(result["favorite_foods"], "")
         self.assertEqual(result["unfavorite_foods"], "")
         self.assertEqual(result["favorite_menus"], "")
+        self.assertEqual(result["role"], str(Role.USER.name))
 
         # Verify file content
         with open(self.temp_file.name, "r") as f:
             lines = f.readlines()
             self.assertEqual(len(lines), 2)  # Header + 1 data row
             data_line = lines[1].strip()
-            self.assertEqual(data_line, "1,,,")
+            self.assertEqual(data_line, "1,,,,USER")
 
     def test_get_profile_returns_lists(self):
         """Test that get_profile returns lists, not strings"""
@@ -57,6 +66,7 @@ class TestProfileCSV(unittest.TestCase):
             "favorite_foods": ["apple", "banana"],
             "unfavorite_foods": ["onion"],
             "favorite_menus": ["menu1"],
+            "role": Role.USER.name,
         }
         self.profile_csv.create_profile(profile_data)
 
@@ -72,6 +82,8 @@ class TestProfileCSV(unittest.TestCase):
         self.assertEqual(result["unfavorite_foods"], ["onion"])
         self.assertIsInstance(result["favorite_menus"], list)
         self.assertEqual(result["favorite_menus"], ["menu1"])
+        self.assertIsInstance(result["role"], str)
+        self.assertEqual(result["role"], str(Role.USER.name))
 
     def test_get_profile_empty_lists(self):
         """Test that get_profile returns empty lists for empty fields"""
@@ -81,6 +93,7 @@ class TestProfileCSV(unittest.TestCase):
             "favorite_foods": [],
             "unfavorite_foods": [],
             "favorite_menus": [],
+            "role": Role.USER.name,
         }
         self.profile_csv.create_profile(profile_data)
 
@@ -92,3 +105,4 @@ class TestProfileCSV(unittest.TestCase):
         self.assertEqual(result["favorite_foods"], [])
         self.assertEqual(result["unfavorite_foods"], [])
         self.assertEqual(result["favorite_menus"], [])
+        self.assertEqual(result["role"], str(Role.USER.name))
