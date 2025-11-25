@@ -7,8 +7,6 @@ BASE_URL = "https://api.spoonacular.com"
 class SpoonacularAPIService:
     """Cliente para interactuar directamente con la API de Spoonacular."""
 
-    # ⭐️ CORRECCIÓN: Ahora el constructor SÓLO acepta la clave.
-    # Esto obliga a que la clave sea inyectada por el IngredientInjector.
     def __init__(self, api_key: str):
         self.api_key = api_key
 
@@ -18,14 +16,13 @@ class SpoonacularAPIService:
         Devuelve None si hay error o no se encuentra.
         """
 
-        # El resto del código es correcto y usa self.api_key correctamente.
         search_endpoint = "/food/ingredients/search"
         url = BASE_URL + search_endpoint
 
         params = {"apiKey": self.api_key, "query": name, "number": 1}
 
         try:
-            # 1. Realizar la búsqueda inicial para obtener el ID
+
             response = requests.get(url, params=params)
             response.raise_for_status()
             data = response.json()
@@ -35,7 +32,6 @@ class SpoonacularAPIService:
 
             ingredient_id = data["results"][0]["id"]
 
-            # 2. Obtener la información detallada usando el ID
             info_endpoint = f"/food/ingredients/{ingredient_id}/information"
             info_url = BASE_URL + info_endpoint
 
