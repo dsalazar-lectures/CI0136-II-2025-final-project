@@ -1,5 +1,6 @@
 import os
 from typing import Optional, Tuple, List
+import time
 
 import requests
 
@@ -12,9 +13,11 @@ class DeepSeekClient:
 
     def __init__(self) -> None:
         self._api_key = os.getenv("DEEPSEEK_API_KEY")
-        self._base_url = "https://api.deepseek.com/v1/chat/completions"
+        self._base_url = "https://openrouter.ai/api/v1/chat/completions"
         # Allow overriding the model from environment if needed
-        self._model_name = os.getenv("DEEPSEEK_MODEL_NAME", "deepseek-chat")
+        self._model_name = os.getenv(
+            "DEEPSEEK_MODEL_NAME", "deepseek/deepseek-chat-v3-0324:free"
+        )
 
     def _build_headers(self) -> dict:
         """
@@ -80,18 +83,54 @@ class DeepSeekClient:
             "stream": False,
         }
 
-        try:
-            response = requests.post(
-                self._base_url,
-                headers=self._build_headers(),
-                json=body,
-                timeout=15,
-            )
-        except requests.RequestException as exc:
-            return None, f"DeepSeek request failed: {str(exc)}"
+        max_retries = 3
+        for attempt in range(max_retries):
+            try:
+                response = requests.post(
+                    self._base_url,
+                    headers=self._build_headers(),
+                    json=body,
+                    timeout=30,  # Increased timeout to 30 seconds
+                )
 
-        if response.status_code != 200:
-            return None, f"DeepSeek returned status code {response.status_code}"
+                # Handle 429 and 502 errors with retry
+                if response.status_code in [429, 502, 503]:
+                    if attempt < max_retries - 1:
+                        wait_time = 2 ** (attempt + 3)  # 8s, 16s, 32s
+                        error_msg = {
+                            429: "Rate limit",
+                            502: "Bad gateway",
+                            503: "Service unavailable",
+                        }.get(response.status_code, "Server error")
+                        time.sleep(wait_time)
+                        continue
+                    else:
+                        return (
+                            None,
+                            f"Service temporarily unavailable (status {response.status_code}). Please try again later.",
+                        )
+
+                # Handle other non-200 status codes
+                if response.status_code != 200:
+                    error_detail = response.text
+                    return (
+                        None,
+                        f"OpenRouter returned status code {response.status_code}: {error_detail}",
+                    )
+
+                # Success - break out of retry loop
+                break
+
+            except requests.RequestException as exc:
+                if attempt < max_retries - 1:
+                    wait_time = 2 ** (attempt + 1)
+                    print(f"Request failed: {exc}. Retrying in {wait_time} seconds...")
+                    time.sleep(wait_time)
+                    continue
+                return (
+                    None,
+                    f"OpenRouter request failed after {max_retries} attempts: {str(exc)}",
+                )
 
         try:
             data = response.json()
