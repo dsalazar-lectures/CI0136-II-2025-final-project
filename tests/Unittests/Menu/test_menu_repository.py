@@ -10,42 +10,29 @@ from src.Model.Menu.MenuDay import MenuDay
 class TestMenuRepository(unittest.TestCase):
 
     def setUp(self):
-        # Use a temporary directory so tests do not touch real CSV files
-        self.temp_dir = tempfile.TemporaryDirectory()
-
-        # Paths for normal and custom menus CSV inside the temp dir
-        self.menus_csv_path = os.path.join(self.temp_dir.name, "menus.csv")
-        self.custom_menus_csv_path = os.path.join(
-            self.temp_dir.name, "custom_menus.csv"
+        self.temp_file = tempfile.NamedTemporaryFile(
+            mode="w", delete=False, suffix="_test_menus.csv"
         )
+        self.temp_file.close()
 
-        # Initialize normal menus CSV with headers
-        headers = [
-            "menu_id",
-            "day",
-            "breakfast_recipe_id",
-            "lunch_recipe_id",
-            "dinner_recipe_id",
-            "dessert_recipe_id",
-        ]
-
-        with open(self.menus_csv_path, "w", newline="") as file:
+        with open(self.temp_file.name, "w", newline="") as file:
             writer = csv.writer(file)
-            writer.writerow(headers)
+            writer.writerow(
+                [
+                    "menu_id",
+                    "day",
+                    "breakfast_recipe_id",
+                    "lunch_recipe_id",
+                    "dinner_recipe_id",
+                    "dessert_recipe_id",
+                ]
+            )
 
-        # Initialize custom menus CSV with headers
-        with open(self.custom_menus_csv_path, "w", newline="") as file:
-            writer = csv.writer(file)
-            writer.writerow(headers)
-
-        self.repository = MenuRepository(
-            csv_file_path=self.menus_csv_path,
-            custom_csv_file_path=self.custom_menus_csv_path,
-        )
+        self.repository = MenuRepository(self.temp_file.name)
 
     def tearDown(self):
-        # Remove the entire temporary directory and its files
-        self.temp_dir.cleanup()
+        if os.path.exists(self.temp_file.name):
+            os.unlink(self.temp_file.name)
 
     def test_create_menu_success(self):
         # Arrange
