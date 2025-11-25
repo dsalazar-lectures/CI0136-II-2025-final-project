@@ -20,7 +20,7 @@ class Recipe:
         self.name = name
         self.categories = ast.literal_eval(categories)
         self.ingredients = ast.literal_eval(ingredients)
-        self.duration = int(duration)
+        self.duration = int(duration) if duration else 0
         self.instructions = instructions
         self.portions = int(portions)
         self.author = author

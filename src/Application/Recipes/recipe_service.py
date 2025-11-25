@@ -1,10 +1,12 @@
 import random
 from src.Infrastructure.Recipes.CSVRecipeRepository import CSVRecipeRepository
 from src.Application.Recipes.FilterComposer import FilterComposer
+from src.Application.Recipes.RecipePrioritizer import RecipePrioritizer
 from src.Shared.Logs.custom_logger import CustomLogger
 
 recipe_repository = CSVRecipeRepository()
 filter_composer = FilterComposer()
+recipe_prioritizer = RecipePrioritizer()
 logger = CustomLogger()
 
 
@@ -187,3 +189,8 @@ def get_random_recipe_by_category(category):
         return None
 
     return random.choice(recipes)
+
+
+def get_prioritized_recipes(favorite_foods):
+    all_recipes = recipe_repository.get_all()
+    return recipe_prioritizer.prioritize(all_recipes, favorite_foods)
