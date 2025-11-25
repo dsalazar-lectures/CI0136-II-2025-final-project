@@ -4,7 +4,7 @@ from src.Application.Interfaces.IExternalIngredientProvider import (
 )
 from src.Model.Ingredients.BaseIngredient import BaseIngredient
 from src.Model.Ingredients.Ingredients import Ingredient
-from .SpoonacularAPIService import SpoonacularAPIService  # Importamos el servicio
+from .SpoonacularAPIService import SpoonacularAPIService
 from typing import List, Dict
 
 

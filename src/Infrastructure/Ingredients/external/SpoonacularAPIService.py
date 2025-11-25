@@ -5,15 +5,14 @@ BASE_URL = "https://api.spoonacular.com"
 
 
 class SpoonacularAPIService:
-    """Cliente para interactuar directamente con la API de Spoonacular."""
+    """class to interact with Spoonacular API for ingredient data."""
 
     def __init__(self, api_key: str):
         self.api_key = api_key
 
     def fetch_ingredient_data(self, name: str) -> Optional[Dict]:
         """
-        Busca un ingrediente por nombre y devuelve el JSON crudo de la API.
-        Devuelve None si hay error o no se encuentra.
+        Search for ingredients by name and return raw JSON from the API.
         """
 
         search_endpoint = "/food/ingredients/search"
