@@ -2,6 +2,7 @@ import unittest
 from unittest.mock import patch
 from flask import Flask
 from types import SimpleNamespace
+import os
 from src.Application.Menu import MenuUseCase
 from src.API.Menu.menuRoutes import menu_bp
 from tests.Mocks.Recipes.mock_recipe_repo import MockRecipe
@@ -13,6 +14,11 @@ class MenuEndpointTestCase(unittest.TestCase):
         app.register_blueprint(menu_bp, url_prefix="/api")
         self.client = app.test_client()
 
+    def tearDown(self):
+        """Remove side-effect files created during tests."""
+        if os.path.exists("profiles.csv"):
+            os.remove("profiles.csv")
+    
     @patch("src.Application.Recipes.recipe_service.get_recipes_by_category")
     def test_get_menu_returns_empty_list_when_recipes_repo_empty(
         self, mock_get_recipes
