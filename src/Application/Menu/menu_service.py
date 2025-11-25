@@ -11,7 +11,7 @@ def generate_menus(
     Generates a menu with n days, each day with breakfast, lunch, dinner and dessert.
 
     Returns:
-        Tuple[Optional[Menu], Optional[List[str]], Optional[List[Dict]]]: 
+        Tuple[Optional[Menu], Optional[List[str]], Optional[List[Dict]]]:
             (menu, missing_categories, menu_details)
         - If successful: (Menu, None, [list of menu details with recipes])
         - If categories are missing: (None, [list of missing categories], None)
