@@ -21,3 +21,4 @@ Streamlit==1.50.0
 pandas==2.3.3
 numpy==2.3.4
 fpdf==1.7.2
+timedelta==2020.12.3
