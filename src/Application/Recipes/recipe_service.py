@@ -196,6 +196,10 @@ def get_prioritized_recipes(favorite_foods):
     return recipe_prioritizer.prioritize(all_recipes, favorite_foods)
 
 def rate_recipe(recipe_id, username, rating):
+    if not isinstance(rating, int):
+        return -1
+
     if rating < 1 or rating > 5:
         return -1
+
     return recipe_repository.rate_recipe(recipe_id, username, rating)

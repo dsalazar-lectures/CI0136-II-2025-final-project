@@ -20,7 +20,7 @@ def get_all_recipes():
 def get_recipe(recipe_id):
     recipe = recipe_service.get_recipe_by_id(recipe_id)
     if not recipe:
-        return jsonify({"error": "Receta no encontrada"}), 404
+        return jsonify({"error": "Recipe not found"}), 404
     return jsonify(recipe.to_dict())
 
 
@@ -29,7 +29,7 @@ def get_recipes_by_ingredient(ingredient):
     recipes = recipe_service.get_recipes_by_ingredient(ingredient)
     if not recipes:
         return (
-            jsonify({"message": f"No se encontraron recetas con '{ingredient}'"}),
+            jsonify({"message": f"Could not find recipes with '{ingredient}'"}),
             404,
         )
 
@@ -67,13 +67,13 @@ def filter_recipes():
         try:
             filter_criteria["duration"] = int(filter_criteria["duration"])
         except (ValueError, TypeError):
-            return jsonify({"error": "Duration debe ser un número"}), 400
+            return jsonify({"error": "Duration must be a number"}), 400
 
     if "rating" in filter_criteria and filter_criteria["rating"] is not None:
         try:
             filter_criteria["rating"] = float(filter_criteria["rating"])
         except (ValueError, TypeError):
-            return jsonify({"error": "Rating debe ser un número"}), 400
+            return jsonify({"error": "Rating must be a number"}), 400
 
     filtered_recipes = recipe_service.filter_recipes(filter_criteria)
 
@@ -81,7 +81,7 @@ def filter_recipes():
         return (
             jsonify(
                 {
-                    "message": "No se encontraron recetas con los filtros aplicados",
+                    "message": "Could not find recipes with selected filters",
                     "recipes": [],
                 }
             ),
@@ -107,12 +107,12 @@ def get_prioritized_recipes():
     user_id = request.args.get("user_id", type=int)
 
     if not user_id:
-        return jsonify({"error": "user_id es requerido como parámetro"}), 400
+        return jsonify({"error": "user_id is required as parameter"}), 400
 
     # Get user profile
     profile = profile_service.get_profile(user_id)
     if not profile:
-        return jsonify({"error": "Perfil de usuario no encontrado"}), 404
+        return jsonify({"error": "Profile not found"}), 404
 
     # Get prioritized recipes based on user's favorite foods
     prioritized_recipes = recipe_service.get_prioritized_recipes(profile.favorite_foods)
