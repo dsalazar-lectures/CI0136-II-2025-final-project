@@ -1,5 +1,7 @@
-from flask import Blueprint, request, jsonify, make_response
+from flask import Blueprint, request, jsonify, make_response, redirect, url_for
+from flask_dance.contrib.google import make_google_blueprint, google
 import jwt
+import os
 from src.Application.User.Services.UserApplicationService import UserApplicationService
 from src.Application.User.Services.EncryptionService import EncryptionService
 from src.Application.User.Services.ValidationService import ValidationService
@@ -38,6 +40,18 @@ user_app_service = UserApplicationService(
 )
 auth_service = AuthorizationService(user_app_service, profile_service)
 
+# Configuración para Google OAuth
+google_bp = make_google_blueprint(
+    client_id=os.getenv("GOOGLE_CLIENT_ID"),
+    client_secret=os.getenv("GOOGLE_CLIENT_SECRET"),
+    redirect_to="google.login_google_callback",
+    scope=[
+        "openid",
+        "https://www.googleapis.com/auth/userinfo.profile",
+        "https://www.googleapis.com/auth/userinfo.email",
+    ],
+)
+
 
 @auth_bp.route("/register", methods=["POST"])
 def register():
@@ -66,8 +80,39 @@ def login():
     return response_with_header
 
 
+@google_bp.route("/login-google", methods=["GET"])
+def login_google():
+    return redirect(url_for("google.login"))
+
+
+# User will be redirected here after login
+@google_bp.route("/login-google/callback", methods=["GET"])
+def login_google_callback():
+
+    if not google.authorized:
+        return jsonify({"error:" "User not authenticated"}), 401
+
+    resp = google.get("https://www.googleapis.com/oauth2/v3/userinfo")
+
+    if not resp.ok:
+        return jsonify({"error:" "Couldn't get information from Google"}), 401
+
+    user_info = resp.json()
+
+    if "email" not in user_info:
+        return jsonify({"error": "Couldn't get information from Google"}), 401
+
+    user, response, status_code = user_app_service.login_with_google(user_info["email"])
+
+    if not user:
+        return jsonify(response), status_code
+
+    response_with_token = make_response(jsonify(response), status_code)
+
+    return response_with_token
+
+
 @auth_bp.route("/change-password", methods=["POST"])
-# TODO(@Paulette): add jwt_required decorator
 def change_password():
     is_auth, response, status_code = auth_service.is_authorized(
         request.headers,
@@ -78,7 +123,7 @@ def change_password():
         return jsonify(response), status_code
     
     if "Authorization" not in request.headers or not request.headers["Authorization"]:
-        return jsonify({"error": "Missing signature"}), 401
+        return jsonify({"error": "Missing token"}), 401
 
     # Request username, old_password, and new_password
     data = request.get_json()
@@ -112,7 +157,7 @@ def regenerate_key():
     auth = request.headers.get("Authorization", "")
     parts = auth.split()
     if len(parts) != 2 or parts[0].lower() != "bearer":
-        return jsonify({"error": "Missing or invalid Authorization header"}), 401
+        return jsonify({"error": "Missing token"}), 401
     token = parts[1].strip()
 
     try:
@@ -129,12 +174,8 @@ def regenerate_key():
     if not user:
         return jsonify(resp), status
 
-    new_key = token_service.generate_key()
-    ok = user_repository.update_user_key(username, new_key)
-    if not ok:
-        return jsonify({"error": "Failed to rotate key"}), 500
-
-    return jsonify({"message": "Key regenerated successfully"}), 200
+    _, resp, status = user_app_service.regenerate_key(user.username)
+    return jsonify(resp), status
 
 
 @auth_bp.route("/delete-account", methods=["DELETE"])
