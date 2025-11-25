@@ -6,6 +6,7 @@ from src.Application.Menu import MenuUseCase
 from src.API.Menu.menuRoutes import menu_bp
 from src.Model.Menu.Menu import Menu
 from src.Model.Menu.MenuDay import MenuDay
+from tests.Mocks.Recipes.mock_recipe import MockRecipe
 
 
 class MenuEndpointTestCase(unittest.TestCase):
