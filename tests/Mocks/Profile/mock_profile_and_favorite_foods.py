@@ -33,7 +33,7 @@ class MockProfileAndFavoriteFoods(IProfileRepository):
         profile = self.profiles[user_id]
         profile.unfavorite_foods = unfavorites
         return profile
-    
+
     # Favorite Menu helpers
     def add_favorite_menu(self, user_id: int, menu_id: str) -> bool:
         profile = self.profiles.get(user_id)

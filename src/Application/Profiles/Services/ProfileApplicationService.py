@@ -31,11 +31,11 @@ class ProfileApplicationService(IProfileApplicationService):
             f.replace("-", " ").strip().lower() for f in favorites if isinstance(f, str)
         ]
         return self.profile_repository.restore_profile(user_id, favorites_norm)
-    
+
     def set_unfavorite_ingredients(
         self, user_id: int, unfavorites: List[Any]
     ) -> Optional[Profile]:
-        """ Update unfavorite_foods for the user. """
+        """Update unfavorite_foods for the user."""
 
         ingredients_norm: List[str] = []
 

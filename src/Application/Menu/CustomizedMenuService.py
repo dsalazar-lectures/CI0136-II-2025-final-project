@@ -3,7 +3,7 @@ from src.Application.Recipes import recipe_service
 from src.Application.Menu.ICustomizedMenuService import ICustomizedMenuService
 from .CustomizedMenuHandlers import (
     MenuContext,
-    ExcludeIngredientsHandler, 
+    ExcludeIngredientsHandler,
     FavoritesFilterHandler,
     CategoryFilterHandler,
     ScoreAndSortHandler,
@@ -22,6 +22,7 @@ def _ensure_list(value):
     if isinstance(value, (list, tuple, set)):
         return list(value)
     return [value]
+
 
 def _norm(text: str) -> str:
     return text.replace("-", " ").strip().lower()

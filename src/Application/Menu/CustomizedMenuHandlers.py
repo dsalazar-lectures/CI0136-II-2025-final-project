@@ -41,6 +41,7 @@ class MenuHandler(ABC):
     def handle(self, recipes: List[Any], ctx: MenuContext) -> List[Any]:
         pass
 
+
 class ExcludeIngredientsHandler(MenuHandler):
     """Filter out any recipes that contain excluded ingredients."""
 
@@ -67,6 +68,7 @@ class ExcludeIngredientsHandler(MenuHandler):
             )
 
         return [recipe for recipe in recipes if is_safe(recipe)]
+
 
 class FavoritesFilterHandler(MenuHandler):
     def handle(self, recipes: List[Any], ctx: MenuContext) -> List[Any]:

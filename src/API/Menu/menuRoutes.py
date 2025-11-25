@@ -101,10 +101,13 @@ def customized_menu():
 
     menu_id = menu_obj.menu_id if menu_obj else None
 
-    return jsonify(
-        {
-            "recipes": recipes_data,
-            "menu_id": menu_id,
-            "message": msg,
-        }
-    ), status
+    return (
+        jsonify(
+            {
+                "recipes": recipes_data,
+                "menu_id": menu_id,
+                "message": msg,
+            }
+        ),
+        status,
+    )

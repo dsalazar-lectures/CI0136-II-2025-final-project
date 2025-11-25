@@ -109,6 +109,7 @@ def remove_favorite_menu(user_id: int):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
 @profiles_bp.route("/profiles/<int:user_id>/unfavorites", methods=["PUT"])
 def set_unfavorites(user_id: int):
     payload = request.get_json(silent=True) or {}

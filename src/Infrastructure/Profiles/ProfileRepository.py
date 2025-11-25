@@ -136,9 +136,9 @@ class ProfileRepository(IProfileRepository):
                 ),
             )
         return None
-    
+
     def update_unfavorite_foods(self, user_id, unfavorites) -> Optional[Profile]:
-        """ Update the unfavorite_foods field for a user. """
+        """Update the unfavorite_foods field for a user."""
         updated = self.profile_database.update_fields(
             user_id, {"unfavorite_foods": unfavorites}
         )
@@ -151,4 +151,3 @@ class ProfileRepository(IProfileRepository):
             unfavorite_foods=updated["unfavorite_foods"],
             favorite_menus=updated["favorite_menus"],
         )
-    

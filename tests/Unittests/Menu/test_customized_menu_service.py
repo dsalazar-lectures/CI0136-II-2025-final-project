@@ -192,9 +192,7 @@ class TestCustomizedMenuServiceBehavior(unittest.TestCase):
     def test_excluded_ingredients_are_removed_from_results(self):
         """Recipes containing excluded ingredients should not appear."""
         sut = build_sut(self.recipes)
-        result = sut.recommend_by_favorites(
-            ["tomate"], limit=10, excluded=["queso"]
-        )
+        result = sut.recommend_by_favorites(["tomate"], limit=10, excluded=["queso"])
 
         self.assertTrue(len(result) > 0)
 
@@ -217,20 +215,16 @@ class TestCustomizedMenuServiceBehavior(unittest.TestCase):
         for recipe in result:
             ingredients_lower = [i.lower() for i in recipe.ingredients]
             self.assertFalse(
-                any(
-                    "queso" in ing or "pollo" in ing
-                    for ing in ingredients_lower
-                ),
+                any("queso" in ing or "pollo" in ing for ing in ingredients_lower),
                 f"La receta {recipe.title} contiene queso o pollo y no debería aparecer",
             )
 
     def test_excluding_all_matching_ingredients_can_return_empty(self):
         """If excluded blocks all recipes that match favorites, result can be empty."""
         sut = build_sut(self.recipes)
-        result = sut.recommend_by_favorites(
-            ["tomate"], limit=10, excluded=["tomate"]
-        )
+        result = sut.recommend_by_favorites(["tomate"], limit=10, excluded=["tomate"])
         self.assertEqual(result, [])
+
 
 if __name__ == "__main__":
     unittest.main()

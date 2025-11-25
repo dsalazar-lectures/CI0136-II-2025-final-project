@@ -18,7 +18,7 @@ class MenuEndpointTestCase(unittest.TestCase):
         """Remove side-effect files created during tests."""
         if os.path.exists("profiles.csv"):
             os.remove("profiles.csv")
-    
+
     @patch("src.Application.Recipes.recipe_service.get_recipes_by_category")
     def test_get_menu_returns_empty_list_when_recipes_repo_empty(
         self, mock_get_recipes
