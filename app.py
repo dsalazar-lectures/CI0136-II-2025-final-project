@@ -54,6 +54,7 @@ def create_app():
                 "POST /api/menu/customized?user_id=<id>&category=<cat-optional>&save=true - Save all recipes based in favorite ingredients",
                 "GET /api/profiles/<user_id> - GET profile by user ID",
                 "PUT /api/profiles/<user_id>/favorites - PUT user ID and favorite ingredients",
+                "PUT /api/profiles/<user_id>/unfavorites - PUT user ID and unfavorite ingredients",
                 "GET /api/profiles/<user_id>/favorite-menus - Get user's favorite menus",
                 "POST /api/profiles/<user_id>/favorite-menus - Add menu to favorites",
                 "DELETE /api/profiles/<user_id>/favorite-menus - Remove menu from favorites",

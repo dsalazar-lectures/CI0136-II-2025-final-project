@@ -73,21 +73,27 @@ def customized_menu():
     if not profile:
         return jsonify({"error": "Perfil no encontrado"}), 404
 
+    excluded_ingredients: list[str] = []
+    profile_unfavorites = getattr(profile, "unfavorite_foods", []) or []
+
+    for item in profile_unfavorites:
+        if isinstance(item, dict):
+            ingredient = (item.get("ingredient") or "").strip()
+        else:
+            ingredient = str(item).strip()
+        if ingredient:
+            excluded_ingredients.append(ingredient)
+
     recipes = customized_service.recommend_by_favorites(
-        profile.favorite_foods, category
+        profile.favorite_foods,
+        category,
+        excluded=excluded_ingredients,
     )
     recipes_data = [r.to_dict() for r in recipes]
 
     # View recipes
     if request.method == "GET":
-        return (
-            jsonify(
-                {
-                    "recipes": recipes_data,
-                }
-            ),
-            200,
-        )
+        return jsonify({"recipes": recipes_data}), 200
 
     # Save recipe menus
     menu_repo = MenuRepository()
@@ -95,7 +101,10 @@ def customized_menu():
 
     menu_id = menu_obj.menu_id if menu_obj else None
 
-    return (
-        jsonify({"recipes": recipes_data, "menu_id": menu_id, "message": msg}),
-        status,
-    )
+    return jsonify(
+        {
+            "recipes": recipes_data,
+            "menu_id": menu_id,
+            "message": msg,
+        }
+    ), status
