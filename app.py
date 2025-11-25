@@ -3,6 +3,8 @@ from dotenv import load_dotenv
 import sys
 import os
 
+load_dotenv()
+
 # Add src directory to path for imports
 sys.path.append(os.path.join(os.path.dirname(__file__), "src"))
 
@@ -24,7 +26,6 @@ def create_app():
     app.json.ensure_ascii = False
 
     # Secret key for sessions with Google
-    load_dotenv()
     app.secret_key = os.getenv("SECRET_KEY", "dev-dafult-key")
 
     # Register blueprints
