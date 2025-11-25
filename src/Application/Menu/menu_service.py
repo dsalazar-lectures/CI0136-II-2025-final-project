@@ -2,6 +2,9 @@ from typing import List, Dict, Tuple, Optional
 from src.Model.Menu.Menu import Menu
 from src.Model.Menu.MenuDay import MenuDay
 from src.Application.Recipes import recipe_service
+from src.Shared.Logs.custom_logger import CustomLogger
+
+logger = CustomLogger()
 
 
 def generate_menus(
@@ -55,6 +58,14 @@ def generate_menus(
             missing_categories.append("postre")
 
         if missing_categories:
+            logger.log(
+                level="warning",
+                user="system",
+                role="-",
+                action="Generate menu",
+                id_object="-",
+                description=f"Missing categories for day {day}: {', '.join(missing_categories)}",
+            )
             return None, missing_categories, None
 
         # Create MenuDay with recipe IDs
@@ -81,6 +92,15 @@ def generate_menus(
     # Create Menu object (menu_id will be assigned in the repository)
     menu = Menu(
         menu_id=0, daily_menus=daily_menus  # Will be automatically assigned when saved
+    )
+
+    logger.log(
+        level="info",
+        user="system",
+        role="-",
+        action="Generate menu",
+        id_object="-",
+        description=f"Successfully generated menu with {count} days",
     )
 
     return menu, None, menu_details
