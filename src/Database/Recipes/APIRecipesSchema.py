@@ -51,6 +51,7 @@ def parse_recipe(meal):
         "calificationsSumatory": 0,
         "calificationsAmount": 0,
         "usersUsedRecipe": 0,
+        "usersRated": [],
     }
 
 
@@ -69,6 +70,7 @@ def write_api_recipes(parsed_recipes):
             "calificationsSumatory",
             "calificationsAmount",
             "usersUsedRecipe",
+            "usersRated"
         ]
         writer = csv.DictWriter(file, fieldnames=fieldnames)
         writer.writeheader()
@@ -98,6 +100,7 @@ def load_api_recipes():
                 row["calificationsSumatory"],
                 row["calificationsAmount"],
                 row["usersUsedRecipe"],
+                row.get("usersRated", "[]"),
             )
             api_recipes.append(recipe)
 

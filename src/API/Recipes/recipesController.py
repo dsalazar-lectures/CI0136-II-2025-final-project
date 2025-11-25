@@ -6,19 +6,16 @@ user_repository = UserRepository()
 
 
 def get_username_from_request():
-    auth_header = request.headers.get("Authorization")
+    user_id = request.args.get("user_id", type=int)
 
-    if not auth_header:
+    if not user_id:
+        return None
+    
+    user = user_repository.get_user_by_id(user_id)
+    if not user:
         return None
 
-    parts = auth_header.split()
-
-    if len(parts) != 2 or parts[0].lower() != "bearer":
-        return None
-
-    token = parts[1]
-    user_dto = user_repository.get_user_by_token(token)
-    return user_dto.username if user_dto else None
+    return user.username
 
 
 def create_recipe_controller(data):
@@ -84,3 +81,26 @@ def update_recipe_controller(recipe_id, updates):
         return 403, {"error": "No autorizado para editar esta receta"}
 
     return 200, result.to_dict()
+
+def rate_recipe_controller(recipe_id, data):
+    username = get_username_from_request()
+
+    if not username:
+        return 401, {"error": "Debe enviar un token válido"}
+
+    if "rating" not in data:
+        return 400, {"error": "Se requiere 'rating' (1 a 5)"}
+
+    result = recipe_service.rate_recipe(recipe_id, username, data["rating"])
+
+    if result is None:
+        return 404, {"error": "Receta no encontrada"}
+
+    if result is False:
+        return 403, {"error": "Ya calificó esta receta"}
+
+    if result == -1:
+        return 400, {"error": "Rating inválido (debe ser 1 a 5)"}
+
+    return 200, {"message": "Calificación registrada", "recipe": result.to_dict()}
+

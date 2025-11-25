@@ -194,3 +194,8 @@ def get_random_recipe_by_category(category):
 def get_prioritized_recipes(favorite_foods):
     all_recipes = recipe_repository.get_all()
     return recipe_prioritizer.prioritize(all_recipes, favorite_foods)
+
+def rate_recipe(recipe_id, username, rating):
+    if rating < 1 or rating > 5:
+        return -1
+    return recipe_repository.rate_recipe(recipe_id, username, rating)
