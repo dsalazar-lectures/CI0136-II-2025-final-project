@@ -21,10 +21,10 @@ def generate_menus(
     """
     # Dictionary of meal categories
     meal_categories = {
-        "breakfast": "desayuno",
-        "lunch": "almuerzo",
-        "dinner": "cena",
-        "dessert": "postre",
+        "breakfast": ["desayuno", "breakfast"],
+        "lunch": ["almuerzo", "lunch"],
+        "dinner": ["cena", "dinner"],
+        "dessert": ["postre", "dessert"],
     }
 
     daily_menus = {}
@@ -32,19 +32,30 @@ def generate_menus(
 
     # Generate each day of the menu
     for day in range(1, count + 1):
-        # Get a random recipe for each category
-        breakfast_recipe = recipe_service.get_random_recipe_by_category(
-            meal_categories["breakfast"]
-        )
-        lunch_recipe = recipe_service.get_random_recipe_by_category(
-            meal_categories["lunch"]
-        )
-        dinner_recipe = recipe_service.get_random_recipe_by_category(
-            meal_categories["dinner"]
-        )
-        dessert_recipe = recipe_service.get_random_recipe_by_category(
-            meal_categories["dessert"]
-        )
+        # Get a random recipe for each category (trying both Spanish and English)
+        breakfast_recipe = None
+        for category in meal_categories["breakfast"]:
+            breakfast_recipe = recipe_service.get_random_recipe_by_category(category)
+            if breakfast_recipe:
+                break
+
+        lunch_recipe = None
+        for category in meal_categories["lunch"]:
+            lunch_recipe = recipe_service.get_random_recipe_by_category(category)
+            if lunch_recipe:
+                break
+
+        dinner_recipe = None
+        for category in meal_categories["dinner"]:
+            dinner_recipe = recipe_service.get_random_recipe_by_category(category)
+            if dinner_recipe:
+                break
+
+        dessert_recipe = None
+        for category in meal_categories["dessert"]:
+            dessert_recipe = recipe_service.get_random_recipe_by_category(category)
+            if dessert_recipe:
+                break
 
         # Validate that recipes were found for all categories
         missing_categories = []
