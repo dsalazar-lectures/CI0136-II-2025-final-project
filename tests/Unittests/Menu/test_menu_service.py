@@ -1,39 +1,31 @@
 import unittest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 from src.Application.Menu import menu_service
+from tests.Mocks.Recipes.mock_recipe_repo import MockRecipe
 
 
 class MenuServiceTestCase(unittest.TestCase):
+    def _create_mock_recipe(self, recipe_id, name, category):
+        """Helper to create a mock recipe"""
+        return MockRecipe(recipe_id, name, [category])
+
     @patch("src.Application.Recipes.recipe_service.get_random_recipe_by_category")
     def test_generate_menus_happy_path(self, mock_get_recipe):
-        # Mock recipes for each category
-        mock_breakfast = MagicMock()
-        mock_breakfast.id = 1
-        mock_breakfast.to_dict.return_value = {"id": 1, "name": "Pancakes"}
-
-        mock_lunch = MagicMock()
-        mock_lunch.id = 2
-        mock_lunch.to_dict.return_value = {"id": 2, "name": "Pasta"}
-
-        mock_dinner = MagicMock()
-        mock_dinner.id = 3
-        mock_dinner.to_dict.return_value = {"id": 3, "name": "Salmón"}
-
-        mock_dessert = MagicMock()
-        mock_dessert.id = 4
-        mock_dessert.to_dict.return_value = {"id": 4, "name": "Flan"}
+        # Create mock recipes using helper
+        mock_breakfast = self._create_mock_recipe(1, "Pancakes", "desayuno")
+        mock_lunch = self._create_mock_recipe(2, "Pasta", "almuerzo")
+        mock_dinner = self._create_mock_recipe(3, "Salmón", "cena")
+        mock_dessert = self._create_mock_recipe(4, "Flan", "postre")
 
         # Configure mock to return appropriate recipe based on category
         def get_recipe_by_category(category):
-            if category == "desayuno":
-                return mock_breakfast
-            elif category == "almuerzo":
-                return mock_lunch
-            elif category == "cena":
-                return mock_dinner
-            elif category == "postre":
-                return mock_dessert
-            return None
+            recipes = {
+                "desayuno": mock_breakfast,
+                "almuerzo": mock_lunch,
+                "cena": mock_dinner,
+                "postre": mock_dessert,
+            }
+            return recipes.get(category)
 
         mock_get_recipe.side_effect = get_recipe_by_category
 
@@ -73,7 +65,7 @@ class MenuServiceTestCase(unittest.TestCase):
     @patch("src.Application.Recipes.recipe_service.get_random_recipe_by_category")
     def test_count_zero_returns_empty(self, mock_get_recipe):
         # Even with available recipes, count 0 should return empty menu
-        mock_recipe = MagicMock()
+        mock_recipe = self._create_mock_recipe(1, "Recipe", "desayuno")
         mock_get_recipe.return_value = mock_recipe
 
         menu, missing_categories, menu_details = menu_service.generate_menus(0)
@@ -94,10 +86,7 @@ class MenuServiceTestCase(unittest.TestCase):
         def get_recipe_by_category(category):
             if category == "desayuno":
                 return None
-            mock_recipe = MagicMock()
-            mock_recipe.id = 1
-            mock_recipe.to_dict.return_value = {"id": 1, "name": "Recipe"}
-            return mock_recipe
+            return self._create_mock_recipe(1, "Recipe", category)
 
         mock_get_recipe.side_effect = get_recipe_by_category
 
