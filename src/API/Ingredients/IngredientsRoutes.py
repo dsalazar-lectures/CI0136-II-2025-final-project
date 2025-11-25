@@ -34,7 +34,7 @@ def create_new_ingredient():
     """Create a new ingredient"""
     name = request.json.get("name")
     if not name:
-        return jsonify({"error": "Ingredient name is required"}), 404
+        return jsonify({"error": "Ingredient name is required"}), 400
     categories = request.json.get("categories")
     substitutes = request.json.get("substitutes")
     components = request.json.get("components")

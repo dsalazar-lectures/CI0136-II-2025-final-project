@@ -6,17 +6,21 @@ from src.API.Ingredients.IngredientsRoutes import ingredients_bp
 
 class IngredientServiceTestCase(unittest.TestCase):
     def setUp(self):
+
         app = Flask(__name__)
-        app.register_blueprint(ingredients_bp)
+
+        app.register_blueprint(ingredients_bp, url_prefix="/api")
         self.client = app.test_client()
+
+        self.API_PREFIX = "/api/ingredients"
 
     @patch("src.API.Ingredients.IngredientsRoutes.ingredient_service")
     def test_create_ingredient_valid(self, mock_service):
-        """Test POST /ingredients/create with valid data"""
+        """Test POST /api/ingredients/create with valid data"""
         mock_service.create_ingredient.return_value = None
 
         response = self.client.post(
-            "/ingredients/create",
+            f"{self.API_PREFIX}/create",
             json={
                 "name": "Oat Milk",
                 "categories": ["plant_milk"],
@@ -34,11 +38,11 @@ class IngredientServiceTestCase(unittest.TestCase):
 
     @patch("src.API.Ingredients.IngredientsRoutes.ingredient_service")
     def test_create_ingredient_not_valid(self, mock_service):
-        """Test POST /ingredients/create without name field"""
+        """Test POST /api/ingredients/create without name field"""
         mock_service.create_ingredient.return_value = None
 
         response = self.client.post(
-            "/ingredients/create",
+            f"{self.API_PREFIX}/create",
             json={
                 "categories": ["plant_milk"],
                 "substitutes": ["almond_milk", "soy_milk"],
@@ -46,19 +50,21 @@ class IngredientServiceTestCase(unittest.TestCase):
             },
         )
 
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 400)
+
         data = response.get_json()
-        self.assertEqual(data["error"], "Ingredient name is required")
+        self.assertIsNotNone(data)
+        self.assertEqual(data.get("error"), "Ingredient name is required")
         mock_service.create_ingredient.assert_not_called()
 
     @patch("src.API.Ingredients.IngredientsRoutes.ingredient_service")
     def test_update_categories(self, mock_service):
-        """Test POST /ingredients/update with categories field"""
+        """Test POST /api/ingredients/update with categories field"""
         mock_ing = Mock()
         mock_service.get_ingredient_by_id.return_value = mock_ing
 
         response = self.client.post(
-            "/ingredients/update", json={"id": 1, "categories": ["dairy", "fat"]}
+            f"{self.API_PREFIX}/update", json={"id": 1, "categories": ["dairy", "fat"]}
         )
 
         self.assertEqual(response.status_code, 200)
@@ -68,12 +74,12 @@ class IngredientServiceTestCase(unittest.TestCase):
 
     @patch("src.API.Ingredients.IngredientsRoutes.ingredient_service")
     def test_update_substitutes(self, mock_service):
-        """Test POST /ingredients/update with substitutes field"""
+        """Test POST /api/ingredients/update with substitutes field"""
         mock_ing = Mock()
         mock_service.get_ingredient_by_id.return_value = mock_ing
 
         response = self.client.post(
-            "/ingredients/update",
+            f"{self.API_PREFIX}/update",
             json={"id": 1, "substitutes": ["Almond Milk", "Oat Milk"]},
         )
 
@@ -86,12 +92,13 @@ class IngredientServiceTestCase(unittest.TestCase):
 
     @patch("src.API.Ingredients.IngredientsRoutes.ingredient_service")
     def test_update_components(self, mock_service):
-        """Test POST /ingredients/update with components field"""
+        """Test POST /api/ingredients/update with components field"""
         mock_ing = Mock()
         mock_service.get_ingredient_by_id.return_value = mock_ing
 
         response = self.client.post(
-            "/ingredients/update", json={"id": 1, "components": ["soy", "plant oils"]}
+            f"{self.API_PREFIX}/update",
+            json={"id": 1, "components": ["soy", "plant oils"]},
         )
 
         self.assertEqual(response.status_code, 200)
@@ -101,12 +108,12 @@ class IngredientServiceTestCase(unittest.TestCase):
 
     @patch("src.API.Ingredients.IngredientsRoutes.ingredient_service")
     def test_update_all(self, mock_service):
-        """Test POST /ingredients/update with all fields"""
+        """Test POST /api/ingredients/update with all fields"""
         mock_ing = Mock()
         mock_service.get_ingredient_by_id.return_value = mock_ing
 
         response = self.client.post(
-            "/ingredients/update",
+            f"{self.API_PREFIX}/update",
             json={
                 "id": 1,
                 "categories": ["plant_milk"],
@@ -126,11 +133,11 @@ class IngredientServiceTestCase(unittest.TestCase):
 
     @patch("src.API.Ingredients.IngredientsRoutes.ingredient_service")
     def test_update_id_not_found(self, mock_service):
-        """Test POST /ingredients/update without ID field"""
+        """Test POST /api/ingredients/update when ID is not found"""
         mock_service.get_ingredient_by_id.return_value = None
 
         response = self.client.post(
-            "/ingredients/update", json={"id": 999, "categories": ["plant_milk"]}
+            f"{self.API_PREFIX}/update", json={"id": 999, "categories": ["plant_milk"]}
         )
 
         self.assertEqual(response.status_code, 404)
@@ -140,27 +147,27 @@ class IngredientServiceTestCase(unittest.TestCase):
 
     @patch("src.API.Ingredients.IngredientsRoutes.ingredient_service")
     def test_delete_ingredient_success(self, mock_service):
-        """Test POST /ingredients/delete"""
+        """Test POST /api/ingredients/delete"""
         mock_service.delete_ingredient.return_value = None
 
-        response = self.client.post("/ingredients/delete", json={"id": 1})
+        response = self.client.post(f"{self.API_PREFIX}/delete", json={"id": 1})
 
         self.assertEqual(response.status_code, 200)
         data = response.get_json()
         self.assertEqual(data["message"], "Ingredient deleted successfully")
-        mock_service.delete_ingredient.assert_called_once()
+        mock_service.delete_ingredient.assert_called_once_with(1)
 
     @patch("src.API.Ingredients.IngredientsRoutes.ingredient_service")
     def test_delete_ingredient_id_not_found(self, mock_service):
-        """Test POST /ingredients/delete without ID field"""
+        """Test POST /api/ingredients/delete when ID is not found"""
         mock_service.delete_ingredient.return_value = "ID is not valid"
 
-        response = self.client.post("/ingredients/delete", json={"id": 999})
+        response = self.client.post(f"{self.API_PREFIX}/delete", json={"id": 999})
 
         self.assertEqual(response.status_code, 404)
         data = response.get_json()
-        self.assertEqual(data["error"], "Ingredient not found")
-        mock_service.delete_ingredient.assert_called_once()
+        self.assertEqual(data.get("error"), "Ingredient not found")
+        mock_service.delete_ingredient.assert_called_once_with(999)
 
 
 if __name__ == "__main__":
