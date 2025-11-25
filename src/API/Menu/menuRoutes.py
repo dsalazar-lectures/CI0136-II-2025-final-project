@@ -9,6 +9,8 @@ from src.Application.Menu.CustomizedMenuService import CustomizedMenuService
 from src.Application.Profiles.Services.ProfileApplicationService import (
     ProfileApplicationService,
 )
+
+from src.Infrastructure.Menu.MenuRepository import MenuRepository
 from src.Infrastructure.Profiles.ProfileRepository import ProfileRepository
 from src.Infrastructure.Menu.MenuRepository import MenuRepository
 
