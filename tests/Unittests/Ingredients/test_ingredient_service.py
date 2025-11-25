@@ -162,6 +162,37 @@ class IngredientServiceTestCase(unittest.TestCase):
         self.assertEqual(data["error"], "Ingredient not found")
         mock_service.delete_ingredient.assert_called_once()
 
+    @patch("src.API.Ingredients.IngredientsRoutes.ingredient_ai_service")
+    def test_ai_substitutes_success(self, mock_service):
+        """POST /ingredients/ai-substitutes returns 200 and body forwarded"""
+        mock_service.get_ai_substitutes_message.return_value = {
+            "status_code": 200,
+            "body": {
+                "ingredient": "Whole Milk",
+                "ai_message": ["Oat Milk", "Almond Milk", "Soy Milk"],
+            }
+        }
+
+        response = self.client.post(
+            "/ingredients/ai-substitutes", json={"ingredient": "Whole Milk"}
+        )
+
+        self.assertEqual(response.status_code, 200)
+        data = response.get_json()
+        self.assertIn("ai_message", data)
+        self.assertEqual(data["ai_message"], ["Oat Milk", "Almond Milk", "Soy Milk"])
+        mock_service.get_ai_substitutes_message.assert_called_once_with("Whole Milk")
+
+    @patch("src.API.Ingredients.IngredientsRoutes.ingredient_ai_service")
+    def test_ai_substitutes_missing_ingredient(self, mock_service):
+        """POST /ingredients/ai-substitutes without ingredient returns 400"""
+        response = self.client.post("/ingredients/ai-substitutes", json={})
+
+        self.assertEqual(response.status_code, 400)
+        data = response.get_json()
+        self.assertEqual(data["error"], "Ingredient name is required")
+        mock_service.get_ai_substitutes_message.assert_not_called()
+
 
 if __name__ == "__main__":
     unittest.main()
