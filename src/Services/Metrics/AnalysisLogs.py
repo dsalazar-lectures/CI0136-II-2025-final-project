@@ -102,7 +102,12 @@ class AnalysisLogs:
 
                 st.bar_chart(recipes_counts)
 
-    def top_least_search_recipes(df_list, recipe_repo: IRecipeRepository | None = None):
+    def top_least_search_recipes(
+        df_list,
+        start_date=(datetime.today() - timedelta(days=7)),
+        end_date=datetime.today(),
+        recipe_repo: IRecipeRepository | None = None,
+    ):
         recipe_repo = recipe_repo or CSVRecipeRepository()
         if df_list is None or len(df_list) == 0:
             st.text(MSG_NO_DATA_OR_FUNC)
