@@ -1,6 +1,6 @@
 import unittest
 import inspect
-from typing import List, Optional
+from typing import List
 from src.Application.Menu.ICustomizedMenuService import ICustomizedMenuService
 from src.Application.Menu.CustomizedMenuService import CustomizedMenuService
 
