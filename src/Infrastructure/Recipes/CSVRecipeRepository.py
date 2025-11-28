@@ -185,7 +185,7 @@ class CSVRecipeRepository(IRecipeRepository):
 
         self.rewrite_csv()
         return recipe
-      
+
     def find_by_categories(self, categories):
         load_recipes()
 
