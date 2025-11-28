@@ -44,7 +44,7 @@ class AccountApplicationService:
                 "error",
                 username_to_delete,
                 None,
-                LogActionNames.DELETE_ACCOUNT.name,
+                LogActionNames.DELETE_ACCOUNT.value,
                 None,
                 "Missing or invalid Authorization header",
             )
@@ -60,7 +60,7 @@ class AccountApplicationService:
                     "error",
                     username_to_delete,
                     None,
-                    LogActionNames.DELETE_ACCOUNT.name,
+                    LogActionNames.DELETE_ACCOUNT.value,
                     None,
                     "Token payload missing username",
                 )
@@ -70,7 +70,7 @@ class AccountApplicationService:
                 "error",
                 username_to_delete,
                 None,
-                LogActionNames.DELETE_ACCOUNT.name,
+                LogActionNames.DELETE_ACCOUNT.value,
                 None,
                 "Failed to decode token",
             )
@@ -88,7 +88,7 @@ class AccountApplicationService:
                 "warning",
                 username_to_delete,
                 None,
-                LogActionNames.DELETE_ACCOUNT.name,
+                LogActionNames.DELETE_ACCOUNT.value,
                 None,
                 "User to delete not found",
             )
@@ -101,7 +101,7 @@ class AccountApplicationService:
                 "warning",
                 user_to_delete.username,
                 user_to_delete.role,
-                LogActionNames.DELETE_ACCOUNT.name,
+                LogActionNames.DELETE_ACCOUNT.value,
                 user_to_delete.id,
                 "User profile to delete not found",
             )
@@ -114,7 +114,7 @@ class AccountApplicationService:
                 "error",
                 user_to_delete.username,
                 user_to_delete.role,
-                LogActionNames.DELETE_ACCOUNT.name,
+                LogActionNames.DELETE_ACCOUNT.value,
                 user_to_delete.id,
                 "Failed to delete user profile",
             )
@@ -125,7 +125,7 @@ class AccountApplicationService:
                 "info",
                 user_to_delete.username,
                 user_to_delete.role,
-                LogActionNames.DELETE_ACCOUNT.name,
+                LogActionNames.DELETE_ACCOUNT.value,
                 user_to_delete.id,
                 "Profile deleted successfully",
             )
@@ -137,7 +137,7 @@ class AccountApplicationService:
                     "error",
                     user_to_delete.username,
                     user_to_delete.role,
-                    LogActionNames.DELETE_ACCOUNT.name,
+                    LogActionNames.DELETE_ACCOUNT.value,
                     user_to_delete.id,
                     "User deletion failed, restoring profile",
                 )
@@ -151,7 +151,7 @@ class AccountApplicationService:
                     "info",
                     user_to_delete.username,
                     user_to_delete.role,
-                    LogActionNames.RESTORE_PROFILE.name,
+                    LogActionNames.RESTORE_PROFILE.value,
                     user_to_delete.id,
                     "Profile restored successfully after failed account deletion",
                 )
@@ -161,7 +161,7 @@ class AccountApplicationService:
             "info",
             user_to_delete.username,
             user_to_delete.role,
-            LogActionNames.DELETE_ACCOUNT.name,
+            LogActionNames.DELETE_ACCOUNT.value,
             user_to_delete.id,
             "User account deleted successfully",
         )

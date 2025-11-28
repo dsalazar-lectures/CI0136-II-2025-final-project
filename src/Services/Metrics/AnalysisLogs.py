@@ -4,6 +4,7 @@ import streamlit as st
 from src.Application.Recipes.IRecipeRepository import IRecipeRepository
 from src.Infrastructure.Recipes.CSVRecipeRepository import CSVRecipeRepository
 from datetime import datetime, timedelta
+from src.Shared.Logs.log_action_names import LogActionNames
 
 
 # --------------------------------------------------------------------------------
@@ -12,9 +13,10 @@ MSG_EXEC_ERROR_TPL = "Error executing the metric: {}"
 DATE_COL = "timestamp"
 USER_COL = "user"
 ACTION_COL = "action"
-ACTION_VALUE_LOGIN = "Login"
+ACTION_VALUE_LOGIN = LogActionNames.LOGIN.value
 LEVEL_COL = "level"
 ERROR_LEVELS = {"ERROR"}  # Only errors only (no warnings)
+SEARCH_RECIPE_ACTION = LogActionNames.SEARCH_RECIPE.value.lower()
 
 
 # --------------------------------------------------------------------------------
@@ -83,16 +85,16 @@ class AnalysisLogs:
         else:
             df = None
             for item in df_list:
-                if item["name"] == "Search recipes":
+                if item["name"] == SEARCH_RECIPE_ACTION:
                     df = item["data"]
                     break
 
             if df is None or df.empty:
-                st.text("No 'Search recipes' data found.")
+                st.text(f"No {SEARCH_RECIPE_ACTION} data found.")
             else:
-                counts = df["Id_Producto"].value_counts().head(10)
+                counts = df["id_object"].value_counts().head(10)
                 recipes_counts = {}
-                for recipe_id in df["Id_Producto"].unique():
+                for recipe_id in df["id_object"].unique():
                     recipe = recipe_repo.get_by_id(recipe_id)
                     if recipe:
                         recipes_counts[recipe.to_dict()["name"]] = counts[recipe_id]
@@ -111,12 +113,12 @@ class AnalysisLogs:
         else:
             df = None
             for item in df_list:
-                if item["name"] == "Search recipes":
+                if item["name"] == SEARCH_RECIPE_ACTION:
                     df = item["data"]
                     break
 
             if df is None or df.empty:
-                st.text("No 'Search recipes' data found.")
+                st.text(f"No {SEARCH_RECIPE_ACTION} data found.")
             else:
                 df["timestamp"] = pd.to_datetime(df["timestamp"])
                 week_ago = datetime.today() - timedelta(days=7)
@@ -124,7 +126,7 @@ class AnalysisLogs:
                     (df["timestamp"] >= week_ago)
                     & (df["timestamp"] <= datetime.today())
                 ]
-                counts = df["Id_Producto"].value_counts(ascending=True)
+                counts = df["id_object"].value_counts(ascending=True)
                 # st.write(f"all counts {counts}")
                 counts = counts[counts < 5]
                 # st.write(f"filtered counts {counts}")

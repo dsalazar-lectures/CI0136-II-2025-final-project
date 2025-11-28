@@ -22,7 +22,7 @@ def get_recipe_by_id(recipe_id):
             level="error",
             user=recipe_id,
             role="-",
-            action=LogActionNames.SEARCH_RECIPE.name,
+            action=LogActionNames.SEARCH_RECIPE.value,
             id_object=recipe.id,
             description=f"Could not find recipe with ID {recipe_id}",
         )
@@ -31,7 +31,7 @@ def get_recipe_by_id(recipe_id):
             level="info",
             user=recipe_id,
             role="-",
-            action=LogActionNames.SEARCH_RECIPE.name,
+            action=LogActionNames.SEARCH_RECIPE.value,
             id_object=recipe.id,
             description=f"Retrieved recipe with ID {recipe_id}",
         )        
@@ -49,7 +49,7 @@ def create_recipe(recipe_data, username):
             level="error",
             user=username,
             role="-",  # Can be changed if necessary
-            action=LogActionNames.CREATE_RECIPE.name,
+            action=LogActionNames.CREATE_RECIPE.value,
             id_object="-",
             description=f"Validation error by {username}",
         )
@@ -61,7 +61,7 @@ def create_recipe(recipe_data, username):
             level="error",
             user=username,
             role="-",
-            action=LogActionNames.CREATE_RECIPE.name,
+            action=LogActionNames.CREATE_RECIPE.value,
             id_object="-",
             description=f"Failed to create recipe {username}",
         )
@@ -71,7 +71,7 @@ def create_recipe(recipe_data, username):
             level="info",
             user=username,
             role="-",
-            action=LogActionNames.CREATE_RECIPE.name,
+            action=LogActionNames.CREATE_RECIPE.value,
             id_object=recipe.id,
             description=f"Recipe '{recipe.name}' created successfully by {username}",
         )
@@ -86,7 +86,7 @@ def delete_recipe(recipe_id, username):
             level="error",
             user=username,
             role="-",
-            action=LogActionNames.DELETE_RECIPE.name,
+            action=LogActionNames.DELETE_RECIPE.value,
             id_object="-",
             description=f"Recipe {recipe_id} not found",
         )
@@ -96,7 +96,7 @@ def delete_recipe(recipe_id, username):
             level="warning",
             user=username,
             role="-",
-            action=LogActionNames.DELETE_RECIPE.name,
+            action=LogActionNames.DELETE_RECIPE.value,
             id_object=recipe_id,
             description=f"User {username} does not own recipe {recipe_id}",
         )
@@ -106,7 +106,7 @@ def delete_recipe(recipe_id, username):
             level="info",
             user=username,
             role="-",
-            action=LogActionNames.DELETE_RECIPE.name,
+            action=LogActionNames.DELETE_RECIPE.value,
             id_object=recipe_id,
             description=f"Recipe {recipe_id} deleted successfully",
         )
@@ -119,7 +119,7 @@ def update_recipe(recipe_id, updates, username):
             level="error",
             user=username,
             role="-",
-            action=LogActionNames.UPDATE_RECIPE.name,
+            action=LogActionNames.UPDATE_RECIPE.value,
             id_object=recipe_id,
             description=f"Validation failed for update data in recipe {recipe_id}",
         )
@@ -131,7 +131,7 @@ def update_recipe(recipe_id, updates, username):
             level="error",
             user=username,
             role="-",
-            action=LogActionNames.UPDATE_RECIPE.name,
+            action=LogActionNames.UPDATE_RECIPE.value,
             id_object=recipe_id,
             description=f"Recipe {recipe_id} not found",
         )
@@ -141,7 +141,7 @@ def update_recipe(recipe_id, updates, username):
             level="warning",
             user=username,
             role="-",
-            action=LogActionNames.UPDATE_RECIPE.name,
+            action=LogActionNames.UPDATE_RECIPE.value,
             id_object=recipe_id,
             description=f"User {username} does not own recipe {recipe_id}",
         )
@@ -151,7 +151,7 @@ def update_recipe(recipe_id, updates, username):
             level="info",
             user=username,
             role="-",
-            action=LogActionNames.UPDATE_RECIPE.name,
+            action=LogActionNames.UPDATE_RECIPE.value,
             id_object=recipe_id,
             description=f"Recipe {recipe_id} updated successfully by {username})",
         )

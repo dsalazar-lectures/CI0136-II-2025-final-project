@@ -50,7 +50,7 @@ class UserApplicationService:
         )
         if not is_valid:
             user_logger.log(
-                "warning", "-", "-", LogActionNames.REGISTER.name, "-", "Missing fields"
+                "warning", "-", "-", LogActionNames.REGISTER.value, "-", "Missing fields"
             )
             return None, error_response, status_code
 
@@ -59,7 +59,7 @@ class UserApplicationService:
         )
         if not is_valid:
             user_logger.log(
-                "warning", data["username"], "-", LogActionNames.REGISTER.name, "-", valid_msg
+                "warning", data["username"], "-", LogActionNames.REGISTER.value, "-", valid_msg
             )
             return None, {"error": valid_msg}, 400
 
@@ -68,7 +68,7 @@ class UserApplicationService:
         )
         if not is_valid:
             user_logger.log(
-                "warning", data["username"], "-", LogActionNames.REGISTER.name, "-", valid_msg
+                "warning", data["username"], "-", LogActionNames.REGISTER.value, "-", valid_msg
             )
             return None, {"error": valid_msg}, 400
 
@@ -88,7 +88,7 @@ class UserApplicationService:
 
         if not user:
             user_logger.log(
-                "error", data["username"], "-", LogActionNames.REGISTER.name, "-", message
+                "error", data["username"], "-", LogActionNames.REGISTER.value, "-", message
             )
             return None, {"error": message}, status
 
@@ -96,7 +96,7 @@ class UserApplicationService:
             "info",
             user.username,
             user.role,
-            LogActionNames.REGISTER.name,
+            LogActionNames.REGISTER.value,
             user.id,
             "User registered successfully",
         )
@@ -110,13 +110,13 @@ class UserApplicationService:
             self.validation_service.validate_request_data(data, required_fields)
         )
         if not is_valid:
-            user_logger.log("warning", "-", "-", LogActionNames.LOGIN.name, "-", "Missing fields")
+            user_logger.log("warning", "-", "-", LogActionNames.LOGIN.value, "-", "Missing fields")
             return None, error_response, None, status_code
 
         user = self.user_repository.get_user_by_username(data["username"])
         if not user:
             user_logger.log(
-                "warning", data["username"], "-", LogActionNames.LOGIN.name, "-", "User not found"
+                "warning", data["username"], "-", LogActionNames.LOGIN.value, "-", "User not found"
             )
             return None, {"error": "Invalid username or password"}, None, 401
 
@@ -125,7 +125,7 @@ class UserApplicationService:
                 "warning",
                 user.username,
                 user.role,
-                LogActionNames.LOGIN.name,
+                LogActionNames.LOGIN.value,
                 user.id,
                 "Incorrect password",
             )
@@ -134,7 +134,7 @@ class UserApplicationService:
         token = self.token_service.generate_token(user)
 
         user_logger.log(
-            "info", user.username, user.role, LogActionNames.LOGIN.name, user.id, "User logged in"
+            "info", user.username, user.role, LogActionNames.LOGIN.value, user.id, "User logged in"
         )
 
         return user, {"message": "Login successful"}, token, 200
@@ -163,7 +163,7 @@ class UserApplicationService:
                 "warning",
                 user.username,
                 user.role,
-                LogActionNames.PASSWORD_CHANGE.name,
+                LogActionNames.PASSWORD_CHANGE.value,
                 user.id,
                 "Missing fields",
             )
@@ -178,7 +178,7 @@ class UserApplicationService:
                 "warning",
                 user.username,
                 user.role,
-                LogActionNames.PASSWORD_CHANGE.name,
+                LogActionNames.PASSWORD_CHANGE.value,
                 user.id,
                 "Old password incorrect",
             )
@@ -220,7 +220,7 @@ class UserApplicationService:
                 "error",
                 user.username,
                 user.role,
-                LogActionNames.PASSWORD_CHANGE.name,
+                LogActionNames.PASSWORD_CHANGE.value,
                 user.id,
                 message,
             )
@@ -230,7 +230,7 @@ class UserApplicationService:
             "info",
             user.username,
             user.role,
-            LogActionNames.PASSWORD_CHANGE.name,
+            LogActionNames.PASSWORD_CHANGE.value,
             user.id,
             "Password updated",
         )
