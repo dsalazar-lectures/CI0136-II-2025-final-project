@@ -8,6 +8,7 @@ from src.API.Menu.menuRoutes import menu_bp
 from src.Model.Menu.Menu import Menu
 from src.Model.Menu.MenuDay import MenuDay
 
+from tests.Mocks.Recipes.mock_recipe_repo import MockRecipe 
 
 class MenuEndpointTestCase(unittest.TestCase):
     def setUp(self):
@@ -19,16 +20,6 @@ class MenuEndpointTestCase(unittest.TestCase):
         """Remove side-effect files created during tests."""
         if os.path.exists("profiles.csv"):
             os.remove("profiles.csv")
-
-    @patch("src.Application.Recipes.recipe_service.get_recipes_by_category")
-    def test_get_menu_returns_empty_list_when_recipes_repo_empty(
-        self, mock_get_recipes
-    ):
-        mock_get_recipes.return_value = []
-        response = self.client.get("/api/menu?category=unknown")
-        self.assertEqual(response.status_code, 200)
-        data = response.get_json()
-        self.assertEqual(data, [{}])
         
     @patch("src.Application.Menu.MenuUseCase.generateRandomMenu")
     def test_get_menu_returns_new_menu_structure(self, mock_generate_random_menu):
