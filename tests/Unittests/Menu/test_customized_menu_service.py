@@ -1,3 +1,4 @@
+import os
 import unittest
 import inspect
 from typing import List
@@ -5,6 +6,7 @@ from src.Application.Menu.ICustomizedMenuService import ICustomizedMenuService
 from src.Application.Menu.CustomizedMenuService import CustomizedMenuService
 
 from tests.Mocks.Menu.mock_customized_menu import FakeRecipe, FakeRecipeService
+API_RECIPES_PATH = os.path.join("src", "Database", "Recipes", "APIRecipes.csv")
 
 
 def build_sut(
@@ -62,6 +64,10 @@ class TestCustomizedMenuServiceBehavior(unittest.TestCase):
                 rating=5,
             ),
         ]
+
+    def tearDown(self):
+        if os.path.exists(API_RECIPES_PATH):
+            os.remove(API_RECIPES_PATH)
 
     def test_no_favorites_returns_empty(self):
         """Test that empty favorites list returns empty results"""

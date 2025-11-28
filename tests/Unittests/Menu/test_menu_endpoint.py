@@ -18,9 +18,24 @@ class MenuEndpointTestCase(unittest.TestCase):
         self.client = app.test_client()
 
     def tearDown(self):
-        """Remove side-effect files created during tests."""
+        # profiles
         if os.path.exists("profiles.csv"):
             os.remove("profiles.csv")
+
+        # menus
+        menus_path = os.path.join("src", "Database", "Menu", "menus.csv")
+        if os.path.exists(menus_path):
+            os.remove(menus_path)
+
+        # customized menus
+        custom_menus_path = os.path.join("src", "Database", "Menu", "custom_menus.csv")
+        if os.path.exists(custom_menus_path):
+            os.remove(custom_menus_path)
+
+        # API recipes
+        api_recipes_path = os.path.join("src", "Database", "Recipes", "APIRecipes.csv")
+        if os.path.exists(api_recipes_path):
+            os.remove(api_recipes_path)
 
     @patch("src.Application.Menu.MenuUseCase.generateRandomMenu")
     def test_get_menu_returns_new_menu_structure(self, mock_generate_random_menu):

@@ -1,13 +1,20 @@
+import os
 import unittest
 from unittest.mock import patch
 from src.Application.Menu import menu_service
 from tests.Mocks.Recipes.mock_recipe_repo import MockRecipe
+
+API_RECIPES_PATH = os.path.join("src", "Database", "Recipes", "APIRecipes.csv")
 
 
 class MenuServiceTestCase(unittest.TestCase):
     def _create_mock_recipe(self, recipe_id, name, category):
         """Helper to create a mock recipe"""
         return MockRecipe(recipe_id, name, [category])
+
+    def tearDown(self):
+        if os.path.exists(API_RECIPES_PATH):
+            os.remove(API_RECIPES_PATH)
 
     @patch("src.Application.Recipes.recipe_service.get_random_recipe_by_category")
     def test_generate_menus_happy_path(self, mock_get_recipe):
