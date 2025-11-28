@@ -110,14 +110,21 @@ def remove_favorite_menu(user_id: int):
         return jsonify({"error": str(e)}), 500
 
 
-@profiles_bp.route("/profiles/<int:user_id>/role", methods=["GET"])
-def get_user_role(user_id: int):
-    """Get role of a user"""
-    try:
-        profile = profile_service.get_profile(user_id)
-        if not profile:
-            return jsonify({"error": "Perfil no encontrado"}), 404
-        role = profile.role
-        return jsonify({"user_id": user_id, "role": role.name}), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+@profiles_bp.route("/profiles/<int:user_id>/unfavorites", methods=["PUT"])
+def set_unfavorites(user_id: int):
+    payload = request.get_json(silent=True) or {}
+    raw_unfavorites = payload.get("unfavorite_foods") or []
+
+    if not isinstance(raw_unfavorites, list):
+        return (
+            jsonify(
+                {"error": "Formato inválido: 'unfavorite_foods' debe ser una lista."}
+            ),
+            400,
+        )
+
+    updated = profile_service.set_unfavorite_ingredients(user_id, raw_unfavorites)
+    if not updated:
+        return jsonify({"error": "Perfil no encontrado"}), 404
+
+    return jsonify(updated.to_dict()), 200

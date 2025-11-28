@@ -2,7 +2,7 @@ from src.Application.Interfaces.IProfileApplicationService import (
     IProfileApplicationService,
 )
 from src.Model.Profiles.Profiles import Profile
-from typing import List, Optional
+from typing import List, Optional, Any
 
 
 class ProfileApplicationService(IProfileApplicationService):
@@ -31,3 +31,29 @@ class ProfileApplicationService(IProfileApplicationService):
             f.replace("-", " ").strip().lower() for f in favorites if isinstance(f, str)
         ]
         return self.profile_repository.restore_profile(user_id, favorites_norm)
+
+    def set_unfavorite_ingredients(
+        self, user_id: int, unfavorites: List[Any]
+    ) -> Optional[Profile]:
+        """Update unfavorite_foods for the user."""
+
+        ingredients_norm: List[str] = []
+
+        for item in unfavorites:
+            if isinstance(item, dict):
+                ingredient_raw = item.get("ingredient")
+            else:
+                ingredient_raw = item
+
+            if not isinstance(ingredient_raw, str):
+                continue  # ignore non-string entries
+
+            ingredient = ingredient_raw.replace("-", " ").strip().lower()
+            if not ingredient:
+                continue
+
+            ingredients_norm.append(ingredient)
+
+        return self.profile_repository.update_unfavorite_foods(
+            user_id, ingredients_norm
+        )

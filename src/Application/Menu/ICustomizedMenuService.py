@@ -12,5 +12,6 @@ class ICustomizedMenuService(ABC):
         favorites: List[str] | str,
         category: Optional[str] = None,
         limit: int = LIMIT_OF_INGREDIENTS,
+        excluded: List[str] | str | None = None,
     ) -> List[Any]:
         pass
