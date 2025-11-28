@@ -6,6 +6,7 @@ from src.Application.Menu.ICustomizedMenuService import ICustomizedMenuService
 from src.Application.Menu.CustomizedMenuService import CustomizedMenuService
 
 from tests.Mocks.Menu.mock_customized_menu import FakeRecipe, FakeRecipeService
+
 API_RECIPES_PATH = os.path.join("src", "Database", "Recipes", "APIRecipes.csv")
 
 
