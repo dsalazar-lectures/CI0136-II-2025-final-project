@@ -183,6 +183,14 @@ def get_recipes_by_category(category):
     return recipe_repository.find_by_category(category)
 
 
+def get_random_recipe_by_categories(categories):
+    recipes = recipe_repository.find_by_categories(categories)
+    if not recipes:
+        return None
+
+    return random.choice(recipes)
+
+
 def get_random_recipe_by_category(category):
     recipes = recipe_repository.find_by_category(category)
     if not recipes:

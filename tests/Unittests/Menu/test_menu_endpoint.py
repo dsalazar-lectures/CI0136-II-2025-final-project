@@ -5,7 +5,8 @@ from types import SimpleNamespace
 import os
 from src.Application.Menu import MenuUseCase
 from src.API.Menu.menuRoutes import menu_bp
-from tests.Mocks.Recipes.mock_recipe_repo import MockRecipe
+from src.Model.Menu.Menu import Menu
+from src.Model.Menu.MenuDay import MenuDay
 
 
 class MenuEndpointTestCase(unittest.TestCase):
@@ -28,35 +29,36 @@ class MenuEndpointTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         data = response.get_json()
         self.assertEqual(data, [{}])
+        
+    @patch("src.Application.Menu.MenuUseCase.generateRandomMenu")
+    def test_get_menu_returns_new_menu_structure(self, mock_generate_random_menu):
+        # Create a Menu with two days (keys are ints, will become strings in JSON)
+        daily_menus = {
+            1: MenuDay(101, 102, 103, 104),
+            2: MenuDay(201, 202, 203, 204),
+        }
+        menu_obj = Menu(menu_id=42, daily_menus=daily_menus)
+        mock_generate_random_menu.return_value = menu_obj
 
-    @patch("src.Application.Recipes.recipe_service.get_random_recipe_by_category")
-    def test_get_menu_returns_one_random_recipe(self, mock_get_random_recipe):
-        recipe = MockRecipe(1, "recipe1", ["category1", "category2"])
-        mock_get_random_recipe.return_value = recipe
-        response = self.client.get("/api/menu?category=category1")
+        response = self.client.get("/api/menu")
         self.assertEqual(response.status_code, 200)
         data = response.get_json()
-        self.assertIsInstance(data, list)
-        self.assertEqual(len(data), 1)
-        self.assertEqual(data[0]["name"], "recipe1")
 
-    @patch("src.Application.Recipes.recipe_service.get_random_recipe_by_category")
-    def test_get_menu_empty_category(self, mock_get_random_recipe):
-        mock_get_random_recipe.return_value = None
-        response = self.client.get("/api/menu?category=unknown")
-        self.assertEqual(response.status_code, 200)
-        data = response.get_json()
-        self.assertEqual(data, [{}])
+        # Top-level keys
+        self.assertIn("menu_id", data)
+        self.assertIn("daily_menus", data)
+        self.assertEqual(data["menu_id"], 42)
 
-    @patch("src.Application.Recipes.recipe_service.get_random_recipe_by_category")
-    def test_get_menu_category_filter(self, mock_get_random_recipe):
-        recipe = MockRecipe(2, "recipe2", ["category2"])
-        mock_get_random_recipe.return_value = recipe
-        response = self.client.get("/api/menu?category=category2")
-        self.assertEqual(response.status_code, 200)
-        data = response.get_json()
-        self.assertEqual(len(data), 1)
-        self.assertEqual(data[0]["name"], "recipe2")
+        # daily_menus keys should start at '1' and be strings
+        keys = list(data["daily_menus"].keys())
+        self.assertEqual(keys, ["1", "2"])
+
+        # Each day should have MenuDay structure
+        day1 = data["daily_menus"]["1"]
+        self.assertEqual(day1["breakfast"], 101)
+        self.assertEqual(day1["lunch"], 102)
+        self.assertEqual(day1["dinner"], 103)
+        self.assertEqual(day1["dessert"], 104)
 
     def test_get_menu_emailPdf_invalid_address(self):
         response = MenuUseCase.emailPdf(1, "test.gmail.com")

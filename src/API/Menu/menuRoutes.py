@@ -1,5 +1,4 @@
 from flask import Blueprint, jsonify, request
-from src.Application.Recipes import recipe_service
 from src.Application.Menu import menu_service
 from src.Application.Menu import MenuUseCase
 
@@ -7,22 +6,23 @@ from src.Application.Menu.CustomizedMenuService import CustomizedMenuService
 from src.Application.Profiles.Services.ProfileApplicationService import (
     ProfileApplicationService,
 )
+
 from src.Infrastructure.Profiles.ProfileRepository import ProfileRepository
 from src.Infrastructure.Menu.MenuRepository import MenuRepository
 
 menu_bp = Blueprint("menu", __name__)
-recipes_bp = Blueprint("menu", __name__)
 
 customized_service = CustomizedMenuService()
 profile_service = ProfileApplicationService(ProfileRepository("profiles.csv"))
+# instantiate repository lazily to avoid import-time side-effects in tests
 menu_repository = MenuRepository()
 
 
 @menu_bp.route("/menu", methods=["GET"])
 def get_menu():
-    category = request.args.get("category")
-    recipe = recipe_service.get_random_recipe_by_category(category)
-    return jsonify([recipe.to_dict() if recipe else {}])
+    menu = MenuUseCase.generateRandomMenu()
+
+    return jsonify(menu.to_dict())
 
 
 @menu_bp.route("/menu/<int:count>", methods=["GET"])
@@ -50,8 +50,9 @@ def get_menus_number(count: int):
             404,
         )
 
-    # Save menu to repository
-    saved_menu, message, status_code = menu_repository.create_menu(menu)
+    # Save menu to repository (instantiate repo if not available)
+    repo = menu_repository or MenuRepository()
+    saved_menu, message, status_code = repo.create_menu(menu)
 
     if status_code != 201:
         return jsonify({"error": message}), status_code
