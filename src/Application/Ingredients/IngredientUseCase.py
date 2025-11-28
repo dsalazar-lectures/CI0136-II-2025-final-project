@@ -47,6 +47,10 @@ class IngredientUseCase:
         """Delete an ingredient from the ingredient dictionary"""
         return self.repository.delete_ingredient(ingredient_id)
 
+    def get_ingredients_by_category(self, ingredient_category: str) -> List[Ingredient]:
+        """Get all ingredients that belong to a specific category."""
+        return self.repository.get_by_category(ingredient_category)
+
 
 # Create a singleton instance to be imported by the routes
 ingredient_service = IngredientUseCase()
