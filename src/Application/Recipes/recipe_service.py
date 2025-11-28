@@ -3,6 +3,7 @@ from src.Infrastructure.Recipes.CSVRecipeRepository import CSVRecipeRepository
 from src.Application.Recipes.FilterComposer import FilterComposer
 from src.Application.Recipes.RecipePrioritizer import RecipePrioritizer
 from src.Shared.Logs.custom_logger import CustomLogger
+from src.Shared.Logs.log_action_names import LogActionNames
 
 recipe_repository = CSVRecipeRepository()
 filter_composer = FilterComposer()
@@ -29,7 +30,7 @@ def create_recipe(recipe_data, username):
             level="error",
             user=username,
             role="-",  # Can be changed if necessary
-            action="Create recipe",
+            action=LogActionNames.CREATE_RECIPE.name,
             id_object="-",
             description=f"Validation error by {username}",
         )
@@ -41,7 +42,7 @@ def create_recipe(recipe_data, username):
             level="error",
             user=username,
             role="-",
-            action="Create recipe",
+            action=LogActionNames.CREATE_RECIPE.name,
             id_object="-",
             description=f"Failed to create recipe {username}",
         )
@@ -51,7 +52,7 @@ def create_recipe(recipe_data, username):
             level="info",
             user=username,
             role="-",
-            action="Create recipe",
+            action=LogActionNames.CREATE_RECIPE.name,
             id_object=recipe.id,
             description=f"Recipe '{recipe.name}' created successfully by {username}",
         )
@@ -66,7 +67,7 @@ def delete_recipe(recipe_id, username):
             level="error",
             user=username,
             role="-",
-            action="Delete recipe",
+            action=LogActionNames.DELETE_RECIPE.name,
             id_object="-",
             description=f"Recipe {recipe_id} not found",
         )
@@ -76,7 +77,7 @@ def delete_recipe(recipe_id, username):
             level="warning",
             user=username,
             role="-",
-            action="Delete recipe",
+            action=LogActionNames.DELETE_RECIPE.name,
             id_object=recipe_id,
             description=f"User {username} does not own recipe {recipe_id}",
         )
@@ -86,7 +87,7 @@ def delete_recipe(recipe_id, username):
             level="info",
             user=username,
             role="-",
-            action="Delete recipe",
+            action=LogActionNames.DELETE_RECIPE.name,
             id_object=recipe_id,
             description=f"Recipe {recipe_id} deleted successfully",
         )
@@ -99,7 +100,7 @@ def update_recipe(recipe_id, updates, username):
             level="error",
             user=username,
             role="-",
-            action="Update recipe",
+            action=LogActionNames.UPDATE_RECIPE.name,
             id_object=recipe_id,
             description=f"Validation failed for update data in recipe {recipe_id}",
         )
@@ -111,7 +112,7 @@ def update_recipe(recipe_id, updates, username):
             level="error",
             user=username,
             role="-",
-            action="Update recipe",
+            action=LogActionNames.UPDATE_RECIPE.name,
             id_object=recipe_id,
             description=f"Recipe {recipe_id} not found",
         )
@@ -121,7 +122,7 @@ def update_recipe(recipe_id, updates, username):
             level="warning",
             user=username,
             role="-",
-            action="Update recipe",
+            action=LogActionNames.UPDATE_RECIPE.name,
             id_object=recipe_id,
             description=f"User {username} does not own recipe {recipe_id}",
         )
@@ -131,7 +132,7 @@ def update_recipe(recipe_id, updates, username):
             level="info",
             user=username,
             role="-",
-            action="Update recipe",
+            action=LogActionNames.UPDATE_RECIPE.name,
             id_object=recipe_id,
             description=f"Recipe {recipe_id} updated successfully by {username})",
         )
