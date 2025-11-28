@@ -16,7 +16,26 @@ def get_all_recipes():
 
 
 def get_recipe_by_id(recipe_id):
-    return recipe_repository.get_by_id(recipe_id)
+    recipe = recipe_repository.get_by_id(recipe_id)
+    if not recipe:
+        logger.log(
+            level="error",
+            user=recipe_id,
+            role="-",
+            action=LogActionNames.SEARCH_RECIPE.name,
+            id_object=recipe.id,
+            description=f"Could not find recipe with ID {recipe_id}",
+        )
+    else:
+        logger.log(
+            level="info",
+            user=recipe_id,
+            role="-",
+            action=LogActionNames.SEARCH_RECIPE.name,
+            id_object=recipe.id,
+            description=f"Retrieved recipe with ID {recipe_id}",
+        )        
+    return recipe
 
 
 def get_recipes_by_ingredient(ingredient):

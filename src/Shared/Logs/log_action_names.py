@@ -9,3 +9,4 @@ class LogActionNames(Enum):
     CREATE_RECIPE = "CreateRecipe"
     DELETE_RECIPE = "DeleteRecipe"
     UPDATE_RECIPE = "UpdateRecipe"
+    SEARCH_RECIPE = "SearchRecipe"
