@@ -183,7 +183,7 @@ class IngredientServiceTestCase(unittest.TestCase):
         mock_service.get_ingredient_by_name.side_effect = get_by_name_side
 
         resp = self.client.post(
-            "/ingredients/search", json={"names": ["tomate", "cebolla"]}
+            f"{self.API_PREFIX}/search", json={"names": ["tomate", "cebolla"]}
         )
         self.assertEqual(resp.status_code, 200)
         data = resp.get_json()
@@ -195,7 +195,7 @@ class IngredientServiceTestCase(unittest.TestCase):
     @patch("src.API.Ingredients.IngredientsRoutes.ingredient_service")
     def test_search_single_name_not_found_returns_404(self, mock_service):
         mock_service.get_ingredient_by_name.return_value = None
-        resp = self.client.post("/ingredients/search", json={"names": "noexist"})
+        resp = self.client.post(f"{self.API_PREFIX}/search", json={"names": "noexist"})
         self.assertEqual(resp.status_code, 404)
         data = resp.get_json()
         self.assertIn("error", data)
@@ -213,7 +213,7 @@ class IngredientServiceTestCase(unittest.TestCase):
 
         mock_service.get_ingredient_by_id.side_effect = get_by_id_side
 
-        resp = self.client.post("/ingredients/search", json={"ids": [1, 2]})
+        resp = self.client.post(f"{self.API_PREFIX}/search", json={"ids": [1, 2]})
         self.assertEqual(resp.status_code, 200)
         data = resp.get_json()
         self.assertIn("results", data)
@@ -235,7 +235,7 @@ class IngredientServiceTestCase(unittest.TestCase):
 
         mock_service.get_ingredients_by_category.return_value = [milk, butter]
 
-        resp = self.client.post("/ingredients/search", json={"categories": ["dairy"]})
+        resp = self.client.post(f"{self.API_PREFIX}/search", json={"categories": ["dairy"]})
         self.assertEqual(resp.status_code, 200)
         data = resp.get_json()
         self.assertIn("results", data)
@@ -245,7 +245,7 @@ class IngredientServiceTestCase(unittest.TestCase):
 
     def test_search_combined_criteria_returns_400(self):
         resp = self.client.post(
-            "/ingredients/search", json={"names": ["a"], "ids": [1]}
+            f"{self.API_PREFIX}/search", json={"names": ["a"], "ids": [1]}
         )
         self.assertEqual(resp.status_code, 400)
         data = resp.get_json()
@@ -253,7 +253,7 @@ class IngredientServiceTestCase(unittest.TestCase):
 
     def test_search_missing_body_returns_400(self):
         # no JSON body -> error
-        resp = self.client.post("/ingredients/search")
+        resp = self.client.post(f"{self.API_PREFIX}/search")
         self.assertEqual(resp.status_code, 400)
         data = resp.get_json()
         self.assertIn("error", data)
