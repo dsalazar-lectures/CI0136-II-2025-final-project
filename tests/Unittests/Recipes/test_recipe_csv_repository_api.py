@@ -38,6 +38,7 @@ class TestCSVRecipeRepositoryAPIIntegration(unittest.TestCase):
                 califications_sumatory="10",
                 califications_amount="2",
                 users_used_recipe="5",
+                users_rated=[],
             ),
             Recipe(
                 id="2",
@@ -51,6 +52,7 @@ class TestCSVRecipeRepositoryAPIIntegration(unittest.TestCase):
                 califications_sumatory="20",
                 califications_amount="4",
                 users_used_recipe="10",
+                users_rated=[],
             ),
         ]
 
@@ -68,6 +70,7 @@ class TestCSVRecipeRepositoryAPIIntegration(unittest.TestCase):
                 califications_sumatory="0",
                 califications_amount="0",
                 users_used_recipe="0",
+                users_rated=[],
             ),
             Recipe(
                 id="52773",
@@ -81,6 +84,7 @@ class TestCSVRecipeRepositoryAPIIntegration(unittest.TestCase):
                 califications_sumatory="0",
                 califications_amount="0",
                 users_used_recipe="0",
+                users_rated=[],
             ),
         ]
 
@@ -236,6 +240,7 @@ class TestCSVRecipeRepositoryAPIIntegration(unittest.TestCase):
             califications_sumatory="0",
             califications_amount="0",
             users_used_recipe="0",
+            users_rated=[],
         )
 
         self.assertEqual(api_recipe.author, "TheMealDB")
@@ -303,6 +308,7 @@ class TestAPIRecipeProperties(unittest.TestCase):
             califications_sumatory="0",
             califications_amount="0",
             users_used_recipe="0",
+            users_rated=[],
         )
 
         # Duration should be None (or "None" as string depending on implementation)
@@ -322,6 +328,7 @@ class TestAPIRecipeProperties(unittest.TestCase):
             califications_sumatory="0",
             califications_amount="0",
             users_used_recipe="0",
+            users_rated=[],
         )
 
         self.assertEqual(api_recipe.author, "TheMealDB")
@@ -340,6 +347,7 @@ class TestAPIRecipeProperties(unittest.TestCase):
             califications_sumatory="0",
             califications_amount="0",
             users_used_recipe="0",
+            users_rated=[],
         )
 
         self.assertEqual(api_recipe.portions, 1)
