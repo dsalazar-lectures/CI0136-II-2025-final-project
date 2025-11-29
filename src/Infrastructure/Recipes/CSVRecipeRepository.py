@@ -52,6 +52,7 @@ class CSVRecipeRepository(IRecipeRepository):
             0,
             0,
             0,
+            "[]",
         )
 
     def save_to_csv(self, recipe):
@@ -70,6 +71,7 @@ class CSVRecipeRepository(IRecipeRepository):
                     recipe.califications_sumatory,
                     recipe.califications_amount,
                     recipe.users_used_recipe,
+                    recipe.users_rated,
                 ]
             )
 
@@ -87,6 +89,7 @@ class CSVRecipeRepository(IRecipeRepository):
             "calificationsSumatory",
             "calificationsAmount",
             "usersUsedRecipe",
+            "usersRated",
         ]
         with open(PATH, mode="w", newline="", encoding="utf-8") as file:
             writer = csv.writer(file)
@@ -105,6 +108,7 @@ class CSVRecipeRepository(IRecipeRepository):
                         r.califications_sumatory,
                         r.califications_amount,
                         r.users_used_recipe,
+                        r.users_rated,
                     ]
                 )
 
@@ -164,6 +168,23 @@ class CSVRecipeRepository(IRecipeRepository):
                 for recipe_category in (recipe.categories)
             )
         ]
+
+    def rate_recipe(self, recipe_id, username, rating):
+        load_recipes()
+        recipe = self.get_by_id(recipe_id)
+
+        if recipe is None:
+            return None
+
+        if username in recipe.users_rated:
+            return False
+
+        recipe.califications_sumatory += rating
+        recipe.califications_amount += 1
+        recipe.users_rated.append(username)
+
+        self.rewrite_csv()
+        return recipe
 
     def find_by_categories(self, categories):
         load_recipes()
