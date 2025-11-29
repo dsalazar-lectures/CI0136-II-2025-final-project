@@ -9,6 +9,11 @@ from src.Application.Profiles.Services.ProfileApplicationService import (
 )
 from src.Infrastructure.Profiles.ProfileRepository import ProfileRepository
 from src.Infrastructure.Menu.MenuRepository import MenuRepository
+from src.Application.User.Services.AuthorizationService import create_default_auth_service
+from src.Model.Profiles.Roles import Role
+
+
+auth_service = create_default_auth_service()
 
 menu_bp = Blueprint("menu", __name__)
 recipes_bp = Blueprint("menu", __name__)
@@ -68,6 +73,14 @@ def emailMenu():
 
 @menu_bp.route("/menu/customized", methods=["GET"])
 def customized_menu():
+    is_auth, response, status_code = auth_service.is_authorized(
+        request.headers,
+        [Role.ADMIN, Role.GOD],
+    )
+
+    if not is_auth:
+        return jsonify(response), status_code
+    
     user_id = request.args.get("user_id", type=int)
     category = request.args.get("category")
     if not user_id:
