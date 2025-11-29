@@ -10,10 +10,10 @@ class IngredientUseCase:
     def __init__(
         self,
         repository: IngredientRepository,
-        external_provider: Optional[IExternalIngredientProvider] = None,
+        external_providers: Optional[List[IExternalIngredientProvider]] = None
     ):
         self.repository = repository
-        self.external_provider = external_provider
+        self.external_providers = external_providers or []
 
     def get_all_ingredients(self) -> List[Ingredient]:
         """Get all ingredients ordered alphabetically."""
