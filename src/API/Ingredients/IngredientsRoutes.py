@@ -28,6 +28,22 @@ def get_ingredient_by_id(ingredient_id):
     return jsonify(ingredient.to_json())
 
 
+@ingredients_bp.route("/ingredients/<string:ingredient_name>", methods=["GET"])
+def get_ingredient_by_name_route(ingredient_name):
+    simple = request.args.get("simple", "false").lower() == "true"
+    ingredient = ingredient_service.get_ingredient_by_name(ingredient_name)
+    if not ingredient:
+        return jsonify({"error": "Ingredient not found"}), 404
+    return (
+        jsonify(
+            {"id": ingredient.id, "name": ingredient.name}
+            if simple
+            else ingredient.to_json()
+        ),
+        200,
+    )
+
+
 @ingredients_bp.route("/ingredients/create", methods=["POST"])
 def create_new_ingredient():
     """Create a new ingredient"""
