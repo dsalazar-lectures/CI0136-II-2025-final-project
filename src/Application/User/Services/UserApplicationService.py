@@ -50,7 +50,12 @@ class UserApplicationService:
         )
         if not is_valid:
             user_logger.log(
-                "warning", "-", "-", LogActionNames.REGISTER.value, "-", "Missing fields"
+                "warning",
+                "-",
+                "-",
+                LogActionNames.REGISTER.value,
+                "-",
+                "Missing fields",
             )
             return None, error_response, status_code
 
@@ -59,7 +64,12 @@ class UserApplicationService:
         )
         if not is_valid:
             user_logger.log(
-                "warning", data["username"], "-", LogActionNames.REGISTER.value, "-", valid_msg
+                "warning",
+                data["username"],
+                "-",
+                LogActionNames.REGISTER.value,
+                "-",
+                valid_msg,
             )
             return None, {"error": valid_msg}, 400
 
@@ -68,7 +78,12 @@ class UserApplicationService:
         )
         if not is_valid:
             user_logger.log(
-                "warning", data["username"], "-", LogActionNames.REGISTER.value, "-", valid_msg
+                "warning",
+                data["username"],
+                "-",
+                LogActionNames.REGISTER.value,
+                "-",
+                valid_msg,
             )
             return None, {"error": valid_msg}, 400
 
@@ -88,7 +103,12 @@ class UserApplicationService:
 
         if not user:
             user_logger.log(
-                "error", data["username"], "-", LogActionNames.REGISTER.value, "-", message
+                "error",
+                data["username"],
+                "-",
+                LogActionNames.REGISTER.value,
+                "-",
+                message,
             )
             return None, {"error": message}, status
 
@@ -110,13 +130,20 @@ class UserApplicationService:
             self.validation_service.validate_request_data(data, required_fields)
         )
         if not is_valid:
-            user_logger.log("warning", "-", "-", LogActionNames.LOGIN.value, "-", "Missing fields")
+            user_logger.log(
+                "warning", "-", "-", LogActionNames.LOGIN.value, "-", "Missing fields"
+            )
             return None, error_response, None, status_code
 
         user = self.user_repository.get_user_by_username(data["username"])
         if not user:
             user_logger.log(
-                "warning", data["username"], "-", LogActionNames.LOGIN.value, "-", "User not found"
+                "warning",
+                data["username"],
+                "-",
+                LogActionNames.LOGIN.value,
+                "-",
+                "User not found",
             )
             return None, {"error": "Invalid username or password"}, None, 401
 
@@ -134,7 +161,12 @@ class UserApplicationService:
         token = self.token_service.generate_token(user)
 
         user_logger.log(
-            "info", user.username, user.role, LogActionNames.LOGIN.value, user.id, "User logged in"
+            "info",
+            user.username,
+            user.role,
+            LogActionNames.LOGIN.value,
+            user.id,
+            "User logged in",
         )
 
         return user, {"message": "Login successful"}, token, 200

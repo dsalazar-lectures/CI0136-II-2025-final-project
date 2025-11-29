@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class LogActionNames(Enum):
     DELETE_ACCOUNT = "DeleteAccount"
     RESTORE_PROFILE = "RestoreProfile"

@@ -20,7 +20,7 @@ def get_recipe_by_id(recipe_id):
     if not recipe:
         logger.log(
             level="error",
-            user=recipe_id,
+            user="-",
             role="-",
             action=LogActionNames.SEARCH_RECIPE.value,
             id_object=recipe.id,
@@ -29,12 +29,12 @@ def get_recipe_by_id(recipe_id):
     else:
         logger.log(
             level="info",
-            user=recipe_id,
+            user="-",
             role="-",
             action=LogActionNames.SEARCH_RECIPE.value,
             id_object=recipe.id,
             description=f"Retrieved recipe with ID {recipe_id}",
-        )        
+        )
     return recipe
 
 
