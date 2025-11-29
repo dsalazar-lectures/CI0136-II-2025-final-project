@@ -5,6 +5,11 @@ from src.Application.Profiles.Services.ProfileApplicationService import (
     ProfileApplicationService,
 )
 from src.Infrastructure.Profiles.ProfileRepository import ProfileRepository
+from src.Application.User.Services.AuthorizationService import create_default_auth_service
+from src.Model.Profiles.Roles import Role
+
+
+auth_service = create_default_auth_service()
 
 recipes_bp = Blueprint("recipes", __name__)
 profile_service = ProfileApplicationService(ProfileRepository("profiles.csv"))
@@ -38,6 +43,14 @@ def get_recipes_by_ingredient(ingredient):
 
 @recipes_bp.route("/addrecipe", methods=["POST"])
 def create_recipe():
+    is_auth, response, status_code = auth_service.is_authorized(
+        request.headers,
+        [Role.ADMIN, Role.GOD],
+    )
+
+    if not is_auth:
+        return jsonify(response), status_code
+    
     data = request.json
     status_code, response_data = recipesController.create_recipe_controller(data)
     return jsonify(response_data), status_code
@@ -45,12 +58,28 @@ def create_recipe():
 
 @recipes_bp.route("/recipes/<int:recipe_id>", methods=["DELETE"])
 def delete_recipe(recipe_id):
+    is_auth, response, status_code = auth_service.is_authorized(
+        request.headers,
+        [Role.ADMIN, Role.GOD],
+    )
+
+    if not is_auth:
+        return jsonify(response), status_code
+    
     status_code, response_data = recipesController.delete_recipe_controller(recipe_id)
     return jsonify(response_data), status_code
 
 
 @recipes_bp.route("/recipes/<int:recipe_id>", methods=["PUT"])
 def update_recipe(recipe_id):
+    is_auth, response, status_code = auth_service.is_authorized(
+        request.headers,
+        [Role.ADMIN, Role.GOD],
+    )
+
+    if not is_auth:
+        return jsonify(response), status_code
+    
     updates = request.json or {}
     status_code, response_data = recipesController.update_recipe_controller(
         recipe_id, updates
@@ -104,6 +133,14 @@ def get_prioritized_recipes():
     """
     Get all recipes prioritized by user's favorite ingredients.
     """
+    is_auth, response, status_code = auth_service.is_authorized(
+        request.headers,
+        [Role.ADMIN, Role.GOD],
+    )
+
+    if not is_auth:
+        return jsonify(response), status_code
+    
     user_id = request.args.get("user_id", type=int)
 
     if not user_id:
