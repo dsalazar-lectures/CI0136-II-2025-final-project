@@ -4,6 +4,11 @@ from src.Application.Profiles.Services.ProfileApplicationService import (
     ProfileApplicationService,
 )
 from src.Infrastructure.Profiles.ProfileRepository import ProfileRepository
+from src.Application.User.Services.AuthorizationService import create_default_auth_service
+from src.Model.Profiles.Roles import Role
+
+
+auth_service = create_default_auth_service()
 
 # Initialize the repository and use case
 profile_repository = ProfileRepository()
@@ -15,6 +20,14 @@ profile_service = ProfileApplicationService(ProfileRepository("profiles.csv"))
 
 @profiles_bp.route("/profiles/<int:user_id>", methods=["GET"])
 def get_profile(user_id: int):
+    is_auth, response, status_code = auth_service.is_authorized(
+        request.headers,
+        [Role.ADMIN, Role.GOD],
+    )
+
+    if not is_auth:
+        return jsonify(response), status_code
+    
     profile = profile_service.get_profile(user_id)
     if not profile:
         return jsonify({"error": "Perfil no encontrado"}), 404
@@ -23,6 +36,14 @@ def get_profile(user_id: int):
 
 @profiles_bp.route("/profiles/<int:user_id>/favorites", methods=["PUT"])
 def set_favorites(user_id: int):
+    is_auth, response, status_code = auth_service.is_authorized(
+        request.headers,
+        [Role.ADMIN, Role.GOD],
+    )
+
+    if not is_auth:
+        return jsonify(response), status_code
+    
     payload = request.get_json(silent=True) or {}
     ingredients = payload.get("ingredients") or []
     if not isinstance(ingredients, list):
@@ -38,6 +59,14 @@ def set_favorites(user_id: int):
 
 @profiles_bp.route("/profiles/<int:user_id>/favorite-menus", methods=["GET"])
 def get_favorite_menus(user_id: int):
+    is_auth, response, status_code = auth_service.is_authorized(
+        request.headers,
+        [Role.ADMIN, Role.GOD],
+    )
+
+    if not is_auth:
+        return jsonify(response), status_code
+    
     """Get all favorite menus for a user"""
     try:
         favorite_menus = profile_use_case.get_favorite_menus(user_id)
@@ -48,6 +77,14 @@ def get_favorite_menus(user_id: int):
 
 @profiles_bp.route("/profiles/<int:user_id>/favorite-menus", methods=["POST"])
 def add_favorite_menu(user_id: int):
+    is_auth, response, status_code = auth_service.is_authorized(
+        request.headers,
+        [Role.ADMIN, Role.GOD],
+    )
+
+    if not is_auth:
+        return jsonify(response), status_code
+    
     """Add a menu to user's favorites"""
     try:
         data = request.get_json(silent=True) or {}
@@ -80,6 +117,14 @@ def add_favorite_menu(user_id: int):
 
 @profiles_bp.route("/profiles/<int:user_id>/favorite-menus", methods=["DELETE"])
 def remove_favorite_menu(user_id: int):
+    is_auth, response, status_code = auth_service.is_authorized(
+        request.headers,
+        [Role.ADMIN, Role.GOD],
+    )
+
+    if not is_auth:
+        return jsonify(response), status_code
+    
     """Remove a menu from user's favorites"""
     try:
         data = request.get_json(silent=True) or {}
@@ -112,6 +157,14 @@ def remove_favorite_menu(user_id: int):
 
 @profiles_bp.route("/profiles/<int:user_id>/role", methods=["GET"])
 def get_user_role(user_id: int):
+    is_auth, response, status_code = auth_service.is_authorized(
+        request.headers,
+        [Role.ADMIN, Role.GOD],
+    )
+
+    if not is_auth:
+        return jsonify(response), status_code
+    
     """Get role of a user"""
     try:
         profile = profile_service.get_profile(user_id)
