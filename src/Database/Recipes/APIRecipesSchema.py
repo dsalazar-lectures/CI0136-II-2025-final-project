@@ -54,6 +54,7 @@ def write_api_recipes(parsed_recipes):
             "calificationsSumatory",
             "calificationsAmount",
             "usersUsedRecipe",
+            "usersRated",
         ]
         writer = csv.DictWriter(file, fieldnames=fieldnames)
         writer.writeheader()

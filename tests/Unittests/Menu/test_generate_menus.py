@@ -1,8 +1,11 @@
+import os
 import unittest
 from unittest.mock import patch
 from flask import Flask
 from tests.Mocks.Menu.mock_menu_service import MockMenuService
 from tests.Mocks.Menu.mock_menu_repository import MockMenuRepository
+
+API_RECIPES_PATH = os.path.join("src", "Database", "Recipes", "APIRecipes.csv")
 
 
 class GenerateMenusTestCase(unittest.TestCase):
@@ -20,6 +23,10 @@ class GenerateMenusTestCase(unittest.TestCase):
             app = Flask(__name__)
             app.register_blueprint(menu_bp, url_prefix="/api")
             self.client = app.test_client()
+
+    def tearDown(self):
+        if os.path.exists(API_RECIPES_PATH):
+            os.remove(API_RECIPES_PATH)
 
     @patch("src.Application.Menu.menu_service.generate_menus")
     @patch("src.API.Menu.menuRoutes.menu_repository")

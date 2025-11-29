@@ -28,7 +28,7 @@ def create_app():
     app.secret_key = os.getenv("SECRET_KEY", "dev-dafult-key")
 
     # Register blueprints
-    app.register_blueprint(ingredients_bp)
+    app.register_blueprint(ingredients_bp, url_prefix="/api")
     app.register_blueprint(recipes_bp, url_prefix="/api")
     app.register_blueprint(menu_bp, url_prefix="/api")
     app.register_blueprint(auth_bp, url_prefix="/auth")
@@ -55,12 +55,14 @@ def create_app():
                 "GET /api/ingredients/<id> - Get ingredient by ID",
                 "GET /api/recipes - Get all recipes",
                 "GET /api/recipes/<id> - Get recipe by ID",
+                "GET /api/menu - Get a daily menu",
                 "GET /api/recipes/prioritized?user_id=<id> - Get all recipes prioritized by user's favorite ingredients",
-                "GET /api/menu?category=<category> - Get all menu items",
                 "GET /api/menu/email - Email selected recipies to specific address",
-                "GET /api/menu/customized?user_id=<id>&category=<cat-optional> - GET all recipes based in favorite ingredients",
+                "GET /api/menu/customized?user_id=<id>&category=<cat-optional> - Get all recipes based in favorite ingredients",
+                "POST /api/menu/customized?user_id=<id>&category=<cat-optional>&save=true - Save all recipes based in favorite ingredients",
                 "GET /api/profiles/<user_id> - GET profile by user ID",
                 "PUT /api/profiles/<user_id>/favorites - PUT user ID and favorite ingredients",
+                "PUT /api/profiles/<user_id>/unfavorites - PUT user ID and unfavorite ingredients",
                 "GET /api/profiles/<user_id>/favorite-menus - Get user's favorite menus",
                 "POST /api/profiles/<user_id>/favorite-menus - Add menu to favorites",
                 "DELETE /api/profiles/<user_id>/favorite-menus - Remove menu from favorites",

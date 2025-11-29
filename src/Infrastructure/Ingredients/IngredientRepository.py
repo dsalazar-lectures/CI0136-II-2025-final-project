@@ -22,6 +22,15 @@ class IngredientRepository:
                 return ingredient
         return None
 
+        def _normalize(n: str) -> str:
+            return (n or "").replace("-", " ").strip().lower()
+
+        target = _normalize(ingredient_name)
+        for ingredient in self._items.values():
+            if _normalize(ingredient.name) == target:
+                return ingredient
+        return None
+
     def get_by_category(self, ingredient_category: str) -> List[Ingredient]:
         matching_ingredients = []
         for ingredient in self._items.values():

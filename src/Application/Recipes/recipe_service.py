@@ -139,6 +139,8 @@ def update_recipe(recipe_id, updates, username):
 
 
 def filter_recipes(filter_criteria):
+    if not validate_data(filter_criteria):
+        return -1
     all_recipes = recipe_repository.get_all()
     return filter_composer.apply_filters(all_recipes, filter_criteria)
 
@@ -183,6 +185,14 @@ def get_recipes_by_category(category):
     return recipe_repository.find_by_category(category)
 
 
+def get_random_recipe_by_categories(categories):
+    recipes = recipe_repository.find_by_categories(categories)
+    if not recipes:
+        return None
+
+    return random.choice(recipes)
+
+
 def get_random_recipe_by_category(category):
     recipes = recipe_repository.find_by_category(category)
     if not recipes:
@@ -194,3 +204,13 @@ def get_random_recipe_by_category(category):
 def get_prioritized_recipes(favorite_foods):
     all_recipes = recipe_repository.get_all()
     return recipe_prioritizer.prioritize(all_recipes, favorite_foods)
+
+
+def rate_recipe(recipe_id, username, rating):
+    if not isinstance(rating, int):
+        return -1
+
+    if rating < 1 or rating > 5:
+        return -1
+
+    return recipe_repository.rate_recipe(recipe_id, username, rating)

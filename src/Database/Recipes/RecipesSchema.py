@@ -26,6 +26,7 @@ def load_recipes():
                 row["calificationsSumatory"],
                 row["calificationsAmount"],
                 row["usersUsedRecipe"],
+                row["usersRated"],
             )
             system_recipes.append(recipe)
 

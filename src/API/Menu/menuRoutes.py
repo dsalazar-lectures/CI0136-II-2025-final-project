@@ -1,5 +1,4 @@
 from flask import Blueprint, jsonify, request
-from src.Application.Recipes import recipe_service
 from src.Application.Menu import menu_service
 from src.Application.Menu import MenuUseCase
 
@@ -7,22 +6,23 @@ from src.Application.Menu.CustomizedMenuService import CustomizedMenuService
 from src.Application.Profiles.Services.ProfileApplicationService import (
     ProfileApplicationService,
 )
+
 from src.Infrastructure.Profiles.ProfileRepository import ProfileRepository
 from src.Infrastructure.Menu.MenuRepository import MenuRepository
 
 menu_bp = Blueprint("menu", __name__)
-recipes_bp = Blueprint("menu", __name__)
 
 customized_service = CustomizedMenuService()
 profile_service = ProfileApplicationService(ProfileRepository("profiles.csv"))
+# instantiate repository lazily to avoid import-time side-effects in tests
 menu_repository = MenuRepository()
 
 
 @menu_bp.route("/menu", methods=["GET"])
 def get_menu():
-    category = request.args.get("category")
-    recipe = recipe_service.get_random_recipe_by_category(category)
-    return jsonify([recipe.to_dict() if recipe else {}])
+    menu = MenuUseCase.generateRandomMenu()
+
+    return jsonify(menu.to_dict())
 
 
 @menu_bp.route("/menu/<int:count>", methods=["GET"])
@@ -50,8 +50,9 @@ def get_menus_number(count: int):
             404,
         )
 
-    # Save menu to repository
-    saved_menu, message, status_code = menu_repository.create_menu(menu)
+    # Save menu to repository (instantiate repo if not available)
+    repo = menu_repository or MenuRepository()
+    saved_menu, message, status_code = repo.create_menu(menu)
 
     if status_code != 201:
         return jsonify({"error": message}), status_code
@@ -66,7 +67,7 @@ def emailMenu():
     return "", MenuUseCase.emailPdf(menuRecipes, recipientEmail)
 
 
-@menu_bp.route("/menu/customized", methods=["GET"])
+@menu_bp.route("/menu/customized", methods=["GET", "POST"])
 def customized_menu():
     user_id = request.args.get("user_id", type=int)
     category = request.args.get("category")
@@ -77,7 +78,41 @@ def customized_menu():
     if not profile:
         return jsonify({"error": "Perfil no encontrado"}), 404
 
+    excluded_ingredients: list[str] = []
+    profile_unfavorites = getattr(profile, "unfavorite_foods", []) or []
+
+    for item in profile_unfavorites:
+        if isinstance(item, dict):
+            ingredient = (item.get("ingredient") or "").strip()
+        else:
+            ingredient = str(item).strip()
+        if ingredient:
+            excluded_ingredients.append(ingredient)
+
     recipes = customized_service.recommend_by_favorites(
-        profile.favorite_foods, category
+        profile.favorite_foods,
+        category,
+        excluded=excluded_ingredients,
     )
-    return jsonify([r.to_dict() for r in recipes]), 200
+    recipes_data = [r.to_dict() for r in recipes]
+
+    # View recipes
+    if request.method == "GET":
+        return jsonify({"recipes": recipes_data}), 200
+
+    # Save recipe menus
+    menu_repo = MenuRepository()
+    menu_obj, msg, status = menu_repo.create_customized_menu(recipes)
+
+    menu_id = menu_obj.menu_id if menu_obj else None
+
+    return (
+        jsonify(
+            {
+                "recipes": recipes_data,
+                "menu_id": menu_id,
+                "message": msg,
+            }
+        ),
+        status,
+    )

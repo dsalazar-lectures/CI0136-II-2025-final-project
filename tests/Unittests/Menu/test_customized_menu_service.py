@@ -1,43 +1,13 @@
+import os
 import unittest
 import inspect
-from typing import List, Optional
+from typing import List
 from src.Application.Menu.ICustomizedMenuService import ICustomizedMenuService
 from src.Application.Menu.CustomizedMenuService import CustomizedMenuService
 
+from tests.Mocks.Menu.mock_customized_menu import FakeRecipe, FakeRecipeService
 
-class FakeRecipe:
-    """Mock recipe class for testing purposes"""
-
-    def __init__(
-        self,
-        title: str,
-        ingredients: List[str],
-        categories: Optional[List[str]] = None,
-        rating: int = 0,
-    ):
-        self.title = title
-        self.ingredients = ingredients
-        self.categories = categories or []
-        self.rating = rating
-
-
-class FakeRecipeService:
-    """Mock recipe service for testing"""
-
-    def __init__(self, recipes: List[FakeRecipe]):
-        self._recipes = list(recipes)
-
-    def get_all_recipes(self) -> List[FakeRecipe]:
-        return list(self._recipes)
-
-    def filter_recipes(self, criteria: dict) -> List[FakeRecipe]:
-        cats = [c.lower().strip() for c in (criteria.get("categories") or [])]
-        out = []
-        for recipe in self._recipes:
-            recipe_categories = [c.lower().strip() for c in (recipe.categories or [])]
-            if set(cats) & set(recipe_categories):
-                out.append(recipe)
-        return out
+API_RECIPES_PATH = os.path.join("src", "Database", "Recipes", "APIRecipes.csv")
 
 
 def build_sut(
@@ -61,6 +31,7 @@ class TestICustomizedMenuServiceInterface(unittest.TestCase):
         self.assertEqual(params[1].name, "favorites")
         self.assertEqual(params[2].name, "category")
         self.assertEqual(params[3].name, "limit")
+        self.assertEqual(params[4].name, "excluded")
 
 
 class TestCustomizedMenuServiceBehavior(unittest.TestCase):
@@ -94,6 +65,10 @@ class TestCustomizedMenuServiceBehavior(unittest.TestCase):
                 rating=5,
             ),
         ]
+
+    def tearDown(self):
+        if os.path.exists(API_RECIPES_PATH):
+            os.remove(API_RECIPES_PATH)
 
     def test_no_favorites_returns_empty(self):
         """Test that empty favorites list returns empty results"""
@@ -164,6 +139,98 @@ class TestCustomizedMenuServiceBehavior(unittest.TestCase):
                     ),
                     f"La receta {recipe.title} no contiene el ingrediente favorito '{favorite}'",
                 )
+
+    def test_favorites_as_string_semicolon(self):
+        """Favorites passed as semicolon-separated string should be parsed"""
+        sut = build_sut(self.recipes)
+        # Use favorites as a single string
+        result = sut.recommend_by_favorites("tomate;queso", limit=10)
+        # should return recipes that include tomate or queso
+        self.assertTrue(len(result) > 0)
+        self.assertTrue(
+            all(
+                any(
+                    "tomate" in i.lower() or "queso" in i.lower() for i in r.ingredients
+                )
+                for r in result
+            )
+        )
+
+    def test_negative_limit_returns_empty(self):
+        """Negative limits are treated as 0 and should return empty list"""
+        sut = build_sut(self.recipes)
+        result = sut.recommend_by_favorites(["tomate"], limit=-5)
+        self.assertEqual(result, [])
+
+    def test_tiebreaker_sorting(self):
+        """When score ties, recipes should be ordered by rating desc then title asc"""
+        # Create recipes that all match "tomate" so they have the same score
+        r1 = FakeRecipe("Alpha Pasta", ["Tomate"], ["almuerzo"], rating=3)
+        r2 = FakeRecipe("Bravo Pasta", ["Tomate"], ["almuerzo"], rating=3)
+        r3 = FakeRecipe("Charlie Pasta", ["Tomate"], ["almuerzo"], rating=2)
+        sut = build_sut([r1, r2, r3])
+        result = sut.recommend_by_favorites(["tomate"], limit=10)
+        titles = [r.title for r in result]
+        # r1 and r2 have same score and same rating, they should be ordered by title ascending
+        self.assertEqual(titles, ["Alpha Pasta", "Bravo Pasta", "Charlie Pasta"])
+
+    def test_ignores_non_string_favorites(self):
+        sut = build_sut(self.recipes)
+        result = sut.recommend_by_favorites(["tomate", 123, None], "almuerzo", limit=10)
+        self.assertTrue(
+            all(any("tomate" in i.lower() for i in r.ingredients) for r in result)
+        )
+
+    def test_empty_string_favorites_returns_empty(self):
+        sut = build_sut(self.recipes)
+        result = sut.recommend_by_favorites("", "almuerzo", limit=10)
+        self.assertEqual(result, [])
+
+    def test_category_with_no_matches_returns_empty(self):
+        sut = build_sut(self.recipes)
+        result = sut.recommend_by_favorites(["tomate"], "desayuno", limit=10)
+        self.assertEqual(result, [])
+
+    def test_no_recipes_in_service_returns_empty(self):
+        sut = build_sut([], require_all=False)
+        result = sut.recommend_by_favorites(["tomate"], "almuerzo", limit=10)
+        self.assertEqual(result, [])
+
+    def test_excluded_ingredients_are_removed_from_results(self):
+        """Recipes containing excluded ingredients should not appear."""
+        sut = build_sut(self.recipes)
+        result = sut.recommend_by_favorites(["tomate"], limit=10, excluded=["queso"])
+
+        self.assertTrue(len(result) > 0)
+
+        for recipe in result:
+            ingredients_lower = [i.lower() for i in recipe.ingredients]
+            self.assertFalse(
+                any("queso" in ing for ing in ingredients_lower),
+                f"La receta {recipe.title} contiene queso y no debería aparecer",
+            )
+
+    def test_excluded_as_string_semicolon(self):
+        """Excluded passed as semicolon-separated string should be parsed."""
+        sut = build_sut(self.recipes)
+        result = sut.recommend_by_favorites(
+            ["tomate"], limit=10, excluded="queso;pollo"
+        )
+
+        self.assertTrue(len(result) > 0)
+
+        for recipe in result:
+            ingredients_lower = [i.lower() for i in recipe.ingredients]
+            self.assertFalse(
+                any("queso" in ing or "pollo" in ing for ing in ingredients_lower),
+                f"La receta {recipe.title} contiene queso o pollo y no debería aparecer",
+            )
+
+    def test_excluding_all_matching_ingredients_can_return_empty(self):
+        """If excluded blocks all recipes that match favorites, result can be empty."""
+        sut = build_sut(self.recipes)
+        result = sut.recommend_by_favorites(["tomate"], limit=10, excluded=["tomate"])
+        self.assertEqual(result, [])
 
 
 if __name__ == "__main__":

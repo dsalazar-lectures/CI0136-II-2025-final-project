@@ -145,3 +145,18 @@ class ProfileRepository(IProfileRepository):
                 role=Role[restored_profile_data["role"]],
             )
         return None
+
+    def update_unfavorite_foods(self, user_id, unfavorites) -> Optional[Profile]:
+        """Update the unfavorite_foods field for a user."""
+        updated = self.profile_database.update_fields(
+            user_id, {"unfavorite_foods": unfavorites}
+        )
+        if not updated:
+            return None
+
+        return Profile(
+            user_id=int(updated["user_id"]),
+            favorite_foods=updated["favorite_foods"],
+            unfavorite_foods=updated["unfavorite_foods"],
+            favorite_menus=updated["favorite_menus"],
+        )

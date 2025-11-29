@@ -1,13 +1,20 @@
+import os
 import unittest
 from unittest.mock import patch
 from src.Application.Menu import menu_service
 from tests.Mocks.Recipes.mock_recipe_repo import MockRecipe
+
+API_RECIPES_PATH = os.path.join("src", "Database", "Recipes", "APIRecipes.csv")
 
 
 class MenuServiceTestCase(unittest.TestCase):
     def _create_mock_recipe(self, recipe_id, name, category):
         """Helper to create a mock recipe"""
         return MockRecipe(recipe_id, name, [category])
+
+    def tearDown(self):
+        if os.path.exists(API_RECIPES_PATH):
+            os.remove(API_RECIPES_PATH)
 
     @patch("src.Application.Recipes.recipe_service.get_random_recipe_by_category")
     def test_generate_menus_happy_path(self, mock_get_recipe):
@@ -17,13 +24,17 @@ class MenuServiceTestCase(unittest.TestCase):
         mock_dinner = self._create_mock_recipe(3, "Salmón", "cena")
         mock_dessert = self._create_mock_recipe(4, "Flan", "postre")
 
-        # Configure mock to return appropriate recipe based on category
+        # Configure mock to return appropriate recipe based on category (Spanish and English)
         def get_recipe_by_category(category):
             recipes = {
                 "desayuno": mock_breakfast,
+                "breakfast": mock_breakfast,
                 "almuerzo": mock_lunch,
+                "lunch": mock_lunch,
                 "cena": mock_dinner,
+                "dinner": mock_dinner,
                 "postre": mock_dessert,
+                "dessert": mock_dessert,
             }
             return recipes.get(category)
 
@@ -84,7 +95,7 @@ class MenuServiceTestCase(unittest.TestCase):
     def test_missing_one_category(self, mock_get_recipe):
         # Mock that only breakfast is missing
         def get_recipe_by_category(category):
-            if category == "desayuno":
+            if category in ["desayuno", "breakfast"]:
                 return None
             return self._create_mock_recipe(1, "Recipe", category)
 
