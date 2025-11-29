@@ -22,3 +22,4 @@ pandas==2.3.3
 numpy==2.3.4
 fpdf==1.7.2
 requests==2.31.0
+timedelta==2020.12.3

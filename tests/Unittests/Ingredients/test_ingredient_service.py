@@ -169,6 +169,95 @@ class IngredientServiceTestCase(unittest.TestCase):
         self.assertEqual(data.get("error"), "Ingredient not found")
         mock_service.delete_ingredient.assert_called_once_with(999)
 
+    @patch("src.API.Ingredients.IngredientsRoutes.ingredient_service")
+    def test_search_by_multiple_names_returns_results_and_not_found(self, mock_service):
+        # setup: "tomate" exists, "cebolla" does not
+        tomate = Mock()
+        tomate.id = 1
+        tomate.name = "tomate"
+        tomate.to_json.return_value = {"id": 1, "name": "tomate"}
+
+        def get_by_name_side(name):
+            return tomate if name.lower() == "tomate" else None
+
+        mock_service.get_ingredient_by_name.side_effect = get_by_name_side
+
+        resp = self.client.post(
+            "/ingredients/search", json={"names": ["tomate", "cebolla"]}
+        )
+        self.assertEqual(resp.status_code, 200)
+        data = resp.get_json()
+        self.assertIn("results", data)
+        self.assertIn("not_found", data)
+        self.assertTrue(any(item["id"] == 1 for item in data["results"]))
+        self.assertIn("cebolla", data["not_found"])
+
+    @patch("src.API.Ingredients.IngredientsRoutes.ingredient_service")
+    def test_search_single_name_not_found_returns_404(self, mock_service):
+        mock_service.get_ingredient_by_name.return_value = None
+        resp = self.client.post("/ingredients/search", json={"names": "noexist"})
+        self.assertEqual(resp.status_code, 404)
+        data = resp.get_json()
+        self.assertIn("error", data)
+
+    @patch("src.API.Ingredients.IngredientsRoutes.ingredient_service")
+    def test_search_by_ids_returns_results_and_not_found(self, mock_service):
+        # id 1 exists, id 2 does not
+        ingr1 = Mock()
+        ingr1.id = 1
+        ingr1.name = "A"
+        ingr1.to_json.return_value = {"id": 1, "name": "A"}
+
+        def get_by_id_side(i):
+            return ingr1 if i == 1 else None
+
+        mock_service.get_ingredient_by_id.side_effect = get_by_id_side
+
+        resp = self.client.post("/ingredients/search", json={"ids": [1, 2]})
+        self.assertEqual(resp.status_code, 200)
+        data = resp.get_json()
+        self.assertIn("results", data)
+        self.assertIn("not_found", data)
+        self.assertTrue(any(item["id"] == 1 for item in data["results"]))
+        self.assertIn(2, data["not_found"])
+
+    @patch("src.API.Ingredients.IngredientsRoutes.ingredient_service")
+    def test_search_by_categories_returns_matching_ingredients(self, mock_service):
+        milk = Mock()
+        milk.id = 10
+        milk.name = "Whole Milk"
+        milk.to_json.return_value = {"id": 10, "name": "Whole Milk"}
+
+        butter = Mock()
+        butter.id = 11
+        butter.name = "Butter"
+        butter.to_json.return_value = {"id": 11, "name": "Butter"}
+
+        mock_service.get_ingredients_by_category.return_value = [milk, butter]
+
+        resp = self.client.post("/ingredients/search", json={"categories": ["dairy"]})
+        self.assertEqual(resp.status_code, 200)
+        data = resp.get_json()
+        self.assertIn("results", data)
+        ids = {r["id"] for r in data["results"]}
+        self.assertIn(10, ids)
+        self.assertIn(11, ids)
+
+    def test_search_combined_criteria_returns_400(self):
+        resp = self.client.post(
+            "/ingredients/search", json={"names": ["a"], "ids": [1]}
+        )
+        self.assertEqual(resp.status_code, 400)
+        data = resp.get_json()
+        self.assertIn("error", data)
+
+    def test_search_missing_body_returns_400(self):
+        # no JSON body -> error
+        resp = self.client.post("/ingredients/search")
+        self.assertEqual(resp.status_code, 400)
+        data = resp.get_json()
+        self.assertIn("error", data)
+
 
 if __name__ == "__main__":
     unittest.main()
