@@ -1,6 +1,6 @@
 """
 Unit tests for API Recipes Schema
-Tests the integration with TheMealDB API
+Tests the integration with TheMealDB API using the Adapter pattern
 """
 
 import unittest
@@ -13,17 +13,17 @@ sys.path.insert(
     0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../"))
 )
 
-from src.Database.Recipes import TheMealDBAdapter
 from src.Database.Recipes import APIRecipesSchema
+from src.Database.Recipes.TheMealDBAdapter import TheMealDBAdapter
+from src.Database.Recipes.TheMealDBService import TheMealDBService
 
 
-class TestGetApiData(unittest.TestCase):
-    """Tests for get_api_data function"""
+class TestTheMealDBService(unittest.TestCase):
+    """Tests for TheMealDBService class"""
 
-    @patch("src.Database.Recipes.APIRecipesSchema.requests.get")
-    def test_get_api_data_success(self, mock_get):
+    @patch("src.Database.Recipes.TheMealDBService.requests.get")
+    def test_obtain_recipes_success(self, mock_get):
         """Test successful API call"""
-        # Mock successful response
         mock_response = MagicMock()
         mock_response.json.return_value = {
             "meals": [
@@ -38,37 +38,40 @@ class TestGetApiData(unittest.TestCase):
         mock_response.raise_for_status = MagicMock()
         mock_get.return_value = mock_response
 
-        result = TheMealDBAdapter.obtain_recipe()
+        service = TheMealDBService()
+        result = service.obtain_recipes("")
 
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0]["idMeal"], "52772")
         self.assertEqual(result[0]["strMeal"], "Teriyaki Chicken Casserole")
 
-    @patch("src.Database.Recipes.APIRecipesSchema.requests.get")
-    def test_get_api_data_no_meals(self, mock_get):
+    @patch("src.Database.Recipes.TheMealDBService.requests.get")
+    def test_obtain_recipes_no_meals(self, mock_get):
         """Test API response with no meals"""
         mock_response = MagicMock()
         mock_response.json.return_value = {}
         mock_response.raise_for_status = MagicMock()
         mock_get.return_value = mock_response
 
-        result = TheMealDBAdapter.obtain_recipe()
+        service = TheMealDBService()
+        result = service.obtain_recipes("")
 
         self.assertEqual(result, [])
 
-    @patch("src.Database.Recipes.APIRecipesSchema.requests.get")
-    def test_get_api_data_request_exception(self, mock_get):
+    @patch("src.Database.Recipes.TheMealDBService.requests.get")
+    def test_obtain_recipes_request_exception(self, mock_get):
         """Test API call with request exception"""
         import requests
 
         mock_get.side_effect = requests.exceptions.RequestException("Connection error")
 
-        result = TheMealDBAdapter.obtain_recipe()
+        service = TheMealDBService()
+        result = service.obtain_recipes("")
 
         self.assertEqual(result, [])
 
-    @patch("src.Database.Recipes.APIRecipesSchema.requests.get")
-    def test_get_api_data_http_error(self, mock_get):
+    @patch("src.Database.Recipes.TheMealDBService.requests.get")
+    def test_obtain_recipes_http_error(self, mock_get):
         """Test API call with HTTP error"""
         import requests
 
@@ -78,13 +81,30 @@ class TestGetApiData(unittest.TestCase):
         )
         mock_get.return_value = mock_response
 
-        result = TheMealDBAdapter.obtain_recipe()
+        service = TheMealDBService()
+        result = service.obtain_recipes("")
 
         self.assertEqual(result, [])
 
+    @patch("src.Database.Recipes.TheMealDBService.requests.get")
+    def test_obtain_recipes_with_query(self, mock_get):
+        """Test API call with search query"""
+        mock_response = MagicMock()
+        mock_response.json.return_value = {"meals": []}
+        mock_response.raise_for_status = MagicMock()
+        mock_get.return_value = mock_response
 
-class TestParseRecipe(unittest.TestCase):
-    """Tests for parse_recipe function"""
+        service = TheMealDBService()
+        service.obtain_recipes("chicken")
+
+        # Verify the URL was constructed correctly
+        mock_get.assert_called_once()
+        call_args = mock_get.call_args[0][0]
+        self.assertIn("chicken", call_args)
+
+
+class TestTheMealDBAdapter(unittest.TestCase):
+    """Tests for TheMealDBAdapter class"""
 
     def test_parse_recipe_complete(self):
         """Test parsing a complete recipe"""
@@ -102,14 +122,23 @@ class TestParseRecipe(unittest.TestCase):
             "strInstructions": "Cook the chicken...",
         }
 
-        result = TheMealDBAdapter.parse_recipe(meal)
+        adapter = TheMealDBAdapter()
+        result = adapter.parse_recipe(meal)
 
         self.assertEqual(result["id"], "52772")
         self.assertEqual(result["name"], "Teriyaki Chicken Casserole")
-        self.assertEqual(result["categories"], ["Chicken", "Japanese"])
-        self.assertEqual(len(result["ingredients"]), 3)
-        self.assertEqual(result["ingredients"][0], "500g chicken")
-        self.assertEqual(result["ingredients"][1], "2 tbsp soy sauce")
+        
+        # Categories are stored as repr() strings
+        categories = eval(result["categories"])
+        self.assertIn("chicken", categories)
+        self.assertIn("japanese", categories)
+        
+        # Ingredients are stored as repr() strings
+        ingredients = eval(result["ingredients"])
+        self.assertEqual(len(ingredients), 3)
+        self.assertEqual(ingredients[0], "500g chicken")
+        self.assertEqual(ingredients[1], "2 tbsp soy sauce")
+        
         self.assertEqual(result["author"], "TheMealDB")
         self.assertEqual(result["portions"], 1)
         self.assertIsNone(result["duration"])
@@ -127,10 +156,13 @@ class TestParseRecipe(unittest.TestCase):
             "strInstructions": "Mix everything",
         }
 
-        result = TheMealDBAdapter.parse_recipe(meal)
+        adapter = TheMealDBAdapter()
+        result = adapter.parse_recipe(meal)
 
-        self.assertEqual(result["ingredients"][0], "tomato")
-        self.assertEqual(result["ingredients"][1], "onion")
+        # Ingredients are stored as repr() strings
+        ingredients = eval(result["ingredients"])
+        self.assertEqual(ingredients[0], "tomato")
+        self.assertEqual(ingredients[1], "onion")
 
     def test_parse_recipe_empty_ingredients(self):
         """Test parsing recipe with empty ingredients"""
@@ -145,10 +177,13 @@ class TestParseRecipe(unittest.TestCase):
             "strInstructions": "Simple dessert",
         }
 
-        result = TheMealDBAdapter.parse_recipe(meal)
+        adapter = TheMealDBAdapter()
+        result = adapter.parse_recipe(meal)
 
-        self.assertEqual(len(result["ingredients"]), 1)
-        self.assertEqual(result["ingredients"][0], "100g sugar")
+        # Ingredients are stored as repr() strings
+        ingredients = eval(result["ingredients"])
+        self.assertEqual(len(ingredients), 1)
+        self.assertEqual(ingredients[0], "100g sugar")
 
     def test_parse_recipe_no_category(self):
         """Test parsing recipe without category"""
@@ -160,9 +195,12 @@ class TestParseRecipe(unittest.TestCase):
             "strInstructions": "Do something",
         }
 
-        result = TheMealDBAdapter.parse_recipe(meal)
+        adapter = TheMealDBAdapter()
+        result = adapter.parse_recipe(meal)
 
-        self.assertEqual(result["categories"], [])
+        # Categories are stored as repr() strings
+        categories = eval(result["categories"])
+        self.assertEqual(categories, [])
 
     def test_parse_recipe_default_values(self):
         """Test that default values are set correctly"""
@@ -173,11 +211,55 @@ class TestParseRecipe(unittest.TestCase):
             "strMeasure1": "1",
         }
 
-        result = TheMealDBAdapter.parse_recipe(meal)
+        adapter = TheMealDBAdapter()
+        result = adapter.parse_recipe(meal)
 
         self.assertEqual(result["calificationsSumatory"], 0)
         self.assertEqual(result["calificationsAmount"], 0)
         self.assertEqual(result["usersUsedRecipe"], 0)
+
+    def test_extract_categories(self):
+        """Test category extraction"""
+        meal = {
+            "strCategory": "Chicken",
+            "strArea": "Japanese",
+        }
+
+        adapter = TheMealDBAdapter()
+        categories = adapter._extract_categories(meal)
+
+        self.assertEqual(len(categories), 2)
+        self.assertIn("chicken", categories)
+        self.assertIn("japanese", categories)
+
+    def test_extract_ingredients(self):
+        """Test ingredient extraction"""
+        meal = {
+            "strIngredient1": "chicken",
+            "strIngredient2": "rice",
+            "strIngredient3": "",
+            "strMeasure1": "500g",
+            "strMeasure2": "",
+            "strMeasure3": "",
+        }
+
+        adapter = TheMealDBAdapter()
+        ingredients = adapter._extract_ingredients(meal)
+
+        self.assertEqual(len(ingredients), 2)
+        self.assertEqual(ingredients[0], "500g chicken")
+        self.assertEqual(ingredients[1], "rice")
+
+    @patch.object(TheMealDBService, "obtain_recipes")
+    def test_get_raw_data(self, mock_obtain):
+        """Test get_raw_data delegates to service"""
+        mock_obtain.return_value = [{"idMeal": "123"}]
+
+        adapter = TheMealDBAdapter()
+        result = adapter.get_raw_data()
+
+        mock_obtain.assert_called_once_with("")
+        self.assertEqual(result, [{"idMeal": "123"}])
 
 
 class TestWriteApiRecipes(unittest.TestCase):
@@ -191,8 +273,8 @@ class TestWriteApiRecipes(unittest.TestCase):
             {
                 "id": "123",
                 "name": "Test Recipe",
-                "categories": ["Chicken", "Asian"],
-                "ingredients": ["chicken", "soy sauce"],
+                "categories": "['chicken', 'asian']",  # Now it's a string
+                "ingredients": "['chicken', 'soy sauce']",  # Now it's a string
                 "duration": None,
                 "instructions": "Cook it",
                 "portions": 1,
@@ -225,8 +307,8 @@ class TestWriteApiRecipes(unittest.TestCase):
             {
                 "id": "1",
                 "name": "Recipe 1",
-                "categories": ["Cat1"],
-                "ingredients": ["ing1"],
+                "categories": "['cat1']",  # Now it's a string
+                "ingredients": "['ing1']",  # Now it's a string
                 "duration": None,
                 "instructions": "Instructions 1",
                 "portions": 1,
@@ -238,8 +320,8 @@ class TestWriteApiRecipes(unittest.TestCase):
             {
                 "id": "2",
                 "name": "Recipe 2",
-                "categories": ["Cat2"],
-                "ingredients": ["ing2"],
+                "categories": "['cat2']",  # Now it's a string
+                "ingredients": "['ing2']",  # Now it's a string
                 "duration": None,
                 "instructions": "Instructions 2",
                 "portions": 1,
@@ -262,34 +344,55 @@ class TestWriteApiRecipes(unittest.TestCase):
 class TestLoadApiRecipes(unittest.TestCase):
     """Tests for load_api_recipes function"""
 
-    @patch(
-        "builtins.open",
-        new_callable=mock_open,
-        read_data="id,name,categories,ingredients,duration,instructions,portions,author,calificationsSumatory,calificationsAmount,usersUsedRecipe\n123,Test Recipe,['Chicken'],['chicken'],None,Cook it,1,TheMealDB,0,0,0\n",
-    )
     @patch("src.Database.Recipes.APIRecipesSchema.Recipe")
-    def test_load_api_recipes(self, mock_recipe, mock_file):
+    @patch("builtins.open", new_callable=mock_open, read_data="id,name,categories,ingredients,duration,instructions,portions,author,calificationsSumatory,calificationsAmount,usersUsedRecipe\n123,Test Recipe,['chicken'],['chicken'],None,Cook it,1,TheMealDB,0,0,0\n")
+    @patch.object(TheMealDBAdapter, "get_raw_data")
+    @patch.object(TheMealDBAdapter, "parse_recipe")
+    @patch("src.Database.Recipes.APIRecipesSchema.write_api_recipes")
+    def test_load_api_recipes(self, mock_write, mock_parse, mock_get_raw, mock_file, mock_recipe):
         """Test loading recipes from CSV"""
+        # Mock the adapter methods
+        mock_get_raw.return_value = [{"idMeal": "123"}]
+        mock_parse.return_value = {
+            "id": "123",
+            "name": "Test Recipe",
+            "categories": "['chicken']",
+            "ingredients": "['chicken']",
+            "duration": None,
+            "instructions": "Cook it",
+            "portions": 1,
+            "author": "TheMealDB",
+            "calificationsSumatory": 0,
+            "calificationsAmount": 0,
+            "usersUsedRecipe": 0,
+        }
+
         # Clear the global list first
         APIRecipesSchema.api_recipes.clear()
 
+        # Call the function
         APIRecipesSchema.load_api_recipes()
 
-        # Verify file was opened
-        mock_file.assert_called_once()
+        # Verify adapter methods were called
+        mock_get_raw.assert_called_once()
+        mock_parse.assert_called_once()
+        
+        # Verify write was called
+        mock_write.assert_called_once()
+        
         # Verify Recipe constructor was called
-        mock_recipe.assert_called_once()
+        mock_recipe.assert_called()
 
 
 class TestIntegration(unittest.TestCase):
     """Integration tests for the complete flow"""
 
     @patch("src.Database.Recipes.APIRecipesSchema.write_api_recipes")
-    @patch("src.Database.Recipes.APIRecipesSchema.get_api_data")
-    def test_full_integration_flow(self, mock_get_api, mock_write):
+    @patch.object(TheMealDBService, "obtain_recipes")
+    def test_full_integration_flow(self, mock_obtain, mock_write):
         """Test complete flow from API to CSV"""
         # Mock API response
-        mock_get_api.return_value = [
+        mock_obtain.return_value = [
             {
                 "idMeal": "52772",
                 "strMeal": "Teriyaki Chicken",
@@ -301,14 +404,16 @@ class TestIntegration(unittest.TestCase):
             }
         ]
 
-        # This would normally happen in the module
-        meals = mock_get_api()
+        # Simulate the flow
+        adapter = TheMealDBAdapter()
+        meals = adapter.get_raw_data()
+        
         if meals:
-            parsed_recipes = [TheMealDBAdapter.parse_recipe(meal) for meal in meals]
+            parsed_recipes = [adapter.parse_recipe(meal) for meal in meals]
             mock_write(parsed_recipes)
 
         # Verify the flow
-        mock_get_api.assert_called_once()
+        mock_obtain.assert_called_once()
         mock_write.assert_called_once()
 
         # Verify parsed recipe structure
@@ -316,6 +421,35 @@ class TestIntegration(unittest.TestCase):
         self.assertEqual(parsed["id"], "52772")
         self.assertEqual(parsed["name"], "Teriyaki Chicken")
         self.assertEqual(parsed["author"], "TheMealDB")
+        
+        # Categories and ingredients are stored as repr() strings
+        categories = eval(parsed["categories"])
+        self.assertIn("chicken", categories)
+        self.assertIn("japanese", categories)
+
+    @patch.object(TheMealDBService, "obtain_recipes")
+    def test_adapter_integration(self, mock_obtain):
+        """Test adapter correctly integrates with service"""
+        mock_obtain.return_value = [
+            {
+                "idMeal": "123",
+                "strMeal": "Test Meal",
+                "strCategory": "Test",
+                "strIngredient1": "ingredient",
+                "strMeasure1": "1 cup",
+            }
+        ]
+
+        adapter = TheMealDBAdapter()
+        raw_data = adapter.get_raw_data()
+        parsed = adapter.parse_recipe(raw_data[0])
+
+        self.assertEqual(parsed["id"], "123")
+        self.assertEqual(parsed["name"], "Test Meal")
+        
+        # Ingredients are stored as repr() strings
+        ingredients = eval(parsed["ingredients"])
+        self.assertIn("1 cup ingredient", ingredients)
 
 
 if __name__ == "__main__":
