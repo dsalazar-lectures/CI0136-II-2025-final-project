@@ -1,8 +1,13 @@
 from flask import Blueprint, jsonify, request
 from src.Application.Recipes import recipe_service
 from src.API.Recipes import recipesController
+from src.Application.Profiles.Services.ProfileApplicationService import (
+    ProfileApplicationService,
+)
+from src.Infrastructure.Profiles.ProfileRepository import ProfileRepository
 
 recipes_bp = Blueprint("recipes", __name__)
+profile_service = ProfileApplicationService(ProfileRepository("profiles.csv"))
 
 
 @recipes_bp.route("/recipes", methods=["GET"])
@@ -15,7 +20,7 @@ def get_all_recipes():
 def get_recipe(recipe_id):
     recipe = recipe_service.get_recipe_by_id(recipe_id)
     if not recipe:
-        return jsonify({"error": "Receta no encontrada"}), 404
+        return jsonify({"error": "Recipe not found"}), 404
     return jsonify(recipe.to_dict())
 
 
@@ -24,7 +29,7 @@ def get_recipes_by_ingredient(ingredient):
     recipes = recipe_service.get_recipes_by_ingredient(ingredient)
     if not recipes:
         return (
-            jsonify({"message": f"No se encontraron recetas con '{ingredient}'"}),
+            jsonify({"message": f"Could not find recipes with '{ingredient}'"}),
             404,
         )
 
@@ -62,21 +67,27 @@ def filter_recipes():
         try:
             filter_criteria["duration"] = int(filter_criteria["duration"])
         except (ValueError, TypeError):
-            return jsonify({"error": "Duration debe ser un número"}), 400
+            return jsonify({"error": "Duration must be a number"}), 400
 
     if "rating" in filter_criteria and filter_criteria["rating"] is not None:
         try:
             filter_criteria["rating"] = float(filter_criteria["rating"])
         except (ValueError, TypeError):
-            return jsonify({"error": "Rating debe ser un número"}), 400
+            return jsonify({"error": "Rating must be a number"}), 400
 
     filtered_recipes = recipe_service.filter_recipes(filter_criteria)
+
+    if filtered_recipes == -1:
+        return (
+            jsonify({"message": "Invalid data"}),
+            400,
+        )
 
     if not filtered_recipes:
         return (
             jsonify(
                 {
-                    "message": "No se encontraron recetas con los filtros aplicados",
+                    "message": "Could not find recipes with selected filters",
                     "recipes": [],
                 }
             ),
@@ -92,3 +103,43 @@ def filter_recipes():
         ),
         200,
     )
+
+
+@recipes_bp.route("/recipes/prioritized", methods=["GET"])
+def get_prioritized_recipes():
+    """
+    Get all recipes prioritized by user's favorite ingredients.
+    """
+    user_id = request.args.get("user_id", type=int)
+
+    if not user_id:
+        return jsonify({"error": "user_id is required as parameter"}), 400
+
+    # Get user profile
+    profile = profile_service.get_profile(user_id)
+    if not profile:
+        return jsonify({"error": "Profile not found"}), 404
+
+    # Get prioritized recipes based on user's favorite foods
+    prioritized_recipes = recipe_service.get_prioritized_recipes(profile.favorite_foods)
+
+    return (
+        jsonify(
+            {
+                "count": len(prioritized_recipes),
+                "user_id": user_id,
+                "favorite_ingredients": profile.favorite_foods,
+                "recipes": [recipe.to_dict() for recipe in prioritized_recipes],
+            }
+        ),
+        200,
+    )
+
+
+@recipes_bp.route("/recipes/<int:recipe_id>/rate", methods=["POST"])
+def rate_recipe(recipe_id):
+    data = request.json or {}
+    status_code, response_data = recipesController.rate_recipe_controller(
+        recipe_id, data
+    )
+    return jsonify(response_data), status_code

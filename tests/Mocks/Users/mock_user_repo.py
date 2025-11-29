@@ -23,8 +23,7 @@ class MockUserRepository(IUserRepository):
             password=user_dto.password,
             email=user_dto.email,
             role=user_dto.role,
-            key="mock_key",
-            token=user_dto.token,
+            key=user_dto.key,
         )
 
         mock_user = MockUser(
@@ -33,8 +32,7 @@ class MockUserRepository(IUserRepository):
             password=user_dto.password,
             email=user_dto.email,
             role=user_dto.role,
-            key="mock_key",
-            token=user_dto.token,
+            key=user_dto.key,
         )
         self._users.append(mock_user)
         self._next_id += 1
@@ -47,22 +45,23 @@ class MockUserRepository(IUserRepository):
                 return user
         return None
 
+    def get_user_by_email(self, email):
+        for user in self._users:
+            if user.email == email:
+                return user
+        return None
+
     def get_user_by_id(self, user_id):
         for user in self._users:
             if user.id == user_id:
                 return user
         return None
 
-    def get_user_by_token(self, token):
-        for user in self._users:
-            if user.token == token:
-                return user
-        return None
-
-    def update_user_token(self, username, token, key):
+    def update_user_key(self, username: str, new_key: str) -> bool:
         for user in self._users:
             if user.username == username:
-                user.token = token
+                user.key = new_key
+                return True
         return False
 
     def update_password(self, username: str, hashed_password: str):
@@ -71,3 +70,24 @@ class MockUserRepository(IUserRepository):
                 user.password = hashed_password
                 return True, "Password updated successfully", 200
         return False, "Failed to update password", 400
+
+    def delete_user(self, user_id: int) -> bool:
+        for user in self._users:
+            if user.id == user_id:
+                self._users.remove(user)
+                return True
+        return False
+
+    def update_email(self, username: str, new_email: str):
+        for user in self._users:
+            if user.username == username:
+                user.email = new_email
+                return True, "Email updated successfully", 200
+        return False, "Failed to update email", 400
+
+    def update_password_by_id(self, user_id: str, hashed_password: str):
+        for user in self._users:
+            if str(user.id) == user_id:  # Convertir a string para comparar
+                user.password = hashed_password
+                return True, "Password updated successfully", 200
+        return False, "User not found", 404

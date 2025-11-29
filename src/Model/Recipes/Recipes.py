@@ -15,18 +15,23 @@ class Recipe:
         califications_sumatory,
         califications_amount,
         users_used_recipe,
+        users_rated,
     ):
         self.id = int(id)
         self.name = name
         self.categories = ast.literal_eval(categories)
         self.ingredients = ast.literal_eval(ingredients)
-        self.duration = int(duration)
+        self.duration = int(duration) if duration else 0
         self.instructions = instructions
         self.portions = int(portions)
         self.author = author
         self.califications_sumatory = int(califications_sumatory)
         self.califications_amount = int(califications_amount)
         self.users_used_recipe = int(users_used_recipe)
+        try:
+            self.users_rated = ast.literal_eval(users_rated) if users_rated else []
+        except Exception:
+            self.users_rated = []
 
     @property
     def rating(self):
@@ -48,6 +53,7 @@ class Recipe:
             "author": self.author,
             "rating": self.rating,
             "amount of users that have used this recipe": self.users_used_recipe,
+            "usersRated": self.users_rated,
         }
 
     def __str__(self):

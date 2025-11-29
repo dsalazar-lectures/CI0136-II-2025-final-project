@@ -2,6 +2,7 @@ import csv
 from src.Database.Recipes.RecipesSchema import system_recipes, PATH, load_recipes
 from src.Model.Recipes.Recipes import Recipe
 from src.Application.Recipes.IRecipeRepository import IRecipeRepository
+from src.Database.Recipes.APIRecipesSchema import api_recipes, load_api_recipes
 
 # storage for user-created recipes separate from CSV system_recipes
 
@@ -9,20 +10,32 @@ from src.Application.Recipes.IRecipeRepository import IRecipeRepository
 class CSVRecipeRepository(IRecipeRepository):
     def get_all(self):
         load_recipes()
+        load_api_recipes()
+        all_recipes = system_recipes + api_recipes
+        return all_recipes
+
+    def get_api_recipes():
+        load_api_recipes()
+        return api_recipes
+
+    def get_system_recipes():
+        load_recipes()
         return system_recipes
 
     def get_by_id(self, recipe_id):
         load_recipes()
-        return next(
-            (recipe for recipe in system_recipes if recipe.id == recipe_id), None
-        )
+        load_api_recipes()
+        all_recipes = system_recipes + api_recipes
+        return next((recipe for recipe in all_recipes if recipe.id == recipe_id), None)
 
     def find_by_ingredient(self, ingredient):
         load_recipes()
+        load_api_recipes()
+        all_recipes = system_recipes + api_recipes
         ingredient = ingredient.lower()
         return [
             recipe
-            for recipe in system_recipes
+            for recipe in all_recipes
             if any(ingredient in ing.lower() for ing in recipe.ingredients)
         ]
 
@@ -39,6 +52,7 @@ class CSVRecipeRepository(IRecipeRepository):
             0,
             0,
             0,
+            "[]",
         )
 
     def save_to_csv(self, recipe):
@@ -57,6 +71,7 @@ class CSVRecipeRepository(IRecipeRepository):
                     recipe.califications_sumatory,
                     recipe.califications_amount,
                     recipe.users_used_recipe,
+                    recipe.users_rated,
                 ]
             )
 
@@ -74,6 +89,7 @@ class CSVRecipeRepository(IRecipeRepository):
             "calificationsSumatory",
             "calificationsAmount",
             "usersUsedRecipe",
+            "usersRated",
         ]
         with open(PATH, mode="w", newline="", encoding="utf-8") as file:
             writer = csv.writer(file)
@@ -92,6 +108,7 @@ class CSVRecipeRepository(IRecipeRepository):
                         r.califications_sumatory,
                         r.califications_amount,
                         r.users_used_recipe,
+                        r.users_rated,
                     ]
                 )
 
@@ -140,12 +157,50 @@ class CSVRecipeRepository(IRecipeRepository):
 
     def find_by_category(self, category):
         load_recipes()
+        load_api_recipes()
+        all_recipes = api_recipes + system_recipes
         category = category.lower()
         return [
             recipe
-            for recipe in system_recipes
+            for recipe in all_recipes
             if any(
                 category in str(recipe_category).lower()
                 for recipe_category in (recipe.categories)
             )
         ]
+
+    def rate_recipe(self, recipe_id, username, rating):
+        load_recipes()
+        recipe = self.get_by_id(recipe_id)
+
+        if recipe is None:
+            return None
+
+        if username in recipe.users_rated:
+            return False
+
+        recipe.califications_sumatory += rating
+        recipe.califications_amount += 1
+        recipe.users_rated.append(username)
+
+        self.rewrite_csv()
+        return recipe
+
+    def find_by_categories(self, categories):
+        load_recipes()
+
+        if categories is None:
+            return []
+
+        if isinstance(categories, str):
+            categories = [c.strip() for c in categories.split(",") if c.strip()]
+
+        search_terms = [str(c).lower() for c in categories]
+
+        result = []
+        for recipe in system_recipes:
+            recipe_categories = [str(rc).lower() for rc in recipe.categories]
+            if any(term in recipe_categories for term in search_terms):
+                result.append(recipe)
+
+        return result

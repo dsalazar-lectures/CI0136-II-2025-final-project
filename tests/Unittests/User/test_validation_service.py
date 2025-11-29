@@ -6,6 +6,12 @@ class TestValidationService(unittest.TestCase):
     def setUp(self):
         self.validation_service = ValidationService()
 
+        self.generic_msg = (
+            "error: The new password does not meet the security requirements "
+            "(minimum 8 characters and include at least one number, one uppercase letter, "
+            'and one special character (e.g. !@#$%^&*(),.?":{}|<>).'
+        )
+
     def test_validate_request_data_success(self):
         data = {"username": "test", "password": "123456", "email": "test@example.com"}
         required_fields = ["username", "password", "email"]
@@ -65,7 +71,7 @@ class TestValidationService(unittest.TestCase):
         is_valid, error = self.validation_service.validate_password_format("123")
 
         self.assertFalse(is_valid)
-        self.assertEqual(error, "Password must be at least 8 characters long.")
+        self.assertEqual(error, self.generic_msg)
 
     def test_validate_password_in_lower_case(self):
         is_valid, error = self.validation_service.validate_password_format(
@@ -73,7 +79,7 @@ class TestValidationService(unittest.TestCase):
         )
 
         self.assertFalse(is_valid)
-        self.assertEqual(error, "Password must contain at least one uppercase letter.")
+        self.assertEqual(error, self.generic_msg)
 
     def test_validate_password_without_num(self):
         is_valid, error = self.validation_service.validate_password_format(
@@ -81,7 +87,7 @@ class TestValidationService(unittest.TestCase):
         )
 
         self.assertFalse(is_valid)
-        self.assertEqual(error, "Password must contain at least one number.")
+        self.assertEqual(error, self.generic_msg)
 
     def test_validate_password_without_special_char(self):
         is_valid, error = self.validation_service.validate_password_format(
@@ -89,7 +95,7 @@ class TestValidationService(unittest.TestCase):
         )
 
         self.assertFalse(is_valid)
-        self.assertEqual(error, "Password must contain at least one special character.")
+        self.assertEqual(error, self.generic_msg)
 
 
 if __name__ == "__main__":

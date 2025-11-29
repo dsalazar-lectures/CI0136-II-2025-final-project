@@ -7,7 +7,6 @@ class MockUser:
         email=None,
         role="user",
         key=None,
-        token=None,
     ):
         self.id = id
         self.username = username
@@ -15,7 +14,6 @@ class MockUser:
         self.email = email
         self.role = role
         self.key = key
-        self.token = token
 
     def to_dict(self):
         return {

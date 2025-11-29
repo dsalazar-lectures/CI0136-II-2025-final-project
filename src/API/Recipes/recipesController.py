@@ -6,63 +6,54 @@ user_repository = UserRepository()
 
 
 def get_username_from_request():
-    auth_header = request.headers.get("Authorization")
+    user_id = request.args.get("user_id", type=int)
 
-    if not auth_header:
+    if not user_id:
         return None
 
-    parts = auth_header.split()
-
-    if len(parts) != 2 or parts[0].lower() != "bearer":
+    user = user_repository.get_user_by_id(user_id)
+    if not user:
         return None
 
-    token = parts[1]
-    user_dto = user_repository.get_user_by_token(token)
-    return user_dto.username if user_dto else None
+    return user.username
 
 
 def create_recipe_controller(data):
     username = get_username_from_request()
 
     if not username:
-        return 401, {
-            "error": "Proporcione un token valido en Authorization: Bearer <token>"
-        }
+        return 401, {"error": "Invalid user_id"}
 
     recipe = recipe_service.create_recipe(data, username)
 
     if recipe == -1:
-        return 400, {"error": "Se necesita información adicional sobre la receta"}
+        return 400, {"error": "Additional recipe information is required"}
 
-    return 201, {"message": "Receta creada exitosamente", "recipe": recipe.to_dict()}
+    return 201, {"message": "Recipe successfully created", "recipe": recipe.to_dict()}
 
 
 def delete_recipe_controller(recipe_id):
     username = get_username_from_request()
 
     if not username:
-        return 401, {
-            "error": "Proporcione un token valido en Authorization: Bearer <token>"
-        }
+        return 401, {"error": "Invalid user_id"}
 
     result = recipe_service.delete_recipe(recipe_id, username)
 
     if result is None:
-        return 404, {"error": "Receta no encontrada"}
+        return 404, {"error": "Recipe not found"}
 
     if result is False:
-        return 403, {"error": "No autorizado para eliminar esta receta"}
+        return 403, {"error": "Not authorized to delete this recipe"}
 
-    return 200, {"message": "Receta eliminada", "recipe": result.__str__()}
+    return 200, {"message": "Recipe successfully deleted", "recipe": result.__str__()}
 
 
 def update_recipe_controller(recipe_id, updates):
     username = get_username_from_request()
 
     if not username:
-        return 401, {
-            "error": "Proporcione un token valido en Authorization: Bearer <token>"
-        }
+        return 401, {"error": "Invalid user_id"}
 
     allowed_fields = {
         "name",
@@ -77,10 +68,33 @@ def update_recipe_controller(recipe_id, updates):
     result = recipe_service.update_recipe(recipe_id, safe_updates, username)
 
     if result == -1:
-        return 400, {"error": "Datos de actualización inválidos"}
+        return 400, {"error": "Invalid update data"}
     if result is None:
-        return 404, {"error": "Receta no encontrada"}
+        return 404, {"error": "Recipe not found"}
     if result is False:
-        return 403, {"error": "No autorizado para editar esta receta"}
+        return 403, {"error": "Not authorized to edit this recipe"}
 
     return 200, result.to_dict()
+
+
+def rate_recipe_controller(recipe_id, data):
+    username = get_username_from_request()
+
+    if not username:
+        return 401, {"error": "Invalid user_id"}
+
+    if "rating" not in data:
+        return 400, {"error": "'rating' is required (1 to 5)"}
+
+    result = recipe_service.rate_recipe(recipe_id, username, data["rating"])
+
+    if result is None:
+        return 404, {"error": "Recipe not found"}
+
+    if result is False:
+        return 403, {"error": "You have already rated this recipe"}
+
+    if result == -1:
+        return 400, {"error": "Invalid rating value (must be between 1 and 5)"}
+
+    return 200, {"message": "Rating submitted successfully", "recipe": result.to_dict()}

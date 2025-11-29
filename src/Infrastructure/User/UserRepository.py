@@ -17,18 +17,18 @@ class UserRepository(IUserRepository):
         if self.user_exists(user_dto.username, user_dto.email):
             return None, "User already exists", 400
 
-        created_user_data = self.user_csv.create_user(user_dto)
-        if created_user_data:
-            user_entity = User(
-                id=int(created_user_data["id"]),
-                username=created_user_data["username"],
-                password=created_user_data["password"],
-                email=created_user_data["email"],
-                role=created_user_data["role"],
-                key=created_user_data["key"],
-                token=created_user_data["token"],
+        created_user = self.user_csv.create_user(user_dto)
+        if created_user:
+            user = User(
+                id=int(created_user["id"]),
+                username=created_user["username"],
+                password=created_user["password"],
+                email=created_user["email"],
+                role=created_user["role"],
+                key=created_user["key"],
             )
-            return user_entity, "User created successfully", 201
+            return user, "User created successfully", 201
+
         return None, "Failed to create user", 400
 
     def get_user_by_username(self, username):
@@ -41,7 +41,19 @@ class UserRepository(IUserRepository):
                 email=db_user["email"],
                 role=db_user["role"],
                 key=db_user["key"],
-                token=db_user["token"],
+            )
+        return None
+
+    def get_user_by_email(self, email):
+        db_user = self.user_csv.get_user_by_email(email)
+        if db_user:
+            return UserDTO(
+                id=int(db_user["id"]),
+                username=db_user["username"],
+                password=db_user["password"],
+                email=db_user["email"],
+                role=db_user["role"],
+                key=db_user["key"],
             )
         return None
 
@@ -56,25 +68,17 @@ class UserRepository(IUserRepository):
             )
         return None
 
-    def get_user_by_token(self, token):
-        db_user = self.user_csv.get_user_by_token(token)
-        if db_user:
-            return UserDTO(
-                id=int(db_user["id"]),
-                username=db_user["username"],
-                password=db_user["password"],
-                email=db_user["email"],
-                role=db_user["role"],
-                key=db_user["key"],
-                token=db_user["token"],
-            )
-        return None
-
-    def update_user_token(self, username, token, key) -> bool:
-        return self.user_csv.update_user_token(username, token, key)
-
     def update_password(self, username, hashed_password):
-        updated = self.user_csv.update_password(username, hashed_password)
-        if updated:
-            return True, "Password updated successfully", 200
-        return False, "Failed to update password", 400
+        return self.user_csv.update_password(username, hashed_password)
+
+    def update_password_by_id(self, user_id, hashed_password):
+        return self.user_csv.update_password_by_id(user_id, hashed_password)
+
+    def update_user_key(self, username, new_key) -> bool:
+        return self.user_csv.update_user_key(username, new_key)
+
+    def update_email(self, username, new_email):
+        return self.user_csv.update_email(username, new_email)
+
+    def delete_user(self, user_id: int) -> bool:
+        return self.user_csv.delete_user(user_id)

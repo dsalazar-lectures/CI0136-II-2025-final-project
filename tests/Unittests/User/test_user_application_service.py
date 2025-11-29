@@ -5,6 +5,7 @@ from tests.Mocks.Users.mock_user_repo import MockUserRepository
 from tests.Mocks.Users.mock_encryption_service import MockEncryptionService
 from tests.Mocks.Users.mock_token_service import MockTokenService
 from tests.Mocks.Profile.mock_profile_service import MockProfileService
+from unittest.mock import patch
 
 
 class testUserApplicationService(unittest.TestCase):
@@ -14,6 +15,7 @@ class testUserApplicationService(unittest.TestCase):
         self.validation_service = ValidationService()
         self.token_service = MockTokenService()
         self.profile_service = MockProfileService()
+        self.password_reset_service = None
 
         self.user_app_service = UserApplicationService(
             user_repository=self.user_repository,
@@ -21,6 +23,7 @@ class testUserApplicationService(unittest.TestCase):
             encryption_service=self.encryption_service,
             token_service=self.token_service,
             profile_service=self.profile_service,
+            password_reset_service=self.password_reset_service,
         )
 
     def test_register_user_success(self):
@@ -239,9 +242,63 @@ class testUserApplicationService(unittest.TestCase):
         self.assertEqual(
             msg,
             {
-                "error": "The new password does not meet the security requirements (minimum 8 characters, numbers, uppercase, symbols)."
+                "error": 'The new password does not meet the security requirements (minimum 8 characters and include at least one number, one uppercase letter, and one special character (e.g. !@#$%^&*(),.?":{}|<>).'
             },
         )
+
+    def test_regenerate_key_success(self):
+        # register -> k1, regenerate -> k2
+        with patch.object(
+            self.user_app_service.token_service,
+            "generate_key",
+            side_effect=["k1", "k2"],
+        ):
+            self.user_app_service.register_user(
+                {
+                    "username": "testUser",
+                    "password": "Passw@rd123",
+                    "email": "test@example.com",
+                }
+            )
+
+            old_key = self.user_repository.get_user_by_username("testUser").key
+            self.assertEqual(old_key, "k1")
+
+            user2, resp, status = self.user_app_service.regenerate_key("testUser")
+
+            new_key = self.user_repository.get_user_by_username("testUser").key
+            self.assertNotEqual(old_key, new_key)
+            self.assertEqual(status, 200)
+            self.assertEqual(resp["message"], "Key regenerated successfully")
+
+    def test_regenerate_key_missing_header(self):
+        headers = {}
+        user, resp, status = self.user_app_service.regenerate_key(headers)
+        self.assertIsNone(user)
+        self.assertEqual(status, 404)
+        self.assertIn("error", resp)
+
+    def test_regenerate_key_invalid_or_expired(self):
+        self.user_app_service.register_user(
+            {
+                "username": "testUser",
+                "password": "Passw@rd123",
+                "email": "test@example.com",
+            }
+        )
+        user, _, token, _ = self.user_app_service.login_user(
+            {"username": "testUser", "password": "Passw@rd123"}
+        )
+        headers = {"Authorization": f"Bearer {token}"}
+
+        with patch("jwt.decode", return_value={"username": "testUser"}), patch.object(
+            self.user_app_service.token_service, "verify_token", return_value=False
+        ):
+            u, resp, status = self.user_app_service.regenerate_key(headers)
+
+        self.assertIsNone(u)
+        self.assertEqual(status, 404)
+        self.assertIn("error", resp)
 
 
 if __name__ == "__main__":

@@ -1,11 +1,19 @@
 from typing import List, Optional
 from src.Infrastructure.Ingredients.IngredientRepository import IngredientRepository
 from src.Model.Ingredients.Ingredients import Ingredient
+from src.Application.Interfaces.IExternalIngredientProvider import (
+    IExternalIngredientProvider,
+)
 
 
 class IngredientUseCase:
-    def __init__(self):
-        self.repository = IngredientRepository()
+    def __init__(
+        self,
+        repository: IngredientRepository,
+        external_providers: Optional[List[IExternalIngredientProvider]] = None,
+    ):
+        self.repository = repository
+        self.external_providers = external_providers or []
 
     def get_all_ingredients(self) -> List[Ingredient]:
         """Get all ingredients ordered alphabetically."""
@@ -16,8 +24,39 @@ class IngredientUseCase:
         return self.repository.get_by_id(ingredient_id)
 
     def get_ingredient_by_name(self, ingredient_name: str) -> Optional[Ingredient]:
-        """Get a specific ingredient by its name."""
-        return self.repository.get_by_name(ingredient_name)
+        """Busca localmente, luego externamente si no lo encuentra."""
+        local_result = self.repository.get_by_name(ingredient_name)
+        if local_result:
+            return local_result
+
+        results = [
+            provider.search_ingredient(ingredient_name)
+            for provider in self.external_providers
+            if provider is not None
+        ]
+
+        valid_results = [r for r in results if r is not None]
+
+        if not valid_results:
+            return None
+
+        base = valid_results[0]
+        combined_categories = set(base.categories)
+        combined_substitutes = set(base.substitutes)
+
+        for result in valid_results[1:]:
+            combined_categories.update(result.categories)
+            combined_substitutes.update(result.substitutes)
+
+        self.repository.create_ingredient(
+            name=base.name,
+            categories=list(combined_categories),
+            substitutes=list(combined_substitutes),
+            components=getattr(base, "components", []) or [],
+            recipe_count=getattr(base, "recipe_count", 0) or 0,
+        )
+        new_id = self.repository._next_id - 1
+        return self.repository.get_by_id(new_id)
 
     def create_ingredient(
         self, name, categories, substitutes, components, recipe_count=0
@@ -47,6 +86,14 @@ class IngredientUseCase:
         """Delete an ingredient from the ingredient dictionary"""
         return self.repository.delete_ingredient(ingredient_id)
 
+    def get_ingredients_by_category(self, ingredient_category: str) -> List[Ingredient]:
+        """Get all ingredients that belong to a specific category."""
+        return self.repository.get_by_category(ingredient_category)
 
-# Create a singleton instance to be imported by the routes
-ingredient_service = IngredientUseCase()
+
+try:
+    from .IngredientInjector import ingredient_service_instance as ingredient_service
+except ImportError:
+    # Esto manejará el error si la importación falla (ej. durante pruebas)
+    print("FATAL ERROR: Ingredient service dependency injection failed.")
+    ingredient_service = None

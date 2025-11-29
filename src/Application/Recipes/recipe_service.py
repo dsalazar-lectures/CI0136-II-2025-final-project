@@ -1,9 +1,14 @@
 import random
 from src.Infrastructure.Recipes.CSVRecipeRepository import CSVRecipeRepository
 from src.Application.Recipes.FilterComposer import FilterComposer
+from src.Application.Recipes.RecipePrioritizer import RecipePrioritizer
+from src.Shared.Logs.custom_logger import CustomLogger
+from src.Shared.Logs.log_action_names import LogActionNames
 
 recipe_repository = CSVRecipeRepository()
 filter_composer = FilterComposer()
+recipe_prioritizer = RecipePrioritizer()
+logger = CustomLogger()
 
 
 def get_all_recipes():
@@ -11,7 +16,26 @@ def get_all_recipes():
 
 
 def get_recipe_by_id(recipe_id):
-    return recipe_repository.get_by_id(recipe_id)
+    recipe = recipe_repository.get_by_id(recipe_id)
+    if not recipe:
+        logger.log(
+            level="error",
+            user="-",
+            role="-",
+            action=LogActionNames.SEARCH_RECIPE.value,
+            id_object=recipe.id,
+            description=f"Could not find recipe with ID {recipe_id}",
+        )
+    else:
+        logger.log(
+            level="info",
+            user="-",
+            role="-",
+            action=LogActionNames.SEARCH_RECIPE.value,
+            id_object=recipe.id,
+            description=f"Retrieved recipe with ID {recipe_id}",
+        )
+    return recipe
 
 
 def get_recipes_by_ingredient(ingredient):
@@ -21,21 +45,122 @@ def get_recipes_by_ingredient(ingredient):
 def create_recipe(recipe_data, username):
     recipe_data["author"] = username
     if not validate_create_data(recipe_data):
+        logger.log(
+            level="error",
+            user=username,
+            role="-",  # Can be changed if necessary
+            action=LogActionNames.CREATE_RECIPE.value,
+            id_object="-",
+            description=f"Validation error by {username}",
+        )
         return -1
-    return recipe_repository.add_recipe(recipe_data)
+    recipe = recipe_repository.add_recipe(recipe_data)
+
+    if recipe is None:
+        logger.log(
+            level="error",
+            user=username,
+            role="-",
+            action=LogActionNames.CREATE_RECIPE.value,
+            id_object="-",
+            description=f"Failed to create recipe {username}",
+        )
+        return -1
+    else:
+        logger.log(
+            level="info",
+            user=username,
+            role="-",
+            action=LogActionNames.CREATE_RECIPE.value,
+            id_object=recipe.id,
+            description=f"Recipe '{recipe.name}' created successfully by {username}",
+        )
+        return recipe
 
 
 def delete_recipe(recipe_id, username):
-    return recipe_repository.delete_if_owned(recipe_id, username)
+    recipe = recipe_repository.delete_if_owned(recipe_id, username)
+
+    if recipe is None:
+        logger.log(
+            level="error",
+            user=username,
+            role="-",
+            action=LogActionNames.DELETE_RECIPE.value,
+            id_object="-",
+            description=f"Recipe {recipe_id} not found",
+        )
+        return -1
+    elif recipe is False:
+        logger.log(
+            level="warning",
+            user=username,
+            role="-",
+            action=LogActionNames.DELETE_RECIPE.value,
+            id_object=recipe_id,
+            description=f"User {username} does not own recipe {recipe_id}",
+        )
+        return 0
+    else:
+        logger.log(
+            level="info",
+            user=username,
+            role="-",
+            action=LogActionNames.DELETE_RECIPE.value,
+            id_object=recipe_id,
+            description=f"Recipe {recipe_id} deleted successfully",
+        )
+        return recipe
 
 
 def update_recipe(recipe_id, updates, username):
     if not validate_data(updates):
+        logger.log(
+            level="error",
+            user=username,
+            role="-",
+            action=LogActionNames.UPDATE_RECIPE.value,
+            id_object=recipe_id,
+            description=f"Validation failed for update data in recipe {recipe_id}",
+        )
         return -1
-    return recipe_repository.update_if_owned(recipe_id, username, updates)
+    recipe = recipe_repository.update_if_owned(recipe_id, username, updates)
+
+    if recipe is None:
+        logger.log(
+            level="error",
+            user=username,
+            role="-",
+            action=LogActionNames.UPDATE_RECIPE.value,
+            id_object=recipe_id,
+            description=f"Recipe {recipe_id} not found",
+        )
+        return -1
+    elif recipe is False:
+        logger.log(
+            level="warning",
+            user=username,
+            role="-",
+            action=LogActionNames.UPDATE_RECIPE.value,
+            id_object=recipe_id,
+            description=f"User {username} does not own recipe {recipe_id}",
+        )
+        return 0
+    else:
+        logger.log(
+            level="info",
+            user=username,
+            role="-",
+            action=LogActionNames.UPDATE_RECIPE.value,
+            id_object=recipe_id,
+            description=f"Recipe {recipe_id} updated successfully by {username})",
+        )
+        return recipe
 
 
 def filter_recipes(filter_criteria):
+    if not validate_data(filter_criteria):
+        return -1
     all_recipes = recipe_repository.get_all()
     return filter_composer.apply_filters(all_recipes, filter_criteria)
 
@@ -80,9 +205,32 @@ def get_recipes_by_category(category):
     return recipe_repository.find_by_category(category)
 
 
+def get_random_recipe_by_categories(categories):
+    recipes = recipe_repository.find_by_categories(categories)
+    if not recipes:
+        return None
+
+    return random.choice(recipes)
+
+
 def get_random_recipe_by_category(category):
     recipes = recipe_repository.find_by_category(category)
     if not recipes:
         return None
 
     return random.choice(recipes)
+
+
+def get_prioritized_recipes(favorite_foods):
+    all_recipes = recipe_repository.get_all()
+    return recipe_prioritizer.prioritize(all_recipes, favorite_foods)
+
+
+def rate_recipe(recipe_id, username, rating):
+    if not isinstance(rating, int):
+        return -1
+
+    if rating < 1 or rating > 5:
+        return -1
+
+    return recipe_repository.rate_recipe(recipe_id, username, rating)

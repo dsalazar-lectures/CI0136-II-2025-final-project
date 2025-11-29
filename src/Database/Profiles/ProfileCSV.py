@@ -12,7 +12,13 @@ class ProfileCSV:
             with open(self.file_path, "w", newline="") as file:
                 writer = csv.writer(file)
                 writer.writerow(
-                    ["user_id", "favorite_foods", "unfavorite_foods", "favorite_menus"]
+                    [
+                        "user_id",
+                        "favorite_foods",
+                        "unfavorite_foods",
+                        "favorite_menus",
+                        "role",
+                    ]
                 )
 
     def create_profile(self, profile_data):
@@ -22,6 +28,7 @@ class ProfileCSV:
             "favorite_foods": ";".join(profile_data["favorite_foods"]),
             "unfavorite_foods": ";".join(profile_data["unfavorite_foods"]),
             "favorite_menus": ";".join(profile_data["favorite_menus"]),
+            "role": str(profile_data["role"]),
         }
 
         # Appends new profile to CSV file
@@ -33,6 +40,7 @@ class ProfileCSV:
                     "favorite_foods",
                     "unfavorite_foods",
                     "favorite_menus",
+                    "role",
                 ],
             )
             writer.writerow(new_profile)
@@ -64,6 +72,7 @@ class ProfileCSV:
                             if csv_row.get("favorite_menus", "")
                             else []
                         ),
+                        "role": str(csv_row.get("role")),
                     }
         return None
 
@@ -71,7 +80,13 @@ class ProfileCSV:
         if not os.path.exists(self.file_path):
             return None
 
-        fieldnames = ["user_id", "favorite_foods", "unfavorite_foods", "favorite_menus"]
+        fieldnames = [
+            "user_id",
+            "favorite_foods",
+            "unfavorite_foods",
+            "favorite_menus",
+            "role",
+        ]
         rows = []
         found = False
 
@@ -89,9 +104,10 @@ class ProfileCSV:
                                 ";".join(field_value) if field_value else ""
                             )
                         else:
-                            merged[field_name] = (
-                                field_value if field_value is not None else ""
-                            )
+                            if field_value is not None:
+                                merged[field_name] = field_value
+                            else:
+                                continue  # leave the field unchanged
                     rows.append(merged)
                 else:
                     rows.append(csv_row)
@@ -131,6 +147,7 @@ class ProfileCSV:
                     row["favorite_menus"] = ";".join(
                         profile_data.get("favorite_menus", [])
                     )
+                    row["role"] = str(profile_data.get("role"))
                     updated = True
                 rows.append(row)
 
@@ -141,3 +158,25 @@ class ProfileCSV:
                 writer.writerows(rows)
 
         return updated
+
+    def delete_profile(self, user_id: int) -> bool:
+        """Delete a profile by user_id"""
+        rows = []
+        deleted = False
+
+        with open(self.file_path, "r", newline="") as file:
+            reader = csv.DictReader(file)
+            fieldnames = reader.fieldnames
+            for row in reader:
+                if row["user_id"] == str(user_id):
+                    deleted = True
+                    continue  # Skip adding this row to the new list
+                rows.append(row)
+
+        if deleted:
+            with open(self.file_path, "w", newline="") as file:
+                writer = csv.DictWriter(file, fieldnames=fieldnames)
+                writer.writeheader()
+                writer.writerows(rows)
+
+        return deleted
