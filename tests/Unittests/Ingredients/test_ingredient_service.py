@@ -235,7 +235,9 @@ class IngredientServiceTestCase(unittest.TestCase):
 
         mock_service.get_ingredients_by_category.return_value = [milk, butter]
 
-        resp = self.client.post(f"{self.API_PREFIX}/search", json={"categories": ["dairy"]})
+        resp = self.client.post(
+            f"{self.API_PREFIX}/search", json={"categories": ["dairy"]}
+        )
         self.assertEqual(resp.status_code, 200)
         data = resp.get_json()
         self.assertIn("results", data)

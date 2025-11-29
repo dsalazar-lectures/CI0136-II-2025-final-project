@@ -110,9 +110,7 @@ def search_ingredients_body():
     if len(search_criteria) == 0:
         return (
             jsonify(
-                {
-                    "error": "A search criterion is required (names, ids, or categories)"
-                }
+                {"error": "A search criterion is required (names, ids, or categories)"}
             ),
             400,
         )
@@ -183,11 +181,14 @@ def _handle_single_name(name, simple):
     ingredient = ingredient_service.get_ingredient_by_name(name)
     if ingredient is None:
         return jsonify({"error": "Ingredient not found"}), 404
-    return jsonify(
-        {"id": ingredient.id, "name": ingredient.name}
-        if simple
-        else ingredient.to_json()
-    ), 200
+    return (
+        jsonify(
+            {"id": ingredient.id, "name": ingredient.name}
+            if simple
+            else ingredient.to_json()
+        ),
+        200,
+    )
 
 
 def _handle_multiple_names(names, simple):
@@ -239,7 +240,7 @@ def _parse_categories(data):
 
     categories = [cat for cat in items if cat]
     if not categories:
-        return jsonify({"error": "No valid categories found"}), 400    
+        return jsonify({"error": "No valid categories found"}), 400
     return categories
 
 
