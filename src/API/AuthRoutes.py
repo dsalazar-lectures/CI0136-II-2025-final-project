@@ -188,16 +188,10 @@ def delete_account():
     if not is_auth:
         return jsonify(response), status_code
     
-    actorname, _, _ = auth_service.get_username_from_token(request.headers)
-    actor = auth_service.user_app_service.user_repository.get_user_by_username(actorname)
-    roleActor = auth_service.profile_service.get_profile(actor.id).role
-    victim_name = request.get_json().get("username")
-    victim = auth_service.user_app_service.user_repository.get_user_by_username(victim_name)
-    roleVictim = auth_service.profile_service.get_profile(victim.id).role
+    is_auth = auth_service.is_superior_user(request)
     
-    if roleActor == roleVictim:
-        if roleActor != Role.GOD:
-            return jsonify({"error": "An Admin user cannot delete another Admin user"}), 403
+    if not is_auth:
+        return jsonify({"error": "The user has no permission to delete specified target"}), 403
     
     # Get username to delete from request body
     json_data = request.get_json()

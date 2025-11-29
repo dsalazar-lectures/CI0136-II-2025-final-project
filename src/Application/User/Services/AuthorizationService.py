@@ -50,3 +50,29 @@ class AuthorizationService(IAuthorizationService):
         if profile.role not in auth_roles:
             return False, {"error": "Unauthorized access"}, 403
         return True, {}, 200
+    
+    def is_target_owned(self, request):
+        username, _, _ = self.get_username_from_token(
+            request.headers
+        )
+        data = request.get_json()
+        return username == data["username"]
+    
+    def is_superior_user(self, request):
+        superior = self.is_target_owned(request) #check if the user is itself
+        if not superior:
+            username, _, _ = self.get_username_from_token(
+                request.headers
+            )
+            target_name = request.get_json().get("username")
+            user = self.user_app_service.user_repository.get_user_by_username(username)
+            target = self.user_app_service.user_repository.get_user_by_username(target_name)
+            user_profile = self.profile_service.get_profile(user.id)
+            target_profile = self.profile_service.get_profile(target.id)
+            
+            if user_profile.role == Role.GOD:
+                superior = True
+            elif user_profile.role == Role.ADMIN:
+                if target_profile.role == Role.USER:
+                    superior = True
+        return superior
