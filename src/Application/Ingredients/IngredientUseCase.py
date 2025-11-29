@@ -10,7 +10,7 @@ class IngredientUseCase:
     def __init__(
         self,
         repository: IngredientRepository,
-        external_providers: Optional[List[IExternalIngredientProvider]] = None
+        external_providers: Optional[List[IExternalIngredientProvider]] = None,
     ):
         self.repository = repository
         self.external_providers = external_providers or []
@@ -28,13 +28,13 @@ class IngredientUseCase:
         local_result = self.repository.get_by_name(ingredient_name)
         if local_result:
             return local_result
-        
+
         results = [
             provider.search_ingredient(ingredient_name)
             for provider in self.external_providers
             if provider is not None
         ]
-        
+
         valid_results = [r for r in results if r is not None]
 
         if not valid_results:
@@ -43,7 +43,7 @@ class IngredientUseCase:
         base = valid_results[0]
         combined_categories = set(base.categories)
         combined_substitutes = set(base.substitutes)
-        
+
         for result in valid_results[1:]:
             combined_categories.update(result.categories)
             combined_substitutes.update(result.substitutes)
@@ -57,7 +57,7 @@ class IngredientUseCase:
         )
         new_id = self.repository._next_id - 1
         return self.repository.get_by_id(new_id)
-        
+
     def create_ingredient(
         self, name, categories, substitutes, components, recipe_count=0
     ):

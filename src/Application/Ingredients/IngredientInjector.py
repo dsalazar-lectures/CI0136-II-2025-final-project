@@ -40,6 +40,6 @@ else:
 ingredient_repository = IngredientRepository()
 
 ingredient_service_instance = IngredientUseCase(
-    repository=ingredient_repository, external_providers=[
-        spoonacular_adapter, fooddata_adapter]
+    repository=ingredient_repository,
+    external_providers=[spoonacular_adapter, fooddata_adapter],
 )
