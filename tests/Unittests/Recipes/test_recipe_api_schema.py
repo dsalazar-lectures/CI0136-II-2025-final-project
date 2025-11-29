@@ -13,6 +13,7 @@ sys.path.insert(
     0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../"))
 )
 
+from src.Database.Recipes import TheMealDBAdapter
 from src.Database.Recipes import APIRecipesSchema
 
 
@@ -37,7 +38,7 @@ class TestGetApiData(unittest.TestCase):
         mock_response.raise_for_status = MagicMock()
         mock_get.return_value = mock_response
 
-        result = APIRecipesSchema.get_api_data()
+        result = TheMealDBAdapter.obtain_recipe()
 
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0]["idMeal"], "52772")
@@ -51,7 +52,7 @@ class TestGetApiData(unittest.TestCase):
         mock_response.raise_for_status = MagicMock()
         mock_get.return_value = mock_response
 
-        result = APIRecipesSchema.get_api_data()
+        result = TheMealDBAdapter.obtain_recipe()
 
         self.assertEqual(result, [])
 
@@ -62,7 +63,7 @@ class TestGetApiData(unittest.TestCase):
 
         mock_get.side_effect = requests.exceptions.RequestException("Connection error")
 
-        result = APIRecipesSchema.get_api_data()
+        result = TheMealDBAdapter.obtain_recipe()
 
         self.assertEqual(result, [])
 
@@ -77,7 +78,7 @@ class TestGetApiData(unittest.TestCase):
         )
         mock_get.return_value = mock_response
 
-        result = APIRecipesSchema.get_api_data()
+        result = TheMealDBAdapter.obtain_recipe()
 
         self.assertEqual(result, [])
 
@@ -101,7 +102,7 @@ class TestParseRecipe(unittest.TestCase):
             "strInstructions": "Cook the chicken...",
         }
 
-        result = APIRecipesSchema.parse_recipe(meal)
+        result = TheMealDBAdapter.parse_recipe(meal)
 
         self.assertEqual(result["id"], "52772")
         self.assertEqual(result["name"], "Teriyaki Chicken Casserole")
@@ -126,7 +127,7 @@ class TestParseRecipe(unittest.TestCase):
             "strInstructions": "Mix everything",
         }
 
-        result = APIRecipesSchema.parse_recipe(meal)
+        result = TheMealDBAdapter.parse_recipe(meal)
 
         self.assertEqual(result["ingredients"][0], "tomato")
         self.assertEqual(result["ingredients"][1], "onion")
@@ -144,7 +145,7 @@ class TestParseRecipe(unittest.TestCase):
             "strInstructions": "Simple dessert",
         }
 
-        result = APIRecipesSchema.parse_recipe(meal)
+        result = TheMealDBAdapter.parse_recipe(meal)
 
         self.assertEqual(len(result["ingredients"]), 1)
         self.assertEqual(result["ingredients"][0], "100g sugar")
@@ -159,7 +160,7 @@ class TestParseRecipe(unittest.TestCase):
             "strInstructions": "Do something",
         }
 
-        result = APIRecipesSchema.parse_recipe(meal)
+        result = TheMealDBAdapter.parse_recipe(meal)
 
         self.assertEqual(result["categories"], [])
 
@@ -172,7 +173,7 @@ class TestParseRecipe(unittest.TestCase):
             "strMeasure1": "1",
         }
 
-        result = APIRecipesSchema.parse_recipe(meal)
+        result = TheMealDBAdapter.parse_recipe(meal)
 
         self.assertEqual(result["calificationsSumatory"], 0)
         self.assertEqual(result["calificationsAmount"], 0)
@@ -303,7 +304,7 @@ class TestIntegration(unittest.TestCase):
         # This would normally happen in the module
         meals = mock_get_api()
         if meals:
-            parsed_recipes = [APIRecipesSchema.parse_recipe(meal) for meal in meals]
+            parsed_recipes = [TheMealDBAdapter.parse_recipe(meal) for meal in meals]
             mock_write(parsed_recipes)
 
         # Verify the flow
