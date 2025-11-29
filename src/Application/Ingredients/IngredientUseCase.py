@@ -10,10 +10,10 @@ class IngredientUseCase:
     def __init__(
         self,
         repository: IngredientRepository,
-        external_provider: Optional[IExternalIngredientProvider] = None,
+        external_providers: Optional[List[IExternalIngredientProvider]] = None,
     ):
         self.repository = repository
-        self.external_provider = external_provider
+        self.external_providers = external_providers or []
 
     def get_all_ingredients(self) -> List[Ingredient]:
         """Get all ingredients ordered alphabetically."""
@@ -25,23 +25,38 @@ class IngredientUseCase:
 
     def get_ingredient_by_name(self, ingredient_name: str) -> Optional[Ingredient]:
         """Busca localmente, luego externamente si no lo encuentra."""
-        local = self.repository.get_by_name(ingredient_name)
-        if local:
-            return local
+        local_result = self.repository.get_by_name(ingredient_name)
+        if local_result:
+            return local_result
 
-        if self.external_provider:
-            external = self.external_provider.search_ingredient(ingredient_name)
-            if external:
-                self.repository.create_ingredient(
-                    name=external.name,
-                    categories=getattr(external, "categories", []) or [],
-                    substitutes=getattr(external, "substitutes", []) or [],
-                    components=getattr(external, "components", []) or [],
-                    recipe_count=getattr(external, "recipe_count", 0) or 0,
-                )
-                new_id = self.repository._next_id - 1
-                return self.repository.get_by_id(new_id)
-        return None
+        results = [
+            provider.search_ingredient(ingredient_name)
+            for provider in self.external_providers
+            if provider is not None
+        ]
+
+        valid_results = [r for r in results if r is not None]
+
+        if not valid_results:
+            return None
+
+        base = valid_results[0]
+        combined_categories = set(base.categories)
+        combined_substitutes = set(base.substitutes)
+
+        for result in valid_results[1:]:
+            combined_categories.update(result.categories)
+            combined_substitutes.update(result.substitutes)
+
+        self.repository.create_ingredient(
+            name=base.name,
+            categories=list(combined_categories),
+            substitutes=list(combined_substitutes),
+            components=getattr(base, "components", []) or [],
+            recipe_count=getattr(base, "recipe_count", 0) or 0,
+        )
+        new_id = self.repository._next_id - 1
+        return self.repository.get_by_id(new_id)
 
     def create_ingredient(
         self, name, categories, substitutes, components, recipe_count=0
