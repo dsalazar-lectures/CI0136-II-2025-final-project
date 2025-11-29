@@ -24,16 +24,16 @@ def get_ingredient_by_id(ingredient_id):
     """Get a specific ingredient by its ID."""
     ingredient = ingredient_service.get_ingredient_by_id(ingredient_id)
     if not ingredient:
-        return jsonify({"error": "Ingrediente no encontrado"}), 404
+        return jsonify({"error": "Ingredient not found"}), 404
     return jsonify(ingredient.to_json())
 
 
 @ingredients_bp.route("/ingredients/create", methods=["POST"])
 def create_new_ingredient():
     """Create a new ingredient"""
-    name = request.json.get("name")
+    name = request.json.get("name") if request.is_json else None
     if not name:
-        return jsonify({"error": "Ingredient name is required"}), 404
+        return jsonify({"error": "Ingredient name is required"}), 400
     categories = request.json.get("categories")
     substitutes = request.json.get("substitutes")
     components = request.json.get("components")
@@ -46,6 +46,8 @@ def create_new_ingredient():
 @ingredients_bp.route("/ingredients/update", methods=["POST"])
 def update_ingredient():
     """Update one or more fields of an ingredient"""
+    if not request.is_json:
+        return jsonify({"error": "Missing request body"}), 400
     id = request.json.get("id")
     ingredient = ingredient_service.get_ingredient_by_id(id)
     if ingredient is None:
@@ -82,6 +84,8 @@ def update_ingredient():
 def delete_ingredient():
     """Delete an ingredient"""
     # User permissions need to be validated here
+    if not request.is_json:
+        return jsonify({"error": "Missing request body"}), 400
     id = request.json.get("id")
 
     result = ingredient_service.delete_ingredient(id)
@@ -106,15 +110,13 @@ def search_ingredients_body():
     if len(search_criteria) == 0:
         return (
             jsonify(
-                {
-                    "error": "Se requiere un criterio de búsqueda (names, ids, o categories)"
-                }
+                {"error": "A search criterion is required (names, ids, or categories)"}
             ),
             400,
         )
     if len(search_criteria) > 1:
         return (
-            jsonify({"error": "Solo se permite un criterio de búsqueda a la vez"}),
+            jsonify({"error": "Only one search criterion is allowed at a time"}),
             400,
         )
 
@@ -144,7 +146,7 @@ def _get_request_data():
     """Retrieves and validates the JSON body."""
     data = request.get_json(silent=True)
     if data is None:
-        return jsonify({"error": "Cuerpo JSON requerido"}), 400
+        return jsonify({"error": "Missing request body"}), 400
     return data
 
 
@@ -159,18 +161,18 @@ def _get_simple_flag(data):
 def _parse_names(data):
     raw = data.get("names")
     if raw is None:
-        return jsonify({"error": "Campo 'names' requerido en el body"}), 400
+        return jsonify({"error": "Field 'names' is required in the body"}), 400
 
     if isinstance(raw, str):
         items = [n.strip() for n in raw.split(",")]
     elif isinstance(raw, list):
         items = [str(n).strip() for n in raw]
     else:
-        return jsonify({"error": "Campo 'names' debe ser lista o string"}), 400
+        return jsonify({"error": "Field 'names' must be a list or a string"}), 400
 
     names = [n for n in items if n]
     if not names:
-        return jsonify({"error": "No se encontraron nombres válidos"}), 400
+        return jsonify({"error": "No valid names found"}), 400
 
     return names
 
@@ -178,11 +180,14 @@ def _parse_names(data):
 def _handle_single_name(name, simple):
     ingredient = ingredient_service.get_ingredient_by_name(name)
     if ingredient is None:
-        return jsonify({"error": "Ingrediente no encontrado"}), 404
-    return jsonify(
-        {"id": ingredient.id, "name": ingredient.name}
-        if simple
-        else ingredient.to_json()
+        return jsonify({"error": "Ingredient not found"}), 404
+    return (
+        jsonify(
+            {"id": ingredient.id, "name": ingredient.name}
+            if simple
+            else ingredient.to_json()
+        ),
+        200,
     )
 
 
@@ -205,35 +210,38 @@ def _handle_multiple_names(names, simple):
 
 def _parse_ids(data):
     raw = data.get("ids")
-    if not raw:
-        return []
+    if raw is None:
+        return jsonify({"error": "Field 'ids' is required in the body"}), 400
 
     try:
         if isinstance(raw, str):
-            items = [int(id.strip()) for id in raw.split(",")]
+            items = [int(id.strip()) for id in raw.split(",") if id.strip()]
         elif isinstance(raw, list):
             items = [int(id) for id in raw]
         else:
-            return jsonify({"error": "Campo 'ids' debe ser lista o string"}), 400
+            return jsonify({"error": "Field 'ids' must be a list or a string"}), 400
 
         return [id for id in items if id > 0]
     except ValueError:
-        return jsonify({"error": "Los IDs deben ser números enteros"}), 400
+        return jsonify({"error": "IDs must be integers"}), 400
 
 
 def _parse_categories(data):
     raw = data.get("categories")
-    if not raw:
-        return []
+    if raw is None:
+        return jsonify({"error": "Field 'categories' is required in the body"}), 400
 
     if isinstance(raw, str):
         items = [cat.strip() for cat in raw.split(",")]
     elif isinstance(raw, list):
         items = [str(cat).strip() for cat in raw]
     else:
-        return jsonify({"error": "Campo 'categories' debe ser lista o string"}), 400
+        return jsonify({"error": "Field 'categories' must be a list or a string"}), 400
 
-    return [cat for cat in items if cat]
+    categories = [cat for cat in items if cat]
+    if not categories:
+        return jsonify({"error": "No valid categories found"}), 400
+    return categories
 
 
 def _handle_multiple_ids(ids, simple):
