@@ -1,5 +1,10 @@
 from flask import Blueprint, jsonify, request
 from src.Application.Ingredients.IngredientUseCase import ingredient_service
+from src.Application.User.Services.AuthorizationService import create_default_auth_service
+from src.Model.Profiles.Roles import Role
+
+
+auth_service = create_default_auth_service()
 
 ingredients_bp = Blueprint("ingredients", __name__)
 
@@ -31,6 +36,14 @@ def get_ingredient_name(ingredient_name):
 
 @ingredients_bp.route("/ingredients/create", methods=["POST"])
 def create_new_ingredient():
+    is_auth, response, status_code = auth_service.is_authorized(
+        request.headers,
+        [Role.ADMIN, Role.GOD],
+    )
+
+    if not is_auth:
+        return jsonify(response), status_code
+    
     """Create a new ingredient"""
     name = request.json.get("name")
     if not name:
@@ -46,6 +59,14 @@ def create_new_ingredient():
 
 @ingredients_bp.route("/ingredients/update", methods=["POST"])
 def update_ingredient():
+    is_auth, response, status_code = auth_service.is_authorized(
+        request.headers,
+        [Role.ADMIN, Role.GOD],
+    )
+
+    if not is_auth:
+        return jsonify(response), status_code
+    
     """Update one or more fields of an ingredient"""
     id = request.json.get("id")
     ingredient = ingredient_service.get_ingredient_by_id(id)
@@ -81,6 +102,14 @@ def update_ingredient():
 
 @ingredients_bp.route("/ingredients/delete", methods=["POST"])
 def delete_ingredient():
+    is_auth, response, status_code = auth_service.is_authorized(
+        request.headers,
+        [Role.ADMIN, Role.GOD],
+    )
+
+    if not is_auth:
+        return jsonify(response), status_code
+    
     """Delete an ingredient"""
     # User permissions need to be validated here
     id = request.json.get("id")
