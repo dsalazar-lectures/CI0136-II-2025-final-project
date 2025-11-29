@@ -127,18 +127,18 @@ class TestTheMealDBAdapter(unittest.TestCase):
 
         self.assertEqual(result["id"], "52772")
         self.assertEqual(result["name"], "Teriyaki Chicken Casserole")
-        
+
         # Categories are stored as repr() strings
         categories = eval(result["categories"])
         self.assertIn("chicken", categories)
         self.assertIn("japanese", categories)
-        
+
         # Ingredients are stored as repr() strings
         ingredients = eval(result["ingredients"])
         self.assertEqual(len(ingredients), 3)
         self.assertEqual(ingredients[0], "500g chicken")
         self.assertEqual(ingredients[1], "2 tbsp soy sauce")
-        
+
         self.assertEqual(result["author"], "TheMealDB")
         self.assertEqual(result["portions"], 1)
         self.assertIsNone(result["duration"])
@@ -345,11 +345,17 @@ class TestLoadApiRecipes(unittest.TestCase):
     """Tests for load_api_recipes function"""
 
     @patch("src.Database.Recipes.APIRecipesSchema.Recipe")
-    @patch("builtins.open", new_callable=mock_open, read_data="id,name,categories,ingredients,duration,instructions,portions,author,calificationsSumatory,calificationsAmount,usersUsedRecipe\n123,Test Recipe,['chicken'],['chicken'],None,Cook it,1,TheMealDB,0,0,0\n")
+    @patch(
+        "builtins.open",
+        new_callable=mock_open,
+        read_data="id,name,categories,ingredients,duration,instructions,portions,author,calificationsSumatory,calificationsAmount,usersUsedRecipe\n123,Test Recipe,['chicken'],['chicken'],None,Cook it,1,TheMealDB,0,0,0\n",
+    )
     @patch.object(TheMealDBAdapter, "get_raw_data")
     @patch.object(TheMealDBAdapter, "parse_recipe")
     @patch("src.Database.Recipes.APIRecipesSchema.write_api_recipes")
-    def test_load_api_recipes(self, mock_write, mock_parse, mock_get_raw, mock_file, mock_recipe):
+    def test_load_api_recipes(
+        self, mock_write, mock_parse, mock_get_raw, mock_file, mock_recipe
+    ):
         """Test loading recipes from CSV"""
         # Mock the adapter methods
         mock_get_raw.return_value = [{"idMeal": "123"}]
@@ -376,10 +382,10 @@ class TestLoadApiRecipes(unittest.TestCase):
         # Verify adapter methods were called
         mock_get_raw.assert_called_once()
         mock_parse.assert_called_once()
-        
+
         # Verify write was called
         mock_write.assert_called_once()
-        
+
         # Verify Recipe constructor was called
         mock_recipe.assert_called()
 
@@ -407,7 +413,7 @@ class TestIntegration(unittest.TestCase):
         # Simulate the flow
         adapter = TheMealDBAdapter()
         meals = adapter.get_raw_data()
-        
+
         if meals:
             parsed_recipes = [adapter.parse_recipe(meal) for meal in meals]
             mock_write(parsed_recipes)
@@ -421,7 +427,7 @@ class TestIntegration(unittest.TestCase):
         self.assertEqual(parsed["id"], "52772")
         self.assertEqual(parsed["name"], "Teriyaki Chicken")
         self.assertEqual(parsed["author"], "TheMealDB")
-        
+
         # Categories and ingredients are stored as repr() strings
         categories = eval(parsed["categories"])
         self.assertIn("chicken", categories)
@@ -446,7 +452,7 @@ class TestIntegration(unittest.TestCase):
 
         self.assertEqual(parsed["id"], "123")
         self.assertEqual(parsed["name"], "Test Meal")
-        
+
         # Ingredients are stored as repr() strings
         ingredients = eval(parsed["ingredients"])
         self.assertIn("1 cup ingredient", ingredients)
